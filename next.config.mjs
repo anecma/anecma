@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirect() {
+    return [{ source: "/", destination: "/pilih-gender", permanent: true }];
+  },
   images: {
     domains: ["res.cloudinary.com"],
-  },
-  async redirect() {
-    return [{ source: "/", destination: "/pilih-gender", permanent: false }];
   },
 };
 
