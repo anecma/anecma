@@ -152,7 +152,7 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
   setImages,
 }) => {
   return (
-    <div className="ckeditor-container">
+    <div className="prose ckeditor-container">
       <CKEditor
         editor={ClassicEditor}
         data={data}
