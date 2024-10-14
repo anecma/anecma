@@ -10,7 +10,7 @@
 .main-container {
   font-family: "Lato";
   width: fit-content;
-  margin-left: 2rem;
+  margin-left: auto;
   margin-right: auto;
 }
 
@@ -23,10 +23,6 @@
 .editor-container_classic-editor .editor-container__editor {
   min-width: 795px;
   max-width: 795px;
-}
-
-/* .editor-container_include-block-toolbar {
-  margin-left: 42px;
 }
 
 .ck-content h3.category {
@@ -155,13 +151,3 @@
   color: #000;
   box-shadow: 5px 5px 0 #b3b3b3;
 }
-.ckeditor-container {
-  height: 300px; 
-  overflow-y: auto;
-  border: 1px solid #ccc; 
- 
-}
-
-.ck-editor__editable {
-  min-height: 300px; 
-} */
