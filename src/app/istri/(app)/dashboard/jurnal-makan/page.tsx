@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
+import { Toaster, toast } from "sonner";
  
 // Opsi waktu makan
 const mealOptions = [
@@ -247,6 +248,8 @@ const FoodLogForm = () => {
         await axiosInstance.post(endpoint, formattedData, {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
+        
+      toast.success("Berhasil Menyimpan.", { duration: 2000 });
       } catch (error) {
         console.error("Error saving data:", error);
       }
@@ -263,6 +266,7 @@ const FoodLogForm = () => {
  
   return (
     <div className="">
+      <Toaster richColors position="top-center" />
       <div className="m-5 flex flex-row">
         <p className="text-2xl font-bold">Jurnal Makan</p>
       </div>

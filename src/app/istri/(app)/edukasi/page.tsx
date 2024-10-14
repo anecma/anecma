@@ -53,11 +53,11 @@ export default function EdukasiPage() {
   }, [session, status]);
 
   return (
-    <main className="m-5">
+    <main className="m-5 mb-20">
       <h1 className="text-2xl font-bold mb-5">Edukasi</h1>
       <hr className="mb-5 h-0.5 border-t-0 bg-gray-300" />
 
-      <div className="mx-5 space-y-5">
+      <div className=" space-y-5">
         {loading ? (
           // Show skeleton loaders while loading
           Array.from({ length: 3 }).map((_, index) => (
