@@ -181,7 +181,7 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
               "italic",
               "underline",
               "|",
-              "mediaEmbed", 
+              "mediaEmbed",
               "link",
               "insertTable",
               "highlight",
@@ -258,7 +258,7 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
             TableToolbar,
             TextPartLanguage,
             TextTransformation,
-            Title,
+            // Title,
             TodoList,
             Underline,
             Undo,
@@ -395,9 +395,17 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
           menuBar: { isVisible: true },
           style: {
             definitions: [
-              { name: "Article category", element: "h3", classes: ["category"] },
+              {
+                name: "Article category",
+                element: "h3",
+                classes: ["category"],
+              },
               { name: "Title", element: "h2", classes: ["document-title"] },
-              { name: "Subtitle", element: "h3", classes: ["document-subtitle"] },
+              {
+                name: "Subtitle",
+                element: "h3",
+                classes: ["document-subtitle"],
+              },
               { name: "Info box", element: "p", classes: ["info-box"] },
               {
                 name: "Side quote",
@@ -431,7 +439,9 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
           mediaEmbed: { previewsInData: true },
         }}
         onReady={(editor) => {
-          editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+          editor.plugins.get("FileRepository").createUploadAdapter = (
+            loader
+          ) => {
             return new MyCustomUploadAdapter(loader, editor, setImages);
           };
         }}
