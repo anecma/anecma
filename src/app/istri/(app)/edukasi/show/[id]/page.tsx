@@ -93,16 +93,19 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
         <div className="flex flex-col items-center">
           <h1 className="text-2xl font-bold text-center">{edukasi.judul}</h1>
           <Image
-            className="w-48 h-48 rounded-lg mt-4" 
-            src={edukasi.thumbnail} 
-            alt={edukasi.judul} 
-            width={192} 
-            height={192} 
+            className="w-48 h-48 rounded-lg mt-4"
+            src={edukasi.thumbnail}
+            alt={edukasi.judul}
+            width={192}
+            height={192}
             priority
           />
         </div>
         <div>
-          <div className="mt-4" dangerouslySetInnerHTML={{ __html: edukasi.konten }} />
+          <div
+            className="prose mt-4"
+            dangerouslySetInnerHTML={{ __html: edukasi.konten }}
+          />
         </div>
       </div>
     </main>
