@@ -56,7 +56,7 @@ import {
   Undo,
 } from "ckeditor5";
 import translations from "ckeditor5/translations/id.js";
-import "ckeditor5/ckeditor5.js";
+import "ckeditor5/ckeditor5.css";
 import "../../app/CustomCKEditor.css";
 
 import {
