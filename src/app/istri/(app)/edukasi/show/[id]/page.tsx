@@ -90,7 +90,7 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
             {edukasi.kategori}
           </p>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center mt-4">
           <h1 className="text-2xl font-bold text-center">{edukasi.judul}</h1>
           <Image
             className="w-48 h-48 rounded-lg mt-4"
