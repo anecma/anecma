@@ -68,8 +68,6 @@ import {
   TodoList,
   Underline,
   Undo,
-  PasteFromOffice,
-  ImageInsert,
 } from "ckeditor5";
 import translations from "ckeditor5/translations/id.js";
 import "ckeditor5/ckeditor5.css";
