@@ -9,7 +9,7 @@ interface UserData {
   hari_pertama_haid: string;
   wilayah_binaan: string;
   kelurahan: string;
-  desa: string; 
+  desa: string;
   tempat_periksa_kehamilan: string;
 }
 
@@ -22,22 +22,74 @@ interface ApiResponse {
 
 const kelurahanData: { [key: string]: string[] } = {
   Sangkrah: ["Sangkrah", "Kedunglumbu", "Mojo", "Semanggi"],
-  Kratonan: ["Gilingan", "Kestalan", "Punggawan"],
-  Gilingan: ["Joyotakan", "Danusuman", "Tipes", "Serengan"],
+  Kratonan: ["Kratonan", "Danukusuman", "Joyotakan"],
+  Gilingan: ["Gilingan", "Kestalan", "Punggawan"],
+  "Bukit Kemuning": ["Sukamenanti"],
 };
 
 const desaData: { [key: string]: string[] } = {
-  Sangkrah: ["Desa Sangkrah 1", "Desa Sangkrah 2"],
-  Kedunglumbu: ["Desa Kedunglumbu 1", "Desa Kedunglumbu 2"],
-  Mojo: ["Desa Mojo 1", "Desa Mojo 2"],
-  Semanggi: ["Desa Semanggi 1", "Desa Semanggi 2"],
-  Gilingan: ["Desa Gilingan 1", "Desa Gilingan 2"],
-  Kestalan: ["Desa Kestalan 1", "Desa Kestalan 2"],
-  Punggawan: ["Desa Punggawan 1", "Desa Punggawan 2"],
-  Joyotakan: ["Desa Joyotakan 1", "Desa Joyotakan 2"],
-  Danusuman: ["Desa Danusuman 1", "Desa Danusuman 2"],
-  Tipes: ["Desa Tipes 1", "Desa Tipes 2"],
-  Serengan: ["Desa Serengan 1", "Desa Serengan 2"],
+  Sangkrah: [
+    "Demangan",
+    "Sangkrah",
+    "Dadapsari",
+    "Sampangan",
+    "Dadapan",
+    "Sawahan",
+    "Ngepung",
+    "Mbelingan",
+  ],
+  Kedunglumbu: [
+    "Palugunan",
+    "Yosodipuran",
+    "Prawiropuran",
+    "Nogobandan",
+    "Kranggan",
+    "Jiwoleksanan",
+    "Tegalkonas",
+    "Kedunglumbu",
+    "Lojiwetan",
+  ],
+  Mojo: ["Kenteng", "Kenteng Baru", "Semanggi Kidul", "Silir"],
+  Semanggi: [
+    "Dalangan",
+    "Dewutan",
+    "Dukuh",
+    "Losari",
+    "Mipitan",
+    "Sampangan",
+    "Sanggungan",
+    "Semanggi",
+  ],
+  Gilingan: [
+    "Bibis Kulon",
+    "Bibis Wetan",
+    "Cinderejo",
+    "Cinderejo Kidul",
+    "Cinderejo Lor",
+    "Gilingan",
+    "Gumunggung",
+    "Margorejo",
+    "Ngemplak Rejosari",
+    "Rejosari",
+  ],
+  Kestalan: ["Kandangdoro", "Kauman Pasar Legi", "Kesatalan", "Ngebrusan"],
+  Punggawan: ["Punggawan", "Madyotaman", "Bromantakan", "Pethetan"],
+  Joyotakan: [
+    "Joyotakan",
+    "Joyotakan Wetan",
+    "Mijipinilihan",
+    "Mijipinilihan Kidul",
+  ],
+  Danukusuman: [
+    "Danukusuman",
+    "Dawung Wetan",
+    "Grobagan",
+    "Jogoprajan",
+    "Jogosuran",
+    "Kajen",
+    "Mijipinilihan Lor",
+  ],
+  Sukamenanti: ["Sukamenanti"],
 };
 
 export default function ProfilPage() {
@@ -77,7 +129,6 @@ export default function ProfilPage() {
 
     fetchUserData();
   }, [session, status]);
-  
 
   const handleEditToggle = () => {
     setIsEditing((prev) => !prev);
@@ -110,10 +161,10 @@ export default function ProfilPage() {
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
     const { id, value } = e.target;
-  
+
     // Memperbarui data yang dapat diedit
     setEditableData((prev) => (prev ? { ...prev, [id]: value } : null));
-  
+
     // Reset kelurahan dan desa jika wilayah_binaan berubah
     if (id === "wilayah_binaan") {
       setKelurahanOptions(kelurahanData[value] || []);
@@ -122,23 +173,31 @@ export default function ProfilPage() {
       );
       setDesaOptions([]); // Reset opsi desa
     }
-  
+
     // Set opsi desa berdasarkan kelurahan yang dipilih
     if (id === "kelurahan") {
       setDesaOptions(desaData[value] || []);
       setEditableData((prev) => (prev ? { ...prev, desa: "" } : null)); // Reset desa saat kelurahan berubah
     }
-  
+
     // Logika untuk tempat pemeriksaan kehamilan
     if (id === "tempat_periksa_kehamilan") {
       if (value === "Puskesmas") {
-        setEditableData((prev) => (prev ? { ...prev, someOtherField: "" } : null));
+        setEditableData((prev) =>
+          prev ? { ...prev, someOtherField: "" } : null
+        );
       } else if (value === "Puskesmas") {
-        setEditableData((prev) => (prev ? { ...prev, someOtherField: "" } : null));
+        setEditableData((prev) =>
+          prev ? { ...prev, someOtherField: "" } : null
+        );
       } else if (value === "Bidan Praktik Mandiri") {
-        setEditableData((prev) => (prev ? { ...prev, someOtherField: "" } : null));
-      }else if (value === "Klinik SPOG") {
-        setEditableData((prev) => (prev ? { ...prev, someOtherField: "" } : null));
+        setEditableData((prev) =>
+          prev ? { ...prev, someOtherField: "" } : null
+        );
+      } else if (value === "Klinik SPOG") {
+        setEditableData((prev) =>
+          prev ? { ...prev, someOtherField: "" } : null
+        );
       }
       //
       if (!value) {
@@ -147,12 +206,10 @@ export default function ProfilPage() {
       }
     }
   };
-  
-  
 
   return (
     <main>
-       <Toaster richColors position="top-center" />
+      <Toaster richColors position="top-center" />
       <div className="m-5 flex flex-row">
         <p className="text-2xl font-bold">Halaman Profil</p>
       </div>
@@ -208,6 +265,7 @@ export default function ProfilPage() {
                 <option value="Sangkrah">Sangkrah</option>
                 <option value="Kratonan">Kratonan</option>
                 <option value="Gilingan">Gilingan</option>
+                <option value="Bukit Kemuning">Bukit Kemuning</option>
               </select>
               <label
                 htmlFor="wilayah_binaan"
@@ -287,9 +345,11 @@ export default function ProfilPage() {
               >
                 <option value="" disabled>
                   Tempat Pemeriksaan Kehamilan
-                </option> 
+                </option>
                 <option value="Puskesmas">Puskesmas</option>
-                <option value="Bidan Praktik Mandir">Bidan Praktik Mandiri</option>
+                <option value="Bidan Praktik Mandir">
+                  Bidan Praktik Mandiri
+                </option>
                 <option value="Klinik SPOG">Klinik SPOG</option>
               </select>
               <label

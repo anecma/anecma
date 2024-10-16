@@ -35,30 +35,35 @@ export default function KalkulatorAnemiaPage() {
           const userResponse = await axiosInstance.get("/istri/get-user", {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           });
-  
+
           if (userResponse.data.success) {
             const { riwayat_hb } = userResponse.data.data.user;
-  
+
             setUserData((prevState) => ({
               ...prevState,
               usia_kehamilan: riwayat_hb?.usia_kehamilan || "",
               hasil_hb_terakhir: riwayat_hb?.nilai_hb || "",
             }));
-  
-            const giziResponse = await axiosInstance.get("/istri/dashboard/get-latest-jurnal-makan", {
-              headers: { Authorization: `Bearer ${session.accessToken}` },
-            });
-  
+
+            const giziResponse = await axiosInstance.get(
+              "/istri/dashboard/get-latest-jurnal-makan",
+              {
+                headers: { Authorization: `Bearer ${session.accessToken}` },
+              }
+            );
+
             if (giziResponse.data.success) {
               const { hasil_gizi } = giziResponse.data.data;
 
-              
               setUserData((prevState) => ({
                 ...prevState,
                 hasil_gizi: hasil_gizi || "",
               }));
             } else {
-              console.warn("Failed to fetch hasil_gizi:", giziResponse.data.message);
+              console.warn(
+                "Failed to fetch hasil_gizi:",
+                giziResponse.data.message
+              );
             }
           }
         } catch (error) {
@@ -66,10 +71,10 @@ export default function KalkulatorAnemiaPage() {
         }
       }
     };
-  
+
     fetchUserData();
   }, [session, status]);
-  
+
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -82,15 +87,21 @@ export default function KalkulatorAnemiaPage() {
 
   const handleCalculateRisk = async () => {
     try {
-      const response = await axiosInstance.post("/istri/dashboard/kalkulator-anemia", userData, {
-        headers: { Authorization: `Bearer ${session?.accessToken}` },
-      });
-  
+      const response = await axiosInstance.post(
+        "/istri/dashboard/kalkulator-anemia",
+        userData,
+        {
+          headers: { Authorization: `Bearer ${session?.accessToken}` },
+        }
+      );
+
       if (response.data.success) {
-        
         // Simpan hasil respon ke localStorage
-        localStorage.setItem('Resiko anemia', JSON.stringify(response.data.data));
-        
+        localStorage.setItem(
+          "Resiko anemia",
+          JSON.stringify(response.data.data)
+        );
+
         // Redirect to the results page
         window.location.href = `/istri/dashboard/kalkulator-anemia/hasil`;
       } else {
@@ -102,8 +113,6 @@ export default function KalkulatorAnemiaPage() {
       // Handle network or other errors
     }
   };
-  
-  
 
   const handleAnemiaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -138,7 +147,7 @@ export default function KalkulatorAnemiaPage() {
               htmlFor="usia_kehamilan"
               className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
             >
-              Usia Kehamilan
+              Usia Kehamilan (Minggu)
             </label>
           </div>
 
