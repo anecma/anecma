@@ -96,7 +96,7 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
           <h1 className="text-2xl font-bold text-center">{edukasi.judul}</h1>
         </div>
         <article
-          className="prose prose-base mt-4"
+          className="ck-content prose prose-base mt-4"
           dangerouslySetInnerHTML={{ __html: edukasi.konten }}
         />
       </div>
