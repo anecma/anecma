@@ -103,7 +103,7 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
         </div>
         <div>
           <div
-            className="prose-xl mt-4"
+            className="mt-4"
             dangerouslySetInnerHTML={{ __html: edukasi.konten }}
           />
         </div>
