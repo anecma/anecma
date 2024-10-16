@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useSession } from "next-auth/react"; // Import useSession
 import axiosInstance from "@/libs/axios"; // Ensure this is your configured axios instance
 
+import "ckeditor5/dist/ckeditor5-content.css";
+
 interface Edukasi {
   id: number;
   created_by: number;
@@ -92,21 +94,11 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
         </div>
         <div className="flex flex-col items-center mt-4">
           <h1 className="text-2xl font-bold text-center">{edukasi.judul}</h1>
-          {/* <Image
-            className="w-48 h-48 rounded-lg mt-4"
-            src={edukasi.thumbnail}
-            alt={edukasi.judul}
-            width={192}
-            height={192}
-            priority
-          /> */}
         </div>
-        <div>
-          <article
-            className="prose prose-base mt-4"
-            dangerouslySetInnerHTML={{ __html: edukasi.konten }}
-          />
-        </div>
+        <article
+          className="prose prose-base mt-4"
+          dangerouslySetInnerHTML={{ __html: edukasi.konten }}
+        />
       </div>
     </main>
   );
