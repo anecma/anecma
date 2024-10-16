@@ -366,6 +366,10 @@ const CustomCKEditor: React.FC<CustomCKEditorProps> = ({
               "imageStyle:breakText",
               "|",
               "resizeImage",
+              "|",
+              "imageStyle:alignLeft",
+              "imageStyle:full",
+              "imageStyle:alignRight",
             ],
           },
           htmlSupport: {
