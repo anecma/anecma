@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react"; // Import useSession
 import axiosInstance from "@/libs/axios"; // Ensure this is your configured axios instance
 
-import "ckeditor5/dist/ckeditor5-content.css";
+import "ckeditor5/ckeditor5-content.css";
 
 interface Edukasi {
   id: number;
