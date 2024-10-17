@@ -16,7 +16,11 @@ declare module "next-auth" {
 
 interface UserData {
   name: string;
-
+  usia: number;
+  resiko_anemia: {
+    hasil_hb: number;
+    resiko: string;
+  }[];
 }
 
 interface ApiResponse {
@@ -35,22 +39,29 @@ export default function DashboardPage() {
     async function fetchUserData() {
       if (status === "authenticated" && session?.accessToken) {
         try {
-          const response = await axiosInstance.get<ApiResponse>("/istri/get-user", {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
+          const response = await axiosInstance.get<ApiResponse>(
+            "/istri/get-user",
+            {
+              headers: { Authorization: `Bearer ${session.accessToken}` },
+            }
+          );
           setUserData(response.data.data.user);
+          // console.log(response.data.data.user);
         } catch (error) {
           console.error("Error fetching user data:", error);
           setError("Failed to load user data.");
         }
       } else if (status === "unauthenticated") {
         setError("You need to be logged in.");
-       
       }
     }
 
     fetchUserData();
   }, [session, status]);
+
+  // Ambil nilai HB dan risiko dari userData
+  const hbValue = userData?.resiko_anemia[0]?.hasil_hb || null;
+  const anemiaRisk = userData?.resiko_anemia[0]?.resiko || null;
 
   return (
     <main>
@@ -73,9 +84,21 @@ export default function DashboardPage() {
           <div className="flex flex-col space-y-2">
             <p className="text-lg font-bold">Status Anemia</p>
             <div className="flex flex-row space-x-2 items-center">
-              <p className="text-green-pastel">Rendah</p>
-              <FaCircle className="w-1 h-1" />
-              <p>HB: 13</p>
+              {anemiaRisk && (
+                <>
+                  <p
+                    className={`text-${
+                      anemiaRisk === "rendah" ? "green-500" : "red-500"
+                    }`}
+                  >
+                    {anemiaRisk.charAt(0).toUpperCase() + anemiaRisk.slice(1)}
+                  </p>
+                  <FaCircle className="w-1 h-1" />
+                  <p>
+                    HB: {hbValue !== null ? hbValue : "Data tidak tersedia"}
+                  </p>
+                </>
+              )}
             </div>
           </div>
           <div>

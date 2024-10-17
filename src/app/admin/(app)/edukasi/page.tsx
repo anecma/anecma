@@ -255,7 +255,6 @@ const DataTable: React.FC = () => {
               <thead>
                 <tr>
                   <th className="px-4 py-2 text-left text-gray-600">Judul</th>
-                  <th className="px-4 py-2 text-left text-gray-600">Konten</th>
                   <th className="px-4 py-2 text-left text-gray-600">Jenis</th>
                   <th className="px-4 py-2 text-left text-gray-600">
                     Kategori
@@ -270,7 +269,6 @@ const DataTable: React.FC = () => {
                     className={index % 2 === 0 ? "bg-purple-100" : "bg-white"}
                   >
                     <td className="px-4 py-2">{item.judul}</td>
-                    <td className="px-4 py-2">{renderKonten(item.konten)}</td>
                     <td className="px-4 py-2">{item.jenis}</td>
                     <td className="px-4 py-2">{item.kategori}</td>
                     <td className="px-4 py-2">
