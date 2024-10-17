@@ -551,7 +551,11 @@ const FoodLogForm = () => {
           {categories.map((category) => (
             <div key={category} className="mb-5">
               <h2 className="text-center text-xl mb-2">
-                Berapa porsi {category.replace(/([A-Z])/g, " $1").toLowerCase()}{" "}
+                Berapa porsi{" "}
+                {category
+                  .replace(/_/g, " ")
+                  .replace(/([A-Z])/g, " $1")
+                  .toLowerCase()}{" "}
                 yang Anda konsumsi saat ini?
               </h2>
               <div className="flex overflow-x-auto gap-5 py-2.5">
