@@ -259,7 +259,6 @@ const mealCategories = {
   ],
 };
 
-
 const mapPortionValue = (value: number) => {
   if (value === 0.5) return "0.5";
   if (value === 1) return "1";
@@ -282,7 +281,8 @@ const FoodLogForm = () => {
   >({});
 
   const [usiakehamilan, setUsiaKehamilan] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
   const [savedImageSrc, setSavedImageSrc] = useState("");
   const [imageSrc, setImageSrc] = useState("");
   const { data: session, status } = useSession();
@@ -456,7 +456,7 @@ const FoodLogForm = () => {
           }
 
           setSavedImageSrc(imageSrc);
-          setIsModalOpen(true); 
+          setIsSaveModalOpen(true);
         }
 
         toast.success("Berhasil Menyimpan.", { duration: 2000 });
@@ -470,29 +470,33 @@ const FoodLogForm = () => {
 
   const openModal = () => {
     let imageSrc = "";
-  
+
     // Validasi usia kehamilan
-    if (typeof usiakehamilan !== 'number') {
+    if (typeof usiakehamilan !== "number") {
       console.error("Usia kehamilan harus berupa angka");
       return;
     }
-  
+
     if (usiakehamilan < 12) {
       imageSrc = "/images/TM1/Edukasi-isi-piringku-TM1.png";
     } else {
-      imageSrc = "/images/TM2/Edukasi-isi-piringku-TM2-TM3.png"; 
+      imageSrc = "/images/TM2/Edukasi-isi-piringku-TM2-TM3.png";
     }
-  
+
     if (imageSrc) {
       setImageSrc(imageSrc);
-      setIsModalOpen(true);
+      setIsGuideModalOpen(true);
     } else {
       console.error("Image source is not set");
     }
   };
-  
-  const closeModal = () => {
-    setIsModalOpen(false);
+
+  const closeSaveModal = () => {
+    setIsSaveModalOpen(false);
+  };
+
+  const closeGuideModal = () => {
+    setIsGuideModalOpen(false);
   };
 
   const categories = Object.keys(mealCategories) as Array<
@@ -505,8 +509,8 @@ const FoodLogForm = () => {
     <div className="">
       <Toaster richColors position="top-center" />
       <ImageModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isSaveModalOpen}
+        onClose={closeSaveModal}
         imageSrc={savedImageSrc}
       />
       <div className="m-5 flex flex-row justify-between items-center">
@@ -520,8 +524,8 @@ const FoodLogForm = () => {
         </button>
 
         <ImageModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
+          isOpen={isGuideModalOpen}
+          onClose={closeGuideModal}
           imageSrc={imageSrc}
         />
       </div>
