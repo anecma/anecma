@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
 import { FaRegEdit } from "react-icons/fa";
 import { Toaster, toast } from "sonner";
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 interface UserData {
   nama_suami?: string;
@@ -89,7 +90,8 @@ export default function ProfilPage() {
   return (
     <main>
       <Toaster richColors position="top-center" />
-      <div className="m-5 flex flex-row">
+      <div className="m-5 flex flex-row items-center">
+        <BackButtonNavigation className="w-10 h-10" />
         <p className="text-2xl font-bold">Halaman Profil</p>
       </div>
 
@@ -159,7 +161,13 @@ export default function ProfilPage() {
                 className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
                 disabled={saving}
               >
-                {saving ? <span>Saving...</span> : <><FaRegEdit /> Simpan</>}
+                {saving ? (
+                  <span>Saving...</span>
+                ) : (
+                  <>
+                    <FaRegEdit /> Simpan
+                  </>
+                )}
               </button>
             ) : (
               <button

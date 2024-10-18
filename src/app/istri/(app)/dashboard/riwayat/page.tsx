@@ -5,10 +5,13 @@ import { FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
+import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
+
 import axiosInstance from "@/libs/axios";
 import { useSession } from "next-auth/react";
 import { AxiosError } from "axios";
 import { Toaster, toast } from "sonner";
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 export default function RiwayatPage() {
   const [nilaiHb, setNilaiHb] = useState<string>("");
@@ -115,8 +118,9 @@ export default function RiwayatPage() {
 
   return (
     <main>
-      <div className="m-5 flex flex-row">
+      <div className="m-5 flex flex-row items-center">
         <Toaster richColors position="top-center" />
+        <BackButtonNavigation className="w-10 h-10" />
         <p className="text-2xl font-bold">Data Pemeriksaan Hemoglobin (HB)</p>
       </div>
 
@@ -164,14 +168,8 @@ export default function RiwayatPage() {
             </label>
           </div>
           <hr className="w-full h-0.5 border-t-0 bg-gray-300" />
-          {/* Tombol Riwayat & Simpan */}
+          {/* Tombol Simpan */}
           <div className="flex flex-row self-end">
-            <button
-              type="button"
-              className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2"
-            >
-              Riwayat
-            </button>
             <button
               type="button"
               onClick={handleSubmit}

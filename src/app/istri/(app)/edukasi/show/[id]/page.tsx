@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react"; // Import useSession
 import axiosInstance from "@/libs/axios"; // Ensure this is your configured axios instance
 
 import "ckeditor5/ckeditor5-content.css";
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 interface Edukasi {
   id: number;
@@ -80,7 +81,10 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
 
   return (
     <main className="m-5 mb-20">
-      <p className="text-2xl font-bold">Edukasi</p>
+      <div className="flex flex-row items-center mb-5">
+        <BackButtonNavigation className="w-8 h-8" />
+        <p className="text-2xl font-bold">Edukasi</p>
+      </div>
       <hr className="mb-5 h-0.5 border-t-0 bg-gray-300" />
 
       <div className="mb-5 items-center p-4 bg-white border border-gray-200 rounded-2xl shadow">

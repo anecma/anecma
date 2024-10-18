@@ -6,7 +6,8 @@ import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers, LuAlarmCheck } from "react-icons/lu";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
-import { toast, Toaster } from "sonner"
+import { toast, Toaster } from "sonner";
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 export default function ReminderTtdPage() {
   const { data: session, status } = useSession();
@@ -22,14 +23,17 @@ export default function ReminderTtdPage() {
   const fetchReminderSettings = async () => {
     if (status === "authenticated" && session?.accessToken) {
       try {
-        const response = await axiosInstance.get("/istri/dashboard/get-user-reminder-ttd", {
-          headers: { Authorization: `Bearer ${session.accessToken}` },
-        });
+        const response = await axiosInstance.get(
+          "/istri/dashboard/get-user-reminder-ttd",
+          {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+          }
+        );
         const data = response.data.data; // Assuming this contains the reminder settings
         setMorningReminderTime(data.waktu_reminder_1);
         setEveningReminderTime(data.waktu_reminder_2);
         setMorningReminderActive(parseInt(data.is_active_reminder_1) === 1);
-        setEveningReminderActive(parseInt(data.is_active_reminder_2) === 1)
+        setEveningReminderActive(parseInt(data.is_active_reminder_2) === 1);
       } catch (error) {
         setError("Gagal memuat pengaturan reminder.");
         console.error("Error fetching reminder settings:", error);
@@ -43,8 +47,11 @@ export default function ReminderTtdPage() {
       try {
         // Validate and format time
         const formatTime = (time: string): string => {
-          const [hours, minutes] = time.split(':');
-          return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+          const [hours, minutes] = time.split(":");
+          return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+            2,
+            "0"
+          )}`;
         };
 
         const dataToSend = {
@@ -69,7 +76,6 @@ export default function ReminderTtdPage() {
         toast.success("Reminder TTD berhasil di tambahkan!", {
           position: "top-center", // Set position to top center
         });
-
       } catch (error) {
         setError("Gagal menyimpan data.");
         setSuccess(null);
@@ -100,7 +106,8 @@ export default function ReminderTtdPage() {
     <main>
       <Toaster richColors position="top-center" />
       {/* Header */}
-      <div className="m-5 flex flex-row">
+      <div className="m-5 flex flex-row items-center">
+        <BackButtonNavigation className="w-10 h-10" />
         <p className="text-2xl font-bold">Reminder TTD</p>
       </div>
 
@@ -118,11 +125,15 @@ export default function ReminderTtdPage() {
               <input
                 type="checkbox"
                 checked={morningReminderActive}
-                onChange={() => setMorningReminderActive(!morningReminderActive)}
+                onChange={() =>
+                  setMorningReminderActive(!morningReminderActive)
+                }
                 className="sr-only peer"
               />
               <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Pagi</span>
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                Pagi
+              </span>
             </label>
           </div>
           <hr className="w-full h-0.5 border-t-0 bg-gray-300" />
@@ -131,11 +142,15 @@ export default function ReminderTtdPage() {
               <input
                 type="checkbox"
                 checked={eveningReminderActive}
-                onChange={() => setEveningReminderActive(!eveningReminderActive)}
+                onChange={() =>
+                  setEveningReminderActive(!eveningReminderActive)
+                }
                 className="sr-only peer"
               />
               <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Malam</span>
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                Malam
+              </span>
             </label>
           </div>
 
@@ -144,22 +159,18 @@ export default function ReminderTtdPage() {
           <div className="flex flex-row self-end mt-2.5">
             <button
               type="button"
-              aria-label="View History"
-              className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2"
-            >
-              Riwayat
-            </button>
-            <button
-              type="button"
               onClick={handleSave}
               aria-label="Save Reminders"
-              className={`text-white ${isSaving ? 'bg-gray-400' : 'bg-green-600'} hover:${isSaving ? 'bg-gray-500' : 'bg-green-700'} focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2`}
+              className={`text-white ${
+                isSaving ? "bg-gray-400" : "bg-green-600"
+              } hover:${
+                isSaving ? "bg-gray-500" : "bg-green-700"
+              } focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2`}
               disabled={isSaving}
             >
-              {isSaving ? 'Saving...' : 'Simpan'}
+              {isSaving ? "Saving..." : "Simpan"}
             </button>
           </div>
-
         </div>
       </div>
 
@@ -172,7 +183,9 @@ export default function ReminderTtdPage() {
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
             <FaHome className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm text-gray-500 dark:text-gray-400">Beranda</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Beranda
+            </span>
           </button>
           <button
             type="button"
@@ -180,7 +193,9 @@ export default function ReminderTtdPage() {
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
             <FiBook className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm text-gray-500 dark:text-gray-400">Pekerjaan</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Pekerjaan
+            </span>
           </button>
           <button
             type="button"
@@ -188,7 +203,9 @@ export default function ReminderTtdPage() {
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
             <IoChatbubblesOutline className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm text-gray-500 dark:text-gray-400">Pesan</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Pesan
+            </span>
           </button>
           <button
             type="button"
@@ -196,7 +213,9 @@ export default function ReminderTtdPage() {
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
             <LuUsers className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm text-gray-500 dark:text-gray-400">Pengguna</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Pengguna
+            </span>
           </button>
         </div>
       </div>

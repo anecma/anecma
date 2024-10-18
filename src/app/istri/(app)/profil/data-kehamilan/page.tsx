@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
 import { FaRegEdit } from "react-icons/fa";
 import { Toaster, toast } from "sonner";
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 interface UserData {
   hari_pertama_haid: string;
@@ -210,7 +211,8 @@ export default function ProfilPage() {
   return (
     <main>
       <Toaster richColors position="top-center" />
-      <div className="m-5 flex flex-row">
+      <div className="m-5 flex flex-row items-center">
+        <BackButtonNavigation className="w-10 h-10" />
         <p className="text-2xl font-bold">Halaman Profil</p>
       </div>
 

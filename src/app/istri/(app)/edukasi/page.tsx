@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react"; // Import useSession
 import axiosInstance from "@/libs/axios"; // Ensure this is your configured axios instance
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 interface Edukasi {
   id: number;
@@ -87,7 +88,9 @@ export default function EdukasiPage() {
                 className="flex flex-row mb-5 items-center bg-white border border-gray-200 rounded-lg shadow p-5"
               >
                 <div className="flex-grow">
-                  <p className={`inline-block px-3 py-1 text-sm font-semibold text-white rounded-full mb-2 ${kategoriClass}`}>
+                  <p
+                    className={`inline-block px-3 py-1 text-sm font-semibold text-white rounded-full mb-2 ${kategoriClass}`}
+                  >
                     {item.kategori}
                   </p>
                   <h5 className="text-ellipsis overflow-hidden mb-2 text-lg font-bold tracking-tight text-gray-900">
@@ -103,7 +106,10 @@ export default function EdukasiPage() {
                   </Link>
                 </div>
 
-                <Link href={`/istri/edukasi/show/${item.id}`} className="flex-shrink-0 ml-5">
+                <Link
+                  href={`/istri/edukasi/show/${item.id}`}
+                  className="flex-shrink-0 ml-5"
+                >
                   <Image
                     className="w-24 h-24 rounded-lg"
                     src={item.thumbnail}
@@ -117,7 +123,9 @@ export default function EdukasiPage() {
             );
           })
         ) : (
-          <div className="text-center text-gray-700">Tidak ada data edukasi ditemukan.</div>
+          <div className="text-center text-gray-700">
+            Tidak ada data edukasi ditemukan.
+          </div>
         )}
       </div>
     </main>

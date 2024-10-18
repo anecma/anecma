@@ -115,14 +115,9 @@ export default function DashboardPage() {
 
       {/* Main Menu */}
       <div className="grid grid-cols-2 mx-5 mb-20 gap-5">
-        <Link href="/istri/dashboard/kalkulator-anemia">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-light border border-gray-200 rounded-lg shadow hover:bg-blue-light/80 hover:shadow-lg transition duration-300 ease-in-out">
-            <p className="text-white font-bold">Kalkulator Anemia</p>
-          </div>
-        </Link>
-        <Link href="/istri/dashboard/jurnal-makan">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-green-pastel border border-green-200 rounded-lg shadow hover:bg-green-pastel/80 hover:shadow-lg transition duration-300 ease-in-out">
-            <p className="text-white font-bold">Jurnal Makan</p>
+        <Link href="/istri/dashboard/riwayat">
+          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-sky border border-gray-200 rounded-lg shadow hover:bg-blue-sky/80 hover:shadow-lg transition duration-300 ease-in-out">
+            <p className="text-white font-bold">Riwayat HB</p>
           </div>
         </Link>
         <Link href="/istri/dashboard/reminder-ttd">
@@ -135,9 +130,14 @@ export default function DashboardPage() {
             <p className="text-white font-bold">Konsumsi TTD</p>
           </div>
         </Link>
-        <Link href="/istri/dashboard/riwayat">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-sky border border-gray-200 rounded-lg shadow hover:bg-blue-sky/80 hover:shadow-lg transition duration-300 ease-in-out">
-            <p className="text-white font-bold">Riwayat HB</p>
+        <Link href="/istri/dashboard/jurnal-makan">
+          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-green-pastel border border-green-200 rounded-lg shadow hover:bg-green-pastel/80 hover:shadow-lg transition duration-300 ease-in-out">
+            <p className="text-white font-bold">Jurnal Makan</p>
+          </div>
+        </Link>
+        <Link href="/istri/dashboard/kalkulator-anemia">
+          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-light border border-gray-200 rounded-lg shadow hover:bg-blue-light/80 hover:shadow-lg transition duration-300 ease-in-out">
+            <p className="text-white font-bold">Kalkulator Anemia</p>
           </div>
         </Link>
       </div>

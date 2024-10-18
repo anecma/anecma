@@ -1,39 +1,42 @@
 "use client";
-import { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import { useSession } from 'next-auth/react';
-import axiosInstance from '@/libs/axios';
-import 'react-datepicker/dist/react-datepicker.css';
-import { toast, Toaster } from 'sonner'; // Import toast from Sonner
+import { useState } from "react";
+import DatePicker from "react-datepicker";
+import { useSession } from "next-auth/react";
+import axiosInstance from "@/libs/axios";
+import "react-datepicker/dist/react-datepicker.css";
+import { toast, Toaster } from "sonner"; // Import toast from Sonner
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 export default function KonsumsiTtdPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [vitCChecked, setVitCChecked] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false); 
+  const [isSaving, setIsSaving] = useState(false);
 
-  const { data: session } = useSession(); 
+  const { data: session } = useSession();
 
   const handleSave = async () => {
     if (!session || !session.accessToken) {
-      setErrorMessage('User is not authenticated.');
+      setErrorMessage("User is not authenticated.");
       return;
     }
 
-    setIsSaving(true); 
+    setIsSaving(true);
 
     try {
-      const formattedDate = selectedDate ? selectedDate.toISOString().split('T')[0] : null;
+      const formattedDate = selectedDate
+        ? selectedDate.toISOString().split("T")[0]
+        : null;
 
       if (!formattedDate) {
-        setErrorMessage('Tanggal tidak boleh kosong.');
-        setIsSaving(false); 
+        setErrorMessage("Tanggal tidak boleh kosong.");
+        setIsSaving(false);
         return;
       }
 
       await axiosInstance.post(
-        '/istri/dashboard/konsumsi-ttd',
+        "/istri/dashboard/konsumsi-ttd",
         {
           tanggal_waktu: formattedDate,
           minum_vit_c: vitCChecked ? 1 : 0,
@@ -43,18 +46,17 @@ export default function KonsumsiTtdPage() {
         }
       );
 
-      setSuccessMessage('Data berhasil disimpan!');
+      setSuccessMessage("Data berhasil disimpan!");
       setErrorMessage(null);
-      
-      // Display toast notification
-      toast.success('TTD Berhasil Ditambahkan!',{
-        position: "top-center",
-      }
-      ); // Show success toast
 
+      // Display toast notification
+      toast.success("TTD Berhasil Ditambahkan!", {
+        position: "top-center",
+      }); // Show success toast
     } catch (error: any) {
-      const errorCode = error.response?.status || 'No code';
-      const errorMessage = error.response?.data?.message || 'Gagal menyimpan data.';
+      const errorCode = error.response?.status || "No code";
+      const errorMessage =
+        error.response?.data?.message || "Gagal menyimpan data.";
       const errorDetails = error.response?.data || error.message;
 
       console.error(`Error Code: ${errorCode}`);
@@ -64,18 +66,19 @@ export default function KonsumsiTtdPage() {
       setErrorMessage(errorMessage);
       setSuccessMessage(null);
     } finally {
-      setIsSaving(false); 
+      setIsSaving(false);
     }
   };
 
   const handleClear = () => {
-    setSelectedDate(null); 
+    setSelectedDate(null);
   };
 
   return (
     <main>
-        <Toaster richColors position="top-center" />
-      <div className="m-5 flex flex-row">
+      <Toaster richColors position="top-center" />
+      <div className="m-5 flex flex-row items-center">
+        <BackButtonNavigation className="w-10 h-10" />
         <p className="text-2xl font-bold">Konsumsi TTD</p>
       </div>
 
@@ -125,17 +128,17 @@ export default function KonsumsiTtdPage() {
           <div className="flex flex-row self-end">
             <button
               type="button"
-              className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2"
-            >
-              Riwayat
-            </button>
-            <button
-              type="button"
               onClick={handleSave}
-              className={`text-white ${isSaving ? 'bg-gray-400' : 'bg-green-pastel'} ${isSaving ? 'hover:bg-gray-400' : 'hover:bg-green-pastel/80'} focus:outline-none focus:ring-4 ${isSaving ? 'focus:ring-gray-400' : 'focus:ring-green-pastel/30'} font-medium rounded-full text-sm px-5 py-2.5 text-center me-2`}
-              disabled={isSaving} 
+              className={`text-white ${
+                isSaving ? "bg-gray-400" : "bg-green-pastel"
+              } ${
+                isSaving ? "hover:bg-gray-400" : "hover:bg-green-pastel/80"
+              } focus:outline-none focus:ring-4 ${
+                isSaving ? "focus:ring-gray-400" : "focus:ring-green-pastel/30"
+              } font-medium rounded-full text-sm px-5 py-2.5 text-center me-2`}
+              disabled={isSaving}
             >
-              {isSaving ? 'Saving...' : 'Simpan'}
+              {isSaving ? "Saving..." : "Simpan"}
             </button>
           </div>
         </div>
@@ -147,9 +150,7 @@ export default function KonsumsiTtdPage() {
             type="button"
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
           >
-            <p className="text-sm text-blue-600 dark:text-blue-500">
-              Home
-            </p>
+            <p className="text-sm text-blue-600 dark:text-blue-500">Home</p>
           </button>
           <button
             type="button"

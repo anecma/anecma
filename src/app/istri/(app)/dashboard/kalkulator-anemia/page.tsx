@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
 import { FaPlus } from "react-icons/fa";
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 interface UserData {
   usia_kehamilan: string;
@@ -125,7 +126,8 @@ export default function KalkulatorAnemiaPage() {
   return (
     <main>
       {/* Header */}
-      <div className="m-5 flex flex-row">
+      <div className="m-5 flex flex-row items-center">
+        <BackButtonNavigation className="w-10 h-10" />
         <p className="text-2xl font-bold">Kalkulator Anemia</p>
       </div>
 

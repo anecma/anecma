@@ -6,6 +6,8 @@ import axiosInstance from "@/libs/axios";
 import { Toaster, toast } from "sonner";
 import ImageModal from "@/components/modal/imagemodal/ImageModal";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 // Opsi waktu makan
 const mealOptions = [
@@ -514,7 +516,10 @@ const FoodLogForm = () => {
         imageSrc={savedImageSrc}
       />
       <div className="m-5 flex flex-row justify-between items-center">
-        <p className="text-2xl font-bold">Jurnal Makan</p>
+        <div className="flex flex-row items-center">
+          <BackButtonNavigation className="w-10 h-10" />
+          <p className="text-2xl font-bold">Jurnal Makan</p>
+        </div>
         <button
           onClick={openModal}
           className="flex items-center bg-blue-500 text-white px-3 py-1.5 rounded-full hover:bg-blue-600 transition shadow-md"

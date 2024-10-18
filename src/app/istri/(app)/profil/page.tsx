@@ -250,14 +250,14 @@ export default function ProfilPage() {
             href="/istri/profil/data-kehamilan"
             className="flex flex-row items-center justify-between bg-white-background p-5 rounded-2xl my-2.5"
           >
-            <p>Data Kehamilan</p>
+            <p>Input Data Kehamilan</p>
             <MdKeyboardArrowRight className="w-7 h-7" />
           </Link>
           <Link
             href="/istri/profil/data-suami"
             className="flex flex-row items-center justify-between bg-white-background p-5 rounded-2xl my-2.5"
           >
-            <p>Data Suami</p>
+            <p>Input Data Suami</p>
             <MdKeyboardArrowRight className="w-7 h-7" />
           </Link>
 
