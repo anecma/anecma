@@ -55,21 +55,25 @@ export default function RiwayatPage() {
     if (status === "authenticated" && session?.accessToken) {
       // Cek apakah total pemeriksaan sudah mencapai atau melebihi 4
       if (totalPemeriksaan >= 4) {
-        toast.error("Anda sudah mencapai batas 4 penambahan data.", { duration: 2000 });
+        toast.error("Anda sudah mencapai batas 4 penambahan data.", {
+          duration: 2000,
+        });
         return;
       }
-  
+
       if (!nilaiHb || !tanggalHaid) {
-        toast.error("Nilai HB dan tanggal haid tidak boleh kosong.", { duration: 2000 });
+        toast.error("Nilai HB dan tanggal haid tidak boleh kosong.", {
+          duration: 2000,
+        });
         return;
       }
-  
+
       const numericNilaiHb = parseFloat(nilaiHb);
       if (isNaN(numericNilaiHb)) {
         toast.error("Nilai HB harus berupa angka.", { duration: 2000 });
         return;
       }
-  
+
       try {
         const response = await axiosInstance.post(
           "/istri/dashboard/insert-riwayat-hb",
@@ -83,15 +87,14 @@ export default function RiwayatPage() {
             },
           }
         );
-  
-  
+
         // Cek apakah hasilnya anemia atau normal
         if (response.data.data.data.hasil_pemeriksaan === "anemia") {
           toast.error(response.data.data.pesan, { duration: 15000 }); // Tampilkan pesan error untuk anemia
         } else {
           toast.success(response.data.data.pesan, { duration: 15000 }); // Tampilkan pesan sukses
         }
-  
+
         setNilaiHb(""); // Reset input HB
         setTanggalHaid(""); // Reset date picker
         fetchTotalPemeriksaan(); // Refresh total pemeriksaan setelah menyimpan data
@@ -109,21 +112,20 @@ export default function RiwayatPage() {
       toast.error("Silakan login untuk menyimpan data.");
     }
   };
-  
 
   return (
     <main>
       <div className="m-5 flex flex-row">
         <Toaster richColors position="top-center" />
-        <p className="text-2xl font-bold">Riwayat HB</p>
+        <p className="text-2xl font-bold">Data Pemeriksaan Hemoglobin (HB)</p>
       </div>
 
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
 
       <div className="mx-5 bg-purple-light rounded-3xl mt-5 mb-72">
         <div className="w-full py-10 px-10 flex flex-col items-center gap-5">
-          <p className="text-lg">Pemeriksaan Ke: {totalPemeriksaan}</p> {/* Display total pemeriksaan */}
-
+          <p className="text-lg">Pemeriksaan Ke: {totalPemeriksaan}</p>{" "}
+          {/* Display total pemeriksaan */}
           {/* Inputan HB */}
           <div className="w-full relative">
             <input
@@ -142,7 +144,6 @@ export default function RiwayatPage() {
               Nilai HB
             </label>
           </div>
-          
           {/* Kalender */}
           <div className="relative my-2.5 w-full">
             <input
@@ -162,9 +163,7 @@ export default function RiwayatPage() {
               Tanggal
             </label>
           </div>
-
           <hr className="w-full h-0.5 border-t-0 bg-gray-300" />
-
           {/* Tombol Riwayat & Simpan */}
           <div className="flex flex-row self-end">
             <button

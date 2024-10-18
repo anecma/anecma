@@ -13,10 +13,10 @@ export default async function LoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold text-center mb-5">Anecma</h1>
+      {/* <h1 className="text-3xl font-bold text-center mb-5">Anecma</h1> */}
       <div className="mb-10">
         <Image
-          src={"/images/red-blood-cells-3.png"}
+          src={"/images/anecma-login-logo.png"}
           alt="Red Blood Cells"
           width="270"
           height="270"

@@ -175,7 +175,7 @@ export default function ProfilPage() {
               htmlFor="tempat_tinggal_ktp"
               className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
             >
-              Tempat Tinggal KTP
+              Tempat Tinggal Sesuai KTP
             </label>
           </div>
           <div className="relative my-2.5">
@@ -192,7 +192,7 @@ export default function ProfilPage() {
               htmlFor="tempat_tinggal_domisili"
               className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
             >
-              Temoat Tinggal Domisili
+              Tempat Tinggal Domisili
             </label>
           </div>
           <div className="relative my-2.5">
@@ -262,24 +262,30 @@ export default function ProfilPage() {
           </Link>
 
           {isEditing ? (
-              <button
-                type="button"
-                onClick={handleSave}
-                className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-                disabled={saving}
-              >
-                {saving ? <span>Saving...</span> : <><FaRegEdit /> Simpan</>}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleEditToggle}
-                className="max-w-fit self-center text-white bg-blue-500 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-              >
-                <FaRegEdit />
-                Edit
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleSave}
+              className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
+              disabled={saving}
+            >
+              {saving ? (
+                <span>Saving...</span>
+              ) : (
+                <>
+                  <FaRegEdit /> Simpan
+                </>
+              )}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleEditToggle}
+              className="max-w-fit self-center text-white bg-blue-500 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
+            >
+              <FaRegEdit />
+              Edit
+            </button>
+          )}
         </form>
       </div>
 
