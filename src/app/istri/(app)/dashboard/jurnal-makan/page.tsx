@@ -6,7 +6,7 @@ import axiosInstance from "@/libs/axios";
 import { Toaster, toast } from "sonner";
 import ImageModal from "@/components/modal/imagemodal/ImageModal";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
+import Swal from 'sweetalert2';
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 // Opsi waktu makan
@@ -362,6 +362,7 @@ const FoodLogForm = () => {
     }));
   };
 
+
   const handleSave = async () => {
     if (status === "authenticated" && session?.accessToken) {
       try {
@@ -369,7 +370,7 @@ const FoodLogForm = () => {
           (option) => option.name === selectedTab
         );
         const jamMakan = currentMealOption?.jam_makan;
-
+  
         const formattedData = Object.keys(selectedPortions).reduce(
           (acc, category) => {
             acc[`${jamMakan}_${category}`] = selectedPortions[category] || "";
@@ -377,9 +378,9 @@ const FoodLogForm = () => {
           },
           {} as Record<string, string>
         );
-
+  
         formattedData.jam_makan = jamMakan || "";
-
+  
         let endpoint = "";
         switch (selectedTab) {
           case "makan_malam":
@@ -394,74 +395,39 @@ const FoodLogForm = () => {
           default:
             throw new Error("Tab tidak dikenali");
         }
-
+  
         const response = await axiosInstance.post(endpoint, formattedData, {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
-
-        let hasilGizi = null;
-        let usiakehamilan = null;
-
-        if (selectedTab === "sarapan") {
-          hasilGizi = response.data.data.hasil_sarapan.hasil_gizi;
-          usiakehamilan = response.data.data.hasil_sarapan.usia_kehamilan;
-        } else if (
-          selectedTab === "makan_siang" ||
-          selectedTab === "makan_malam"
-        ) {
-          hasilGizi = response.data.data.update_jurnal_makan.hasil_gizi;
-          usiakehamilan = response.data.data.update_jurnal_usia_kehamilan;
+  
+        // Customize the SweetAlert for "makan malam"
+        if (selectedTab === "makan_malam") {
+          // Array of predefined links
+          const links = [
+            "https://www.anecma.id/istri/edukasi/show/61",
+            "https://www.anecma.id/istri/edukasi/show/62",
+            "https://www.anecma.id/istri/edukasi/show/63",
+            "https://www.anecma.id/istri/edukasi/show/64",
+            "https://www.anecma.id/istri/edukasi/show/65",
+            "https://www.anecma.id/istri/edukasi/show/66",
+          ];
+  
+          // Select a random link from the array
+          const randomLink = links[Math.floor(Math.random() * links.length)];
+  
+          Swal.fire({
+            icon: "info",
+            html: `
+              ${response.data.data.pesan || "Berhasil menyimpan data untuk makan malam."}
+              <br><br> Here is a random link:
+              <a href="${randomLink}" target="_blank">Click here</a>
+            `,
+            showCloseButton: true,
+            focusConfirm: false,
+          });
+        } else {
+          toast.success("Berhasil Menyimpan.", { duration: 2000 });
         }
-
-        // console.log("Hasil Gizi:", hasilGizi);
-        // console.log("Usia Kehamilan:", usiakehamilan);
-
-        if (hasilGizi === "Gizi Tidak Seimbang") {
-          let imageSrc;
-
-          if (usiakehamilan < 12) {
-            switch (selectedTab) {
-              case "sarapan":
-                imageSrc = "/images/TM1/Rekomendasi-Makan-Pagi.png";
-                break;
-              case "makan_siang":
-                imageSrc = "/images/TM1/Rekomendasi-Makan-Siang.png";
-                break;
-              case "makan_malam":
-                imageSrc = "/images/TM1/Rekomendasi-Makan-Malam.png";
-                break;
-            }
-          } else if (usiakehamilan < 24) {
-            switch (selectedTab) {
-              case "sarapan":
-                imageSrc = "/images/TM2/Rekomendasi-Makan-Pagi.png";
-                break;
-              case "makan_siang":
-                imageSrc = "/images/TM2/Rekomendasi-Makan-siang.png";
-                break;
-              case "makan_malam":
-                imageSrc = "/images/TM2/Rekomendasi-Makan-Malam.png";
-                break;
-            }
-          } else {
-            switch (selectedTab) {
-              case "sarapan":
-                imageSrc = "/images/TM2/Rekomendasi-Makan-Pagi.png";
-                break;
-              case "makan_siang":
-                imageSrc = "/images/TM2/Rekomendasi-Makan-Siang.png";
-                break;
-              case "makan_malam":
-                imageSrc = "/images/TM2/Rekomendasi-Makan-Malam.png";
-                break;
-            }
-          }
-
-          setSavedImageSrc(imageSrc);
-          setIsSaveModalOpen(true);
-        }
-
-        toast.success("Berhasil Menyimpan.", { duration: 2000 });
       } catch (error) {
         console.error("Error saving data:", error);
       }
@@ -469,7 +435,7 @@ const FoodLogForm = () => {
       alert("Anda harus masuk untuk menyimpan data.");
     }
   };
-
+  
   const openModal = () => {
     let imageSrc = "";
 
@@ -510,11 +476,6 @@ const FoodLogForm = () => {
   return (
     <div className="">
       <Toaster richColors position="top-center" />
-      <ImageModal
-        isOpen={isSaveModalOpen}
-        onClose={closeSaveModal}
-        imageSrc={savedImageSrc}
-      />
       <div className="m-5 flex flex-row justify-between items-center">
         <div className="flex flex-row items-center">
           <BackButtonNavigation className="w-10 h-10" />

@@ -1,20 +1,66 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import DatePicker from "react-datepicker";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
 import "react-datepicker/dist/react-datepicker.css";
-import { toast, Toaster } from "sonner"; // Import toast from Sonner
+import { toast, Toaster } from "sonner";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
+
+interface KonsumsiData {
+  tanggal_waktu: string;
+  total_tablet_diminum: number;
+  minum_vit_c: boolean;
+}
 
 export default function KonsumsiTtdPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [vitCChecked, setVitCChecked] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [tabletCount, setTabletCount] = useState("");
+  const [dataTable, setDataTable] = useState<KonsumsiData[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const { data: session } = useSession();
+
+  interface ApiResponseItem {
+    tanggal_waktu: string;
+    total_tablet_diminum: number;
+    minum_vit_c: number; // Assuming this is a number (0 or 1)
+  }
+
+  const fetchTabletData = useCallback(async () => {
+    if (!session || !session.accessToken) return;
+
+    try {
+      const response = await axiosInstance.get(
+        "/istri/dashboard/get-konsumsi-ttd",
+        {
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        }
+      );
+
+      if (response.data.success && Array.isArray(response.data.data)) {
+        const formattedData = response.data.data.map(
+          (item: ApiResponseItem) => ({
+            tanggal_waktu: item.tanggal_waktu,
+            total_tablet_diminum: item.total_tablet_diminum,
+            minum_vit_c: Boolean(item.minum_vit_c),
+          })
+        );
+        setDataTable(formattedData);
+      } else {
+        setErrorMessage("Data tidak valid.");
+      }
+    } catch (error) {
+      console.error("Error fetching table data:", error);
+      setErrorMessage("Gagal mengambil data konsumsi.");
+    }
+  }, [session]);
+
+  useEffect(() => {
+    fetchTabletData(); // Call fetchTabletData on component mount
+  }, [fetchTabletData]);
 
   const handleSave = async () => {
     if (!session || !session.accessToken) {
@@ -40,31 +86,19 @@ export default function KonsumsiTtdPage() {
         {
           tanggal_waktu: formattedDate,
           minum_vit_c: vitCChecked ? 1 : 0,
+          total_tablet_diminum: tabletCount,
         },
         {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         }
       );
 
-      setSuccessMessage("Data berhasil disimpan!");
-      setErrorMessage(null);
-
-      // Display toast notification
-      toast.success("TTD Berhasil Ditambahkan!", {
-        position: "top-center",
-      }); // Show success toast
+      toast.success("TTD Berhasil Ditambahkan!", { position: "top-center" });
+      fetchTabletData(); // Refresh data after saving
     } catch (error: any) {
-      const errorCode = error.response?.status || "No code";
       const errorMessage =
         error.response?.data?.message || "Gagal menyimpan data.";
-      const errorDetails = error.response?.data || error.message;
-
-      console.error(`Error Code: ${errorCode}`);
-      console.error(`Error Message: ${errorMessage}`);
-      console.error("Error Details:", errorDetails);
-
       setErrorMessage(errorMessage);
-      setSuccessMessage(null);
     } finally {
       setIsSaving(false);
     }
@@ -75,8 +109,9 @@ export default function KonsumsiTtdPage() {
   };
 
   return (
-    <main>
+    <main className="flex flex-col min-h-screen">
       <Toaster richColors position="top-center" />
+
       <div className="m-5 flex flex-row items-center">
         <BackButtonNavigation className="w-10 h-10" />
         <p className="text-2xl font-bold">Konsumsi TTD</p>
@@ -84,7 +119,7 @@ export default function KonsumsiTtdPage() {
 
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
 
-      <div className="mx-5 bg-purple-light rounded-3xl mt-5 mb-72">
+      <div className="mx-5 bg-purple-light rounded-3xl mt-5 mb-5">
         <div className="w-full py-10 px-10 flex flex-col items-center gap-5">
           <p className="text-xl">Minum TTD</p>
           <div className="relative w-full">
@@ -94,7 +129,7 @@ export default function KonsumsiTtdPage() {
               dateFormat="yyyy-MM-dd"
               placeholderText="Pilih tanggal"
               className="form-input w-full border-gray-300 rounded-md shadow-sm"
-              renderCustomHeader={({ date, changeYear, changeMonth }) => (
+              renderCustomHeader={({ date }) => (
                 <div className="flex justify-between p-2">
                   <button
                     onClick={() => setSelectedDate(new Date())}
@@ -112,6 +147,26 @@ export default function KonsumsiTtdPage() {
               )}
             />
           </div>
+          <div className="relative w-full mb-4">
+            <label
+              htmlFor="total_tablet_diminum"
+              className="text-sm mb-1 block"
+            >
+              Berapa Tablet:
+            </label>
+            <input
+              id="total_tablet_diminum"
+              type="number"
+              value={tabletCount}
+              onChange={(e) => setTabletCount(e.target.value)}
+              className="form-input border-gray-300 rounded-md shadow-sm"
+              placeholder="Masukkan jumlah tablet"
+            />
+          </div>
+
+          <div>
+            <p className="text-sm">Apakah bersamaan dengan minum vit C?</p>
+          </div>
           <div className="w-full flex flex-row gap-2.5 justify-around items-center">
             <div className="flex flex-row space-x-4 items-center">
               <p className="text-xl">Minum Vit C</p>
@@ -121,7 +176,7 @@ export default function KonsumsiTtdPage() {
               type="checkbox"
               checked={vitCChecked}
               onChange={() => setVitCChecked(!vitCChecked)}
-              className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
             />
           </div>
           <hr className="w-full h-0.5 border-t-0 bg-gray-300" />
@@ -144,35 +199,82 @@ export default function KonsumsiTtdPage() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+      <div className="flex-grow mx-5 mb-40">
+        <div className="bg-white rounded-lg shadow-md p-5">
+          <h2 className="text-xl font-bold mb-4">Data Konsumsi TTD</h2>
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                  Tanggal
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                  Tablet Diminum
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                  Minum Vit C
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {dataTable.map((item, index) => (
+                <tr
+                  key={index}
+                  className={`hover:bg-gray-50 ${
+                    index % 2 === 0 ? "bg-gray-50" : ""
+                  }`}
+                >
+                  <td className="px-4 py-2 text-sm text-gray-700 w-1/3">
+                    {" "}
+                    {/* Wider width for the date column */}
+                    {item.tanggal_waktu.split(" ")[0]}
+                  </td>
+                  <td className="px-4 py-2 text-sm text-gray-700 w-1/4">
+                    {" "}
+                    {/* Fixed width for tablet column */}
+                    {item.total_tablet_diminum}
+                  </td>
+                  <td className="px-4 py-2 text-sm text-gray-700 w-1/4">
+                    {" "}
+                    {/* Fixed width for vit C column */}
+                    {item.minum_vit_c ? "Ya" : "Tidak"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200">
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
           <button
             type="button"
-            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group"
           >
-            <p className="text-sm text-blue-600 dark:text-blue-500">Home</p>
+            <p className="text-sm text-blue-600">Home</p>
           </button>
           <button
             type="button"
-            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group"
           >
-            <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
+            <p className="text-sm text-gray-500 group-hover:text-blue-600">
               Edukasi
             </p>
           </button>
           <button
             type="button"
-            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group"
           >
-            <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
+            <p className="text-sm text-gray-500 group-hover:text-blue-600">
               Konsultasi
             </p>
           </button>
           <button
             type="button"
-            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 group"
           >
-            <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
+            <p className="text-sm text-gray-500 group-hover:text-blue-600">
               Users
             </p>
           </button>

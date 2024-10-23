@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react"; // Import useCallback
+import { useEffect, useState, useCallback } from "react";
 import { FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
-import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
-
 import axiosInstance from "@/libs/axios";
 import { useSession } from "next-auth/react";
 import { AxiosError } from "axios";
@@ -15,11 +13,11 @@ import BackButtonNavigation from "@/components/back-button-navigation/back-butto
 
 export default function RiwayatPage() {
   const [nilaiHb, setNilaiHb] = useState<string>("");
-  const [tanggalHaid, setTanggalHaid] = useState<string>(""); // State untuk date picker
+  const [tanggalHaid, setTanggalHaid] = useState<string>("");
   const { data: session, status } = useSession();
   const [totalPemeriksaan, setTotalPemeriksaan] = useState<number>(0);
+  const [hbData, setHbData] = useState<any[]>([]); // State for storing Hb data
 
-  // Fungsi untuk mengambil total pemeriksaan
   const fetchTotalPemeriksaan = useCallback(async () => {
     if (status === "authenticated" && session?.accessToken) {
       try {
@@ -31,7 +29,6 @@ export default function RiwayatPage() {
             },
           }
         );
-        // Mengambil total_pemeriksaan dari response
         setTotalPemeriksaan(response.data.data.total_pemeriksaan);
       } catch (error) {
         console.error("Error fetching total pemeriksaan:", error);
@@ -46,17 +43,42 @@ export default function RiwayatPage() {
     } else {
       toast.error("Silakan login untuk mengambil data.");
     }
-  }, [session, status]); // Menambahkan session dan status sebagai dependensi
+  }, [session, status]);
 
-  // Memanggil fetchTotalPemeriksaan saat komponen dimuat atau status session berubah
+  const fetchHbData = useCallback(async () => {
+    if (status === "authenticated" && session?.accessToken) {
+      try {
+        const response = await axiosInstance.get(
+          "/istri/dashboard/get-user-hb",
+          {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+          }
+        );
+        setHbData(response.data.data); // Update state with fetched data
+      } catch (error) {
+        console.error("Error fetching Hb data:", error);
+        if (error instanceof AxiosError && error.response) {
+          toast.error(
+            error.response.data.message || "Gagal mengambil data Hb."
+          );
+        } else {
+          toast.error("Gagal mengambil data Hb.");
+        }
+      }
+    } else {
+      toast.error("Silakan login untuk mengambil data.");
+    }
+  }, [session, status]);
+
   useEffect(() => {
     fetchTotalPemeriksaan();
-  }, [fetchTotalPemeriksaan]); // Menambahkan fetchTotalPemeriksaan ke array dependensi
+    fetchHbData(); // Fetch Hb data on component mount
+  }, [fetchTotalPemeriksaan, fetchHbData]);
 
-  // Fungsi untuk menangani submit data
   const handleSubmit = async () => {
     if (status === "authenticated" && session?.accessToken) {
-      // Cek apakah total pemeriksaan sudah mencapai atau melebihi 4
       if (totalPemeriksaan >= 4) {
         toast.error("Anda sudah mencapai batas 4 penambahan data.", {
           duration: 2000,
@@ -82,7 +104,7 @@ export default function RiwayatPage() {
           "/istri/dashboard/insert-riwayat-hb",
           {
             nilai_hb: numericNilaiHb,
-            tanggal: tanggalHaid, // Kirim tanggal haid
+            tanggal: tanggalHaid,
           },
           {
             headers: {
@@ -91,18 +113,18 @@ export default function RiwayatPage() {
           }
         );
 
-        // Cek apakah hasilnya anemia atau normal
         if (response.data.data.data.hasil_pemeriksaan === "anemia") {
-          toast.error(response.data.data.pesan, { duration: 15000 }); // Tampilkan pesan error untuk anemia
+          toast.error(response.data.data.pesan, { duration: 15000 });
         } else {
-          toast.success(response.data.data.pesan, { duration: 15000 }); // Tampilkan pesan sukses
+          toast.success(response.data.data.pesan, { duration: 15000 });
         }
 
-        setNilaiHb(""); // Reset input HB
+        setNilaiHb(""); // Reset input
         setTanggalHaid(""); // Reset date picker
-        fetchTotalPemeriksaan(); // Refresh total pemeriksaan setelah menyimpan data
+        fetchTotalPemeriksaan(); // Refresh total pemeriksaan
+        fetchHbData(); // Refresh Hb data
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error saving data:", error);
         if (error instanceof AxiosError && error.response) {
           toast.error(
             error.response.data.message || "Gagal menyimpan data HB terbaru."
@@ -126,17 +148,15 @@ export default function RiwayatPage() {
 
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
 
-      <div className="mx-5 bg-purple-light rounded-3xl mt-5 mb-72">
+      <div className="mx-5 bg-purple-light rounded-3xl mt-5 mb-5">
         <div className="w-full py-10 px-10 flex flex-col items-center gap-5">
-          <p className="text-lg">Pemeriksaan Ke: {totalPemeriksaan}</p>{" "}
-          {/* Display total pemeriksaan */}
-          {/* Inputan HB */}
+          <p className="text-lg">Pemeriksaan Ke: {totalPemeriksaan}</p>
           <div className="w-full relative">
             <input
               type="text"
               id="nilai_hb"
               value={nilaiHb}
-              onChange={(e) => setNilaiHb(e.target.value)} // Update state on input change
+              onChange={(e) => setNilaiHb(e.target.value)}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
               required
@@ -148,7 +168,6 @@ export default function RiwayatPage() {
               Nilai HB
             </label>
           </div>
-          {/* Kalender */}
           <div className="relative my-2.5 w-full">
             <input
               type="date"
@@ -168,7 +187,6 @@ export default function RiwayatPage() {
             </label>
           </div>
           <hr className="w-full h-0.5 border-t-0 bg-gray-300" />
-          {/* Tombol Simpan */}
           <div className="flex flex-row self-end">
             <button
               type="button"
@@ -179,6 +197,29 @@ export default function RiwayatPage() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Table for displaying Hb data */}
+      <div className="mx-5 my-5 bg-white rounded-lg shadow-md mb-40 ">
+        <h2 className="text-lg font-bold p-4">Riwayat Pemeriksaan HB</h2>
+        <table className="min-w-full">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="py-2 text-center">Tanggal</th>
+              <th className="py-2 text-center">Nilai HB</th>
+              <th className="py-2 text-center">Hasil Pemeriksaan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {hbData.map((item, index) => (
+              <tr key={index} className="border-b">
+                <td className="py-2 text-center">{item.tanggal}</td>
+                <td className="py-2 text-center">{item.nilai_hb}</td>
+                <td className="py-2 text-center">{item.hasil_pemeriksaan}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
@@ -192,7 +233,6 @@ export default function RiwayatPage() {
               Home
             </span>
           </button>
-
           <button
             type="button"
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
@@ -202,7 +242,6 @@ export default function RiwayatPage() {
               Edukasi
             </span>
           </button>
-
           <button
             type="button"
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
@@ -212,7 +251,6 @@ export default function RiwayatPage() {
               Konsultasi
             </span>
           </button>
-
           <button
             type="button"
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"

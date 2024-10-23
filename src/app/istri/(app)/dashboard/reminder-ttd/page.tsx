@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatbubblesOutline } from "react-icons/io5";
@@ -11,8 +11,8 @@ import BackButtonNavigation from "@/components/back-button-navigation/back-butto
 
 export default function ReminderTtdPage() {
   const { data: session, status } = useSession();
-  const [morningReminderTime, setMorningReminderTime] = useState("08:00"); // Default time in H:i format
-  const [eveningReminderTime, setEveningReminderTime] = useState("18:00"); // Default time in H:i format
+  const [morningReminderTime, setMorningReminderTime] = useState("08:00");
+  const [eveningReminderTime, setEveningReminderTime] = useState("18:00");
   const [morningReminderActive, setMorningReminderActive] = useState(false);
   const [eveningReminderActive, setEveningReminderActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export default function ReminderTtdPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Function to fetch the current reminder settings
-  const fetchReminderSettings = async () => {
+  const fetchReminderSettings = useCallback(async () => {
     if (status === "authenticated" && session?.accessToken) {
       try {
         const response = await axiosInstance.get(
@@ -29,7 +29,7 @@ export default function ReminderTtdPage() {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           }
         );
-        const data = response.data.data; // Assuming this contains the reminder settings
+        const data = response.data.data;
         setMorningReminderTime(data.waktu_reminder_1);
         setEveningReminderTime(data.waktu_reminder_2);
         setMorningReminderActive(parseInt(data.is_active_reminder_1) === 1);
@@ -39,13 +39,12 @@ export default function ReminderTtdPage() {
         console.error("Error fetching reminder settings:", error);
       }
     }
-  };
+  }, [session, status]);
 
   const handleSave = async () => {
     if (status === "authenticated" && session?.accessToken) {
-      setIsSaving(true); // Start saving
+      setIsSaving(true);
       try {
-        // Validate and format time
         const formatTime = (time: string): string => {
           const [hours, minutes] = time.split(":");
           return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
@@ -55,44 +54,34 @@ export default function ReminderTtdPage() {
         };
 
         const dataToSend = {
-          waktu_reminder_1: formatTime(morningReminderTime), // Ensures HH:mm format
+          waktu_reminder_1: formatTime(morningReminderTime),
           is_active_reminder_1: morningReminderActive,
-          waktu_reminder_2: formatTime(eveningReminderTime), // Ensures HH:mm format
+          waktu_reminder_2: formatTime(eveningReminderTime),
           is_active_reminder_2: eveningReminderActive,
         };
 
-        const response = await axiosInstance.post(
-          "/istri/dashboard/reminder-ttd",
-          dataToSend,
-          {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          }
-        );
+        await axiosInstance.post("/istri/dashboard/reminder-ttd", dataToSend, {
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        });
 
         setSuccess("Data berhasil disimpan!");
         setError(null);
-
-        // Show success toast notification
-        toast.success("Reminder TTD berhasil di tambahkan!", {
-          position: "top-center", // Set position to top center
+        toast.success("Reminder TTD berhasil ditambahkan!", {
+          position: "top-center",
         });
       } catch (error) {
         setError("Gagal menyimpan data.");
         setSuccess(null);
         console.error("Error saving data:", error);
-        // Show error toast notification
-        toast.error("Gagal menyimpan data.", {
-          position: "top-center", // Set position to top center
-        });
+        toast.error("Gagal menyimpan data.", { position: "top-center" });
       } finally {
-        setIsSaving(false); // End saving
+        setIsSaving(false);
       }
     } else {
       setError("Anda perlu login terlebih dahulu.");
       setSuccess(null);
-      // Show error toast notification for not logged in
       toast.error("Anda perlu login terlebih dahulu.", {
-        position: "top-center", // Set position to top center
+        position: "top-center",
       });
     }
   };
@@ -100,7 +89,7 @@ export default function ReminderTtdPage() {
   // Fetch reminder settings when the component mounts
   useEffect(() => {
     fetchReminderSettings();
-  }, [status]); // Re-fetch if authentication status changes
+  }, [fetchReminderSettings]); // Include fetchReminderSettings in dependency array
 
   return (
     <main>
@@ -117,41 +106,70 @@ export default function ReminderTtdPage() {
         <div className="w-full py-10 px-10 flex flex-col items-center gap-2.5">
           <LuAlarmCheck className="w-7 h-7 text-purple-700" />
           <p className="text-2xl font-semibold">Reminder TTD</p>
+          <p className="text-gray-600 text-center">Berpa kali rekomendasi TTD dari tenaga kesehatan?</p>
           <p className="text-gray-600">Pilih waktu reminder tablet TTD</p>
 
+          <select
+            id="tabletCount"
+            className="mt-2 px-3 py-2 border border-gray-300 rounded-lg"
+          >
+            <option value="" disabled selected hidden>
+              Pilih 
+            </option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+
           {/* Reminder Checkboxes */}
-          <div className="self-start mt-2.5">
-            <label className="inline-flex items-center cursor-pointer">
+          {/* Reminder Checkboxes */}
+          <div className="self-start mt-2.5 flex flex-col gap-2 w-full">
+            <div className="flex items-center justify-between">
+              <label className="inline-flex items-center cursor-pointer me-3">
+                <input
+                  type="checkbox"
+                  checked={morningReminderActive}
+                  onChange={() =>
+                    setMorningReminderActive(!morningReminderActive)
+                  }
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                  Pagi
+                </span>
+              </label>
               <input
-                type="checkbox"
-                checked={morningReminderActive}
-                onChange={() =>
-                  setMorningReminderActive(!morningReminderActive)
-                }
-                className="sr-only peer"
+                type="time"
+                value={morningReminderTime}
+                onChange={(e) => setMorningReminderTime(e.target.value)}
+                className="border border-gray-300 rounded-lg px-2 py-1"
+                disabled={!morningReminderActive} // Disable if checkbox is not checked
               />
-              <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                Pagi
-              </span>
-            </label>
-          </div>
-          <hr className="w-full h-0.5 border-t-0 bg-gray-300" />
-          <div className="self-start mt-2.5">
-            <label className="inline-flex items-center cursor-pointer">
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="inline-flex items-center cursor-pointer me-3">
+                <input
+                  type="checkbox"
+                  checked={eveningReminderActive}
+                  onChange={() =>
+                    setEveningReminderActive(!eveningReminderActive)
+                  }
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                  Malam
+                </span>
+              </label>
               <input
-                type="checkbox"
-                checked={eveningReminderActive}
-                onChange={() =>
-                  setEveningReminderActive(!eveningReminderActive)
-                }
-                className="sr-only peer"
+                type="time"
+                value={eveningReminderTime}
+                onChange={(e) => setEveningReminderTime(e.target.value)}
+                className="border border-gray-300 rounded-lg px-2 py-1"
+                disabled={!eveningReminderActive} // Disable if checkbox is not checked
               />
-              <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                Malam
-              </span>
-            </label>
+            </div>
           </div>
 
           <hr className="w-full h-0.5 border-t-0 bg-gray-300 mt-5" />
