@@ -419,7 +419,7 @@ const FoodLogForm = () => {
             icon: "info",
             html: `
               ${response.data.data.pesan || "Berhasil menyimpan data untuk makan malam."}
-              <br><br> Here is a random link:
+              <br><br> Rekomendasi Makanya Bunda:
               <a href="${randomLink}" target=>Click here</a>
             `,
             showCloseButton: true,
