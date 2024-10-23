@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
 import { toast, Toaster } from "sonner";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
+import { FaClock } from "react-icons/fa6";
 
 export default function ReminderTtdPage() {
   const { data: session, status } = useSession();
@@ -15,6 +16,7 @@ export default function ReminderTtdPage() {
   const [eveningReminderTime, setEveningReminderTime] = useState("18:00");
   const [morningReminderActive, setMorningReminderActive] = useState(false);
   const [eveningReminderActive, setEveningReminderActive] = useState(false);
+  const [tabletCount, setTabletCount] = useState(""); // State for tablet count
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -86,6 +88,23 @@ export default function ReminderTtdPage() {
     }
   };
 
+  const handleTabletCountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const count = e.target.value;
+    setTabletCount(count);
+  
+    if (count === "2") {
+      setMorningReminderActive(true);
+      setEveningReminderActive(true);
+    } else if (count === "1") {
+      setMorningReminderActive(false);
+      setEveningReminderActive(true);
+    } else {
+      setMorningReminderActive(false);
+      setEveningReminderActive(false);
+    }
+  };
+  
+
   // Fetch reminder settings when the component mounts
   useEffect(() => {
     fetchReminderSettings();
@@ -106,22 +125,24 @@ export default function ReminderTtdPage() {
         <div className="w-full py-10 px-10 flex flex-col items-center gap-2.5">
           <LuAlarmCheck className="w-7 h-7 text-purple-700" />
           <p className="text-2xl font-semibold">Reminder TTD</p>
-          <p className="text-gray-600 text-center">Berpa kali rekomendasi TTD dari tenaga kesehatan?</p>
+          <p className="text-gray-600 text-center">
+            Berapa kali rekomendasi TTD dari tenaga kesehatan?
+          </p>
           <p className="text-gray-600">Pilih waktu reminder tablet TTD</p>
 
           <select
             id="tabletCount"
+            value={tabletCount} // Set the value to the state
+            onChange={handleTabletCountChange} // Handle change
             className="mt-2 px-3 py-2 border border-gray-300 rounded-lg"
           >
             <option value="" disabled selected hidden>
-              Pilih 
+              Pilih
             </option>
             <option value="1">1</option>
             <option value="2">2</option>
           </select>
 
-          {/* Reminder Checkboxes */}
-          {/* Reminder Checkboxes */}
           <div className="self-start mt-2.5 flex flex-col gap-2 w-full">
             <div className="flex items-center justify-between">
               <label className="inline-flex items-center cursor-pointer me-3">
@@ -132,19 +153,23 @@ export default function ReminderTtdPage() {
                     setMorningReminderActive(!morningReminderActive)
                   }
                   className="sr-only peer"
+                  disabled={tabletCount !== "2"} // Disable checkbox if not 2
                 />
                 <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                 <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                   Pagi
                 </span>
               </label>
-              <input
-                type="time"
-                value={morningReminderTime}
-                onChange={(e) => setMorningReminderTime(e.target.value)}
-                className="border border-gray-300 rounded-lg px-2 py-1"
-                disabled={!morningReminderActive} // Disable if checkbox is not checked
-              />
+              <div className="relative flex items-center">
+                <input
+                  type="time"
+                  value={morningReminderTime}
+                  onChange={(e) => setMorningReminderTime(e.target.value)}
+                  className="border border-gray-300 rounded-lg pr-2 py-1"
+                  disabled={!morningReminderActive}
+                />
+                <FaClock className="absolute right-2 text-gray-500" />
+              </div>
             </div>
 
             <div className="flex items-center justify-between">
@@ -162,13 +187,16 @@ export default function ReminderTtdPage() {
                   Malam
                 </span>
               </label>
-              <input
-                type="time"
-                value={eveningReminderTime}
-                onChange={(e) => setEveningReminderTime(e.target.value)}
-                className="border border-gray-300 rounded-lg px-2 py-1"
-                disabled={!eveningReminderActive} // Disable if checkbox is not checked
-              />
+              <div className="relative flex items-center">
+                <input
+                  type="time"
+                  value={eveningReminderTime}
+                  onChange={(e) => setEveningReminderTime(e.target.value)}
+                  className="border border-gray-300 rounded-lg pr-2 py-1"
+                  disabled={!eveningReminderActive}
+                />
+                <FaClock className="absolute right-2 text-gray-500" />
+              </div>
             </div>
           </div>
 

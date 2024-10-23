@@ -6,7 +6,7 @@ import axiosInstance from "@/libs/axios";
 import { Toaster, toast } from "sonner";
 import ImageModal from "@/components/modal/imagemodal/ImageModal";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2';
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 // Opsi waktu makan
@@ -362,6 +362,7 @@ const FoodLogForm = () => {
     }));
   };
 
+
   const handleSave = async () => {
     if (status === "authenticated" && session?.accessToken) {
       try {
@@ -369,7 +370,7 @@ const FoodLogForm = () => {
           (option) => option.name === selectedTab
         );
         const jamMakan = currentMealOption?.jam_makan;
-
+  
         const formattedData = Object.keys(selectedPortions).reduce(
           (acc, category) => {
             acc[`${jamMakan}_${category}`] = selectedPortions[category] || "";
@@ -377,9 +378,9 @@ const FoodLogForm = () => {
           },
           {} as Record<string, string>
         );
-
+  
         formattedData.jam_makan = jamMakan || "";
-
+  
         let endpoint = "";
         switch (selectedTab) {
           case "makan_malam":
@@ -394,11 +395,11 @@ const FoodLogForm = () => {
           default:
             throw new Error("Tab tidak dikenali");
         }
-
+  
         const response = await axiosInstance.post(endpoint, formattedData, {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
-
+  
         // Customize the SweetAlert for "makan malam"
         if (selectedTab === "makan_malam") {
           // Array of predefined links
@@ -410,19 +411,16 @@ const FoodLogForm = () => {
             "https://www.anecma.id/istri/edukasi/show/65",
             "https://www.anecma.id/istri/edukasi/show/66",
           ];
-
+  
           // Select a random link from the array
           const randomLink = links[Math.floor(Math.random() * links.length)];
-
+  
           Swal.fire({
             icon: "info",
             html: `
-              ${
-                response.data.data.pesan ||
-                "Berhasil menyimpan data untuk makan malam."
-              }
-              <br><br>Rekomendasi Makan bunda:
-              <a href="${randomLink}" target="_blank" style="color: blue;">Disini</a>
+              ${response.data.data.pesan || "Berhasil menyimpan data untuk makan malam."}
+              <br><br> Here is a random link:
+              <a href="${randomLink}" target=>Click here</a>
             `,
             showCloseButton: true,
             focusConfirm: false,
@@ -437,7 +435,7 @@ const FoodLogForm = () => {
       alert("Anda harus masuk untuk menyimpan data.");
     }
   };
-
+  
   const openModal = () => {
     let imageSrc = "";
 
