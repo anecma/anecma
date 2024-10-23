@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react"; // Import useSession
-import axiosInstance from "@/libs/axios"; // Ensure this is your configured axios instance
+import { useSession } from "next-auth/react";
+import axiosInstance from "@/libs/axios";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 interface Edukasi {
@@ -22,6 +22,7 @@ export default function EdukasiPage() {
   const [edukasiData, setEdukasiData] = useState<Edukasi[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session, status } = useSession();
+  const [filterType, setFilterType] = useState<"all" | "materi" | "video">("all");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,12 +54,39 @@ export default function EdukasiPage() {
     fetchData();
   }, [session, status]);
 
+  // Filtered data based on the selected filter type
+  const filteredData = edukasiData.filter((item) => 
+    filterType === "all" ? true : item.jenis === filterType
+  );
+
   return (
     <main className="m-5 mb-20">
       <h1 className="text-2xl font-bold mb-5">Edukasi</h1>
       <hr className="mb-5 h-0.5 border-t-0 bg-gray-300" />
 
-      <div className=" space-y-5">
+      {/* Filter Buttons */}
+      <div className="mb-5">
+        <button
+          onClick={() => setFilterType("all")}
+          className={`mr-2 px-4 py-2 rounded-lg ${filterType === "all" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+        >
+          Semua
+        </button>
+        <button
+          onClick={() => setFilterType("materi")}
+          className={`mr-2 px-4 py-2 rounded-lg ${filterType === "materi" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+        >
+          Materi
+        </button>
+        <button
+          onClick={() => setFilterType("video")}
+          className={`px-4 py-2 rounded-lg ${filterType === "video" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+        >
+          Video
+        </button>
+      </div>
+
+      <div className="space-y-5">
         {loading ? (
           // Show skeleton loaders while loading
           Array.from({ length: 3 }).map((_, index) => (
@@ -76,8 +104,8 @@ export default function EdukasiPage() {
               </div>
             </div>
           ))
-        ) : edukasiData.length > 0 ? (
-          edukasiData.map((item) => {
+        ) : filteredData.length > 0 ? (
+          filteredData.map((item) => {
             // Conditional class based on kategori
             const kategoriClass =
               item.kategori === "pencegahan" ? "bg-green-500" : "bg-red-500";
