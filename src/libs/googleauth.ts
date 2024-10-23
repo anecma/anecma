@@ -12,7 +12,7 @@ export default async function getTokenFromApiServer(
 ) {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/istri/login-token",
+      "http://api.anecma.id/api/istri/login-token",
       {
         method: "POST",
         headers: {
