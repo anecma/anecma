@@ -1,5 +1,5 @@
-"use client"
-import React, { useEffect, useState, ReactNode } from 'react';
+"use client";
+import React, { useEffect, useState, ReactNode } from "react";
 import { FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { LuUsers } from "react-icons/lu";
@@ -23,21 +23,38 @@ const BottomNavigation = () => {
     <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg border-t border-gray-200">
       <div className="flex justify-around items-center py-3">
         {/* Home Button */}
-        <Link href="/suami/dashboard" className={`flex flex-col items-center ${currentPath === '/suami/dashboard' ? 'text-blue-600' : 'text-gray-700'} hover:text-blue-600`}>
+        <Link
+          href="/suami/dashboard"
+          className={`flex flex-col items-center ${
+            currentPath === "/suami/dashboard"
+              ? "text-blue-600"
+              : "text-gray-700"
+          } hover:text-blue-600`}
+        >
           <FaHome className="w-6 h-6" />
           <span className="text-sm">Home</span>
         </Link>
 
         {/* Diary Button */}
-        <Link href="#" className={`flex flex-col items-center ${currentPath === '/diary' ? 'text-blue-600' : 'text-gray-700'} hover:text-blue-600`}>
+        <Link
+          href="#"
+          className={`flex flex-col items-center ${
+            currentPath === "/diary" ? "text-blue-600" : "text-gray-700"
+          } hover:text-blue-600`}
+        >
           <FiBook className="w-6 h-6" />
-          <span className="text-sm">Diary</span>
+          <span className="text-sm">Edukasi</span>
         </Link>
 
         {/* Users Button */}
-        <Link href="#" className={`flex flex-col items-center ${currentPath === '/users' ? 'text-blue-600' : 'text-gray-700'} hover:text-blue-600`}>
+        <Link
+          href="#"
+          className={`flex flex-col items-center ${
+            currentPath === "/users" ? "text-blue-600" : "text-gray-700"
+          } hover:text-blue-600`}
+        >
           <LuUsers className="w-6 h-6" />
-          <span className="text-sm">Users</span>
+          <span className="text-sm">Profil</span>
         </Link>
       </div>
     </div>

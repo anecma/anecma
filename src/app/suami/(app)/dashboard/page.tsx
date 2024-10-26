@@ -1,17 +1,22 @@
 "use client";
-import { FaCircle, FaUser, FaCalendar, FaRegBell } from 'react-icons/fa';
-import { MdPregnantWoman } from 'react-icons/md';
-import Image from 'next/image';
-import Layout from '../layout';
-import { useEffect, useState } from 'react';
+import { FaCircle, FaUser, FaCalendar, FaRegBell } from "react-icons/fa";
+import { MdOutlinePregnantWoman } from "react-icons/md";
+import Image from "next/image";
+import Layout from "../layout";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import axios from 'axios';
-import axiosInstance from '@/libs/axios';
+import axios from "axios";
+import axiosInstance from "@/libs/axios";
 
 // Define types for suami and istri data
 interface Suami {
-  name: string;
-  age: number;
+  user: { name: string; usia: number };
+  data_wife: {
+    name: string;
+    usia: number;
+    resiko_anemia: { resiko: string; hasil_hb: number }[];
+  };
+  usia_kehamilan_istri: number;
 }
 
 interface Istri {
@@ -23,32 +28,24 @@ interface Istri {
 }
 
 const DashboardSuami = () => {
-  const [userDataSuami, setUserDataSuami] = useState<Suami | null>(null);
+  const [userDataSuami, setUserDataSuami] = useState<Suami | null>();
   const [userDataIstri, setUserDataIstri] = useState<Istri | null>(null);
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-console.log(session)
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+
   useEffect(() => {
     async function fetchUserData() {
-      if (status === "authenticated" && session?.accessToken) {
+      if (status === "authenticated" && token) {
         try {
           // Fetch data for suami
           const suamiResponse = await axiosInstance.get("/suami/get-user", {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
+            headers: { Authorization: `Bearer ${token}` },
           });
           setUserDataSuami(suamiResponse.data.data);
-          console.log("userDataSuami", userDataSuami);
-
-
-          // Fetch data for istri
-          const istriResponse = await axiosInstance.get("/istri/get-user", {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-          setUserDataIstri(istriResponse.data.data);
-          console.log("userDataIstri", userDataIstri);
-
         } catch (error) {
           console.error("Error fetching user data:", error);
           setError("Failed to load user data.");
@@ -62,7 +59,12 @@ console.log(session)
     }
 
     fetchUserData();
-  }, [userDataIstri,userDataSuami,session, status]);
+  }, [status, token]);
+
+  console.log(userDataSuami);
+
+  const hbValue = userDataSuami?.data_wife.resiko_anemia[0]?.hasil_hb || null;
+  const anemiaRisk = userDataSuami?.data_wife.resiko_anemia[0]?.resiko || null;
 
   return (
     <Layout>
@@ -72,7 +74,7 @@ console.log(session)
           <div className="flex flex-row justify-between items-center">
             <div className="flex flex-col space-y-1">
               <p className="text-xl font-bold">Hi, Good morning</p>
-              <p className="text-xl font-bold">{userDataSuami?.name}!</p>
+              <p className="text-xl font-bold">{userDataSuami?.user.name}</p>
             </div>
             <div>
               <FaRegBell className="w-7 h-7 text-gray-500" />
@@ -83,18 +85,22 @@ console.log(session)
         {/* Info Istri */}
         <div className="m-5 bg-green-pastel border border-gray-200 shadow-sm rounded-2xl">
           <div className="flex flex-row m-5 justify-between items-center">
-            <div className="flex flex-col space-y-2">
-              <div className="flex flex-row space-x-2 items-center">
+            <div className="flex flex-col gap-3 items-start">
+              <div className="flex flex-row space-x-4 items-center">
                 <FaUser className="w-4 h-4 text-white" />
-                <p className="text-white">{userDataIstri?.name}</p>
+                <p className="text-white">{userDataSuami?.data_wife.name}</p>
               </div>
-              <div className="flex flex-row space-x-2 items-center">
+              <div className="flex flex-row space-x-4 items-center">
                 <FaCalendar className="w-4 h-4 text-white" />
-                <p className="text-white">{userDataIstri?.age} tahun</p>
+                <p className="text-white">
+                  {userDataSuami?.data_wife.usia} tahun
+                </p>
               </div>
               <div className="flex flex-row space-x-2 items-center">
-                <MdPregnantWoman className="w-6 h-6 text-white" />
-                <p className="text-white">{userDataIstri?.pregnancyAge} minggu</p>
+                <MdOutlinePregnantWoman className="w-6 h-6 text-white" />
+                <p className="text-white">
+                  {userDataSuami?.usia_kehamilan_istri} minggu
+                </p>
               </div>
             </div>
             <div>
@@ -114,17 +120,22 @@ console.log(session)
             <div className="flex flex-col space-y-2">
               <p className="text-lg font-bold">Status Anemia</p>
               <div className="flex flex-row space-x-2 items-center">
-                <p className="text-green-pastel">{userDataIstri?.anemiaStatus}</p>
-                <FaCircle className="w-2 h-2 text-gray-500" />
-                <p>HB: {userDataIstri?.hbLevel}</p>
+                {anemiaRisk && (
+                  <>
+                    <p
+                      className={`text-${
+                        anemiaRisk === "rendah" ? "green-500" : "red-500"
+                      }`}
+                    >
+                      {anemiaRisk.charAt(0).toUpperCase() + anemiaRisk.slice(1)}
+                    </p>
+                    <FaCircle className="w-1 h-1" />
+                    <p>
+                      HB: {hbValue !== null ? hbValue : "Data tidak tersedia"}
+                    </p>
+                  </>
+                )}
               </div>
-              <button
-                type="button"
-                className="text-white bg-blue-light hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2"
-                onClick={() => alert("Reminder to drink TTD!")}
-              >
-                Ingatkan Minum TTD
-              </button>
             </div>
             <div>
               <Image
