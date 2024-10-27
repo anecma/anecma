@@ -14,12 +14,14 @@ export default function ReminderTtdPage() {
   const { data: session, status } = useSession();
   const [morningReminderTime, setMorningReminderTime] = useState("08:00");
   const [eveningReminderTime, setEveningReminderTime] = useState("18:00");
-  const [morningReminderActive, setMorningReminderActive] = useState(false);
-  const [eveningReminderActive, setEveningReminderActive] = useState(false);
   const [tabletCount, setTabletCount] = useState(""); // State for tablet count
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // This state will track whether reminders are active based on tabletCount
+  const [morningReminderActive, setMorningReminderActive] = useState(false);
+  const [eveningReminderActive, setEveningReminderActive] = useState(false);
 
   // Function to fetch the current reminder settings
   const fetchReminderSettings = useCallback(async () => {
@@ -34,6 +36,7 @@ export default function ReminderTtdPage() {
         const data = response.data.data;
         setMorningReminderTime(data.waktu_reminder_1);
         setEveningReminderTime(data.waktu_reminder_2);
+        // Initialize reminder states based on fetched data
         setMorningReminderActive(parseInt(data.is_active_reminder_1) === 1);
         setEveningReminderActive(parseInt(data.is_active_reminder_2) === 1);
       } catch (error) {
@@ -91,7 +94,8 @@ export default function ReminderTtdPage() {
   const handleTabletCountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const count = e.target.value;
     setTabletCount(count);
-  
+
+    // Enable or disable reminders based on selected tablet count
     if (count === "2") {
       setMorningReminderActive(true);
       setEveningReminderActive(true);
@@ -103,12 +107,11 @@ export default function ReminderTtdPage() {
       setEveningReminderActive(false);
     }
   };
-  
 
   // Fetch reminder settings when the component mounts
   useEffect(() => {
     fetchReminderSettings();
-  }, [fetchReminderSettings]); // Include fetchReminderSettings in dependency array
+  }, [fetchReminderSettings]);
 
   return (
     <main>
@@ -132,11 +135,11 @@ export default function ReminderTtdPage() {
 
           <select
             id="tabletCount"
-            value={tabletCount} // Set the value to the state
-            onChange={handleTabletCountChange} // Handle change
+            value={tabletCount}
+            onChange={handleTabletCountChange}
             className="mt-2 px-3 py-2 border border-gray-300 rounded-lg"
           >
-            <option value="" disabled selected hidden>
+            <option value="" disabled hidden>
               Pilih
             </option>
             <option value="1">1</option>
@@ -149,11 +152,9 @@ export default function ReminderTtdPage() {
                 <input
                   type="checkbox"
                   checked={morningReminderActive}
-                  onChange={() =>
-                    setMorningReminderActive(!morningReminderActive)
-                  }
+                  onChange={() => {}}
                   className="sr-only peer"
-                  disabled={tabletCount !== "2"} // Disable checkbox if not 2
+                  disabled={tabletCount === ""} // Disable if no selection
                 />
                 <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                 <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -166,7 +167,7 @@ export default function ReminderTtdPage() {
                   value={morningReminderTime}
                   onChange={(e) => setMorningReminderTime(e.target.value)}
                   className="border border-gray-300 rounded-lg pr-2 py-1"
-                  disabled={!morningReminderActive}
+                  disabled={!morningReminderActive || tabletCount === ""}
                 />
                 <FaClock className="absolute right-2 text-gray-500" />
               </div>
@@ -177,10 +178,9 @@ export default function ReminderTtdPage() {
                 <input
                   type="checkbox"
                   checked={eveningReminderActive}
-                  onChange={() =>
-                    setEveningReminderActive(!eveningReminderActive)
-                  }
+                  onChange={() => {}}
                   className="sr-only peer"
+                  disabled={tabletCount === ""} // Disable if no selection
                 />
                 <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                 <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -193,7 +193,7 @@ export default function ReminderTtdPage() {
                   value={eveningReminderTime}
                   onChange={(e) => setEveningReminderTime(e.target.value)}
                   className="border border-gray-300 rounded-lg pr-2 py-1"
-                  disabled={!eveningReminderActive}
+                  disabled={!eveningReminderActive || tabletCount === ""}
                 />
                 <FaClock className="absolute right-2 text-gray-500" />
               </div>
