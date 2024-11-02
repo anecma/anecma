@@ -6,7 +6,7 @@ import axiosInstance from "@/libs/axios";
 import { Toaster, toast } from "sonner";
 import ImageModal from "@/components/modal/imagemodal/ImageModal";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 // Opsi waktu makan
@@ -64,31 +64,31 @@ const portionSizes = {
 const mealCategories = {
   karbohidrat: [
     {
-      src: "/images/makanan-pokok/Makan-Pokok-1.png",
+      src: "/images/makanan-pokok/Makanan_Pokok_Nasi.png",
       alt: "Nasi 1 Piring",
       title: "Nasi",
       description: "1 Piring Kecil",
     },
     {
-      src: "/images/makanan-pokok/Makan-Pokok-6.png",
+      src: "/images/makanan-pokok/Makanan_Pokok_Kentang_Rebus.png",
       alt: "Kentang 2 Buah",
       title: "Kentang Rebus",
-      description: "2 Buah Ukuran Sedang",
+      description: "2 1/2 Buah Ukuran Sedang",
     },
     {
-      src: "/images/makanan-pokok/Makan-Pokok-4.png",
-      alt: "Mie 2 Gelas",
+      src: "/images/makanan-pokok/Makanan_Pokok_Mie.png",
+      alt: "Mie 1 Piring",
       title: "Mie",
-      description: "2 Gelas Mie Ukuran Sedang",
+      description: "1 Piring Mie Ukuran Sedang",
     },
     {
-      src: "/images/makanan-pokok/Makan-Pokok-5.png",
+      src: "/images/makanan-pokok/Makanan_Pokok_Ubi_Rebus.png",
       alt: "Ubi Jalar Rebus",
       title: "Ubi Jalar Rebus",
       description: "1 Buah Ukuran Sedang",
     },
     {
-      src: "/images/makanan-pokok/Makan-Pokok-2.png",
+      src: "/images/makanan-pokok/Makanan_Pokok_Roti.png",
       alt: "Roti Gandum",
       title: "Roti Gandum",
       description: "3 Potong",
@@ -102,73 +102,61 @@ const mealCategories = {
   ],
   lauk_hewani: [
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-1.png",
+      src: "/images/lauk-hewani/Lauk_Lele_Goreng.png",
       alt: "Ikan-Lele",
       title: "Ikan Lele",
-      description: "1/3 sedang ikan Lele ",
+      description: "1 sedang ikan Lele ",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-2.png",
+      src: "/images/lauk-hewani/Lauk_Ikan_Bandeng_Goreng.png",
       alt: "Ikan-Bandeng",
       title: "Ikan Bandeng Goreng",
       description: "1 potong badan bagian badan",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-3.png",
+      src: "/images/lauk-hewani/Lauk_Ikan_Patin_Goreng.png",
       alt: "Ikan-patin",
       title: "Ikan patin goreng",
       description: "1 potong bagian badan",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-4.png",
+      src: "/images/lauk-hewani/Lauk_Teri_Padang.png",
       alt: "ikan-teri-padang",
       title: "Teri Padang",
       description: "3 sendok makan",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-5.png",
+      src: "/images/lauk-hewani/Lauk_Teri_Nasi.png",
       alt: "ikan-teri-nasi",
       title: "Teri Nasi",
       description: "5 sendok makan",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-7.png",
+      src: "/images/lauk-hewani/Lauk_Telur_Ayam_Goreng.png",
       alt: "telur",
       title: "Telur",
       description: "1 Butir Telur",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-6.png",
+      src: "/images/lauk-hewani/Lauk_Telur_Puyuh.png",
       alt: "telur-puyuh",
       title: "Telur Puyuh",
       description: "5 Butir telur puyuh",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-8.png",
-      alt: "dada-ayam",
-      title: "Ayam Goreng (Dada)",
-      description: "1 Potong sedang",
-    },
-    {
-      src: "/images/lauk-hewani/Lauk-Pauk-9.png",
-      alt: "daging",
-      title: "Rendang Daging Sapi ",
-      description: "1 Potong Daging Sedang",
-    },
-    {
-      src: "/images/lauk-hewani/Lauk-Pauk-10.png",
+      src: "/images/lauk-hewani/Lauk_Ati_Ayam.png",
       alt: "Jeroan",
       title: "Rempela Ati",
       description: "1 buah sedang",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-11.png",
+      src: "/images/lauk-hewani/Lauk_Udang.png",
       alt: "Seafood",
       title: "Seafood Udang",
       description: "5 Ekor Sedang Udang",
     },
     {
-      src: "/images/lauk-hewani/Lauk-Pauk-12.png",
+      src: "/images/lauk-hewani/Lauk_Nugget.png",
       alt: "Nugget",
       title: "Nugget",
       description: "Nugget 2 Potong",
@@ -176,25 +164,31 @@ const mealCategories = {
   ],
   lauk_nabati: [
     {
-      src: "/images/lauk-nabati/Lauk-Pauk-14.png",
+      src: "/images/lauk-nabati/Lauk_Tahu_Goreng.png",
       alt: "Tahu",
       title: "Tahu Goreng",
       description: "2 Potong Sedang",
     },
     {
-      src: "/images/lauk-nabati/Lauk-Pauk-16.png",
+      src: "/images/lauk-nabati/Lauk_Tempe_Goreng.png",
       alt: "Tempe",
       title: "Tempe Goreng",
       description: "2 Tempe Sedang",
     },
     {
-      src: "/images/lauk-nabati/Selingan-1.png",
-      alt: "Kacang Ijo",
-      title: "Bubur Kacang Ijo",
-      description: ": 1 Porsi Sedang",
+      src: "/images/lauk-nabati/Lauk_Tempe_Orek.png",
+      alt: "Tempe",
+      title: "Tempe Orek",
+      description: "3 Sendok Tempe Orek",
     },
     {
-      src: "/images/lauk-nabati/Selingan-2.png",
+      src: "/images/lauk-nabati/Selingan_Kacang_Hijau.png",
+      alt: "Kacang Ijo",
+      title: "Bubur Kacang Ijo",
+      description: "1 Porsi Sedang",
+    },
+    {
+      src: "/images/lauk-nabati/Selingan_Kacang_Rebus.png",
       alt: "Kacang Tanah",
       title: "Kacang Tanah Rebus",
       description: "1 Porsi Sedang",
@@ -202,19 +196,19 @@ const mealCategories = {
   ],
   sayur: [
     {
-      src: "/images/sayur/Sayur-1.png",
+      src: "/images/sayur/Sayur_Sawi.png",
       alt: "Sayur",
       title: "Tumis Sawi",
       description: "5 Sendok Makan",
     },
     {
-      src: "/images/sayur/Sayur-2.png",
+      src: "/images/sayur/Sayur_Bayam.png",
       alt: "Sayur",
       title: "Sayur Bayam",
       description: "1 Mangkuk Kecil",
     },
     {
-      src: "/images/sayur/Sayur-3.png",
+      src: "/images/sayur/Sayur_Sop.png",
       alt: "Sayur",
       title: "Sayur Sop",
       description: "2 Sendok Sayur",
@@ -222,38 +216,38 @@ const mealCategories = {
   ],
   buah: [
     {
-      src: "/images/buah/Buah-1.png",
+      src: "/images/buah/Buah_Semangka.png",
 
       alt: "Semangka",
       title: "Semangka",
-      description: "2 Potong Sedang",
+      description: "1 Potong Sedang",
     },
     {
-      src: "/images/buah/Buah-2.png",
+      src: "/images/buah/Buah_Pepaya.png",
       alt: "Pepaya",
       title: "Pepaya",
       description: "1 Potong Besar",
     },
     {
-      src: "/images/buah/Buah-3.png",
+      src: "/images/buah/Buah_Pisang.png",
       alt: "Pisang",
       title: "Pisang",
       description: "1 Buah Sedang",
     },
     {
-      src: "/images/buah/Buah-4.png",
+      src: "/images/buah/Buah_Melon.png",
       alt: "Melon",
       title: "Melon",
       description: "1 Potong Sedang",
     },
     {
-      src: "/images/buah/Buah-5.png",
+      src: "/images/buah/Buah_Mangga.png",
       alt: "Mangga",
       title: "Mangga",
-      description: "3/4 Buah Besar Mangga",
+      description: "1 Buah Besar Mangga",
     },
     {
-      src: "/images/buah/Buah-6.png",
+      src: "/images/buah/Buah_Apel.png",
       alt: "Apel",
       title: "Apel",
       description: "1 Buah Sedang",
@@ -362,7 +356,6 @@ const FoodLogForm = () => {
     }));
   };
 
-
   const handleSave = async () => {
     if (status === "authenticated" && session?.accessToken) {
       try {
@@ -370,7 +363,7 @@ const FoodLogForm = () => {
           (option) => option.name === selectedTab
         );
         const jamMakan = currentMealOption?.jam_makan;
-  
+
         const formattedData = Object.keys(selectedPortions).reduce(
           (acc, category) => {
             acc[`${jamMakan}_${category}`] = selectedPortions[category] || "";
@@ -378,9 +371,9 @@ const FoodLogForm = () => {
           },
           {} as Record<string, string>
         );
-  
+
         formattedData.jam_makan = jamMakan || "";
-  
+
         let endpoint = "";
         switch (selectedTab) {
           case "makan_malam":
@@ -395,11 +388,11 @@ const FoodLogForm = () => {
           default:
             throw new Error("Tab tidak dikenali");
         }
-  
+
         const response = await axiosInstance.post(endpoint, formattedData, {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
-  
+
         // Customize the SweetAlert for "makan malam"
         if (selectedTab === "makan_malam") {
           // Array of predefined links
@@ -411,14 +404,17 @@ const FoodLogForm = () => {
             "https://www.anecma.id/istri/edukasi/show/65",
             "https://www.anecma.id/istri/edukasi/show/66",
           ];
-  
+
           // Select a random link from the array
           const randomLink = links[Math.floor(Math.random() * links.length)];
-  
+
           Swal.fire({
             icon: "info",
             html: `
-              ${response.data.data.pesan || "Berhasil menyimpan data untuk makan malam."}
+              ${
+                response.data.data.pesan ||
+                "Berhasil menyimpan data untuk makan malam."
+              }
               <br><br> Rekomendasi Makanya Bunda:
               <a href="${randomLink}" target=>Click here</a>
             `,
@@ -435,7 +431,7 @@ const FoodLogForm = () => {
       alert("Anda harus masuk untuk menyimpan data.");
     }
   };
-  
+
   const openModal = () => {
     let imageSrc = "";
 
@@ -528,7 +524,11 @@ const FoodLogForm = () => {
                 {mealCategories[category].map((image, index) => (
                   <div
                     key={index}
-                    className="flex flex-col items-center bg-white w-40 p-5 rounded-2xl flex-shrink-0"
+                    className="flex flex-col items-center bg-white w-40 p-5 rounded-2xl flex-shrink-0 cursor-pointer"
+                    onClick={() => {
+                      setImageSrc(image.src); // Set the image source to the clicked image
+                      setIsGuideModalOpen(true); // Open the modal
+                    }}
                   >
                     <Image
                       src={image.src}
