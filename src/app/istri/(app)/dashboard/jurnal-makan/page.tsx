@@ -93,12 +93,6 @@ const mealCategories = {
       title: "Roti Gandum",
       description: "3 Potong",
     },
-    {
-      src: "/images/makanan-pokok/Makan-Pokok-3.png",
-      alt: "Singkong ",
-      title: "Singkong Rebus",
-      description: "3.5 Potong Kecil",
-    },
   ],
   lauk_hewani: [
     {
