@@ -146,10 +146,9 @@ export default function EdukasiPage() {
                   href={`/istri/edukasi/show/${item.id}`}
                   className="flex-shrink-0 ml-5"
                 >
-                  <p>{item.thumbnail}</p>
                   <Image
                     className="w-24 h-24 rounded-lg"
-                    src={item.thumbnail}
+                    src={encodeURI(item.thumbnail)}
                     alt={item.judul}
                     width={100}
                     height={100}
