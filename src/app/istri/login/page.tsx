@@ -5,11 +5,11 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/libs/auth";
 
 export default async function LoginPage() {
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
 
-  if (session) {
-    redirect("/istri/dashboard");
-  }
+  // if (session) {
+  //   redirect("/istri/dashboard");
+  // }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
