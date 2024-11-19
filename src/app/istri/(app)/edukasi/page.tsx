@@ -22,7 +22,9 @@ export default function EdukasiPage() {
   const [edukasiData, setEdukasiData] = useState<Edukasi[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session, status } = useSession();
-  const [filterType, setFilterType] = useState<"all" | "materi" | "video">("all");
+  const [filterType, setFilterType] = useState<"all" | "materi" | "video">(
+    "all"
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +57,7 @@ export default function EdukasiPage() {
   }, [session, status]);
 
   // Filtered data based on the selected filter type
-  const filteredData = edukasiData.filter((item) => 
+  const filteredData = edukasiData.filter((item) =>
     filterType === "all" ? true : item.jenis === filterType
   );
 
@@ -68,19 +70,25 @@ export default function EdukasiPage() {
       <div className="mb-5">
         <button
           onClick={() => setFilterType("all")}
-          className={`mr-2 px-4 py-2 rounded-lg ${filterType === "all" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+          className={`mr-2 px-4 py-2 rounded-lg ${
+            filterType === "all" ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
         >
           Semua
         </button>
         <button
           onClick={() => setFilterType("materi")}
-          className={`mr-2 px-4 py-2 rounded-lg ${filterType === "materi" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+          className={`mr-2 px-4 py-2 rounded-lg ${
+            filterType === "materi" ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
         >
           Materi
         </button>
         <button
           onClick={() => setFilterType("video")}
-          className={`px-4 py-2 rounded-lg ${filterType === "video" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+          className={`px-4 py-2 rounded-lg ${
+            filterType === "video" ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
         >
           Video
         </button>
@@ -138,6 +146,7 @@ export default function EdukasiPage() {
                   href={`/istri/edukasi/show/${item.id}`}
                   className="flex-shrink-0 ml-5"
                 >
+                  <p>{item.thumbnail}</p>
                   <Image
                     className="w-24 h-24 rounded-lg"
                     src={item.thumbnail}
