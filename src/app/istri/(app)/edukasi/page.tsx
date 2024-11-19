@@ -148,8 +148,12 @@ export default function EdukasiPage() {
                 >
                   <Image
                     className="w-24 h-24 rounded-lg"
-                    src={encodeURI(item.thumbnail)}
+                    src={item.thumbnail}
                     alt={item.judul}
+                    width={100}
+                    height={100}
+                    priority
+                    unoptimized
                   />
                 </Link>
               </div>
