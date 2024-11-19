@@ -150,7 +150,6 @@ export default function EdukasiPage() {
                     className="w-24 h-24 rounded-lg"
                     src={encodeURI(item.thumbnail)}
                     alt={item.judul}
-                    priority
                   />
                 </Link>
               </div>
