@@ -3,6 +3,11 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { FaRegBell, FaCircle } from "react-icons/fa6";
+import { LuCalculator } from "react-icons/lu";
+import { MdOutlineRestaurantMenu } from "react-icons/md";
+import { GiMedicines } from "react-icons/gi";
+import { TbDropletSearch } from "react-icons/tb";
+import { BiSolidAlarmAdd } from "react-icons/bi";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
@@ -34,6 +39,8 @@ export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  
 
   useEffect(() => {
     async function fetchUserData() {
@@ -103,7 +110,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <Image
-              src="/images/blood-pressure.png"
+              src="/images/Anecma_0E.png"
               alt="Blood Pressure Image"
               width={90}
               height={90}
@@ -115,32 +122,41 @@ export default function DashboardPage() {
 
       {/* Main Menu */}
       <div className="grid grid-cols-2 mx-5 mb-20 gap-5">
-        <Link href="/istri/dashboard/riwayat">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-sky border border-gray-200 rounded-lg shadow hover:bg-blue-sky/80 hover:shadow-lg transition duration-300 ease-in-out">
-            <p className="text-white font-bold">Riwayat HB</p>
-          </div>
-        </Link>
-        <Link href="/istri/dashboard/reminder-ttd">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-white border border-blue-200 rounded-lg shadow hover:bg-blue-white/80 hover:shadow-lg transition duration-300 ease-in-out">
-            <p className="text-white font-bold">Reminder TTD</p>
-          </div>
-        </Link>
-        <Link href="/istri/dashboard/konsumsi-ttd">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-gray-white border border-gray-200 rounded-lg shadow hover:bg-gray-white/80 hover:shadow-lg transition duration-300 ease-in-out">
-            <p className="text-white font-bold">Konsumsi TTD</p>
-          </div>
-        </Link>
-        <Link href="/istri/dashboard/jurnal-makan">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-green-pastel border border-green-200 rounded-lg shadow hover:bg-green-pastel/80 hover:shadow-lg transition duration-300 ease-in-out">
-            <p className="text-white font-bold">Jurnal Makan</p>
-          </div>
-        </Link>
-        <Link href="/istri/dashboard/kalkulator-anemia">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-light border border-gray-200 rounded-lg shadow hover:bg-blue-light/80 hover:shadow-lg transition duration-300 ease-in-out">
-            <p className="text-white font-bold">Kalkulator Anemia</p>
-          </div>
-        </Link>
-      </div>
+      <Link href="/istri/dashboard/riwayat">
+        <div className="flex flex-col items-center max-w-sm min-h-28 p-4 bg-blue-sky border border-gray-200 rounded-lg shadow hover:bg-blue-sky/80 hover:shadow-lg transition duration-300 ease-in-out">
+        <TbDropletSearch className="h-10 w-10 text-white mb-3 opacity-80" />
+          <p className="text-white font-bold">Riwayat HB</p>
+        </div>
+      </Link>
+
+      <Link href="/istri/dashboard/reminder-ttd">
+        <div className="flex flex-col items-center max-w-sm min-h-28 p-4 bg-blue-white border border-blue-200 rounded-lg shadow hover:bg-blue-white/80 hover:shadow-lg transition duration-300 ease-in-out">
+          <BiSolidAlarmAdd className="h-10 w-10 text-white mb-3 opacity-80" />
+          <p className="text-white font-bold">Reminder TTD</p>
+        </div>
+      </Link>
+
+      <Link href="/istri/dashboard/konsumsi-ttd">
+        <div className="flex flex-col items-center max-w-sm min-h-28 p-4 bg-gray-white border border-gray-200 rounded-lg shadow hover:bg-gray-white/80 hover:shadow-lg transition duration-300 ease-in-out">
+        <GiMedicines className="h-10 w-10 text-white mb-3 opacity-80" />
+          <p className="text-white font-bold">Konsumsi TTD</p>
+        </div>
+      </Link>
+
+      <Link href="/istri/dashboard/jurnal-makan">
+        <div className="flex flex-col items-center max-w-sm min-h-28 p-4 bg-green-pastel border border-green-200 rounded-lg shadow hover:bg-green-pastel/80 hover:shadow-lg transition duration-300 ease-in-out">
+        <MdOutlineRestaurantMenu className="h-10 w-10 text-white mb-3 opacity-80" />
+          <p className="text-white font-bold">Jurnal Makan</p>
+        </div>
+      </Link>
+
+      <Link href="/istri/dashboard/kalkulator-anemia">
+        <div className="flex flex-col items-center max-w-sm min-h-28 p-4 bg-blue-light border border-gray-200 rounded-lg shadow hover:bg-blue-light/80 hover:shadow-lg transition duration-300 ease-in-out">
+        <LuCalculator className="h-10 w-10 text-white mb-3 opacity-80" />
+          <p className="text-white font-bold">Kalkulator Anemia</p>
+        </div>
+      </Link>
+    </div>
     </main>
   );
 }
