@@ -409,8 +409,8 @@ const FoodLogForm = () => {
                 response.data.data.pesan ||
                 "Berhasil menyimpan data untuk makan malam."
               }
-              <br><br> Rekomendasi Makanya Bunda:
-              <a href="${randomLink}" target=>Click here</a>
+              <br><br> Rekomendasi Makanan Untuk Bunda:
+              <a href="${randomLink}" target=>Klik Disini</a>
             `,
             showCloseButton: true,
             focusConfirm: false,
