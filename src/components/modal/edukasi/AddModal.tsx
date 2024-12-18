@@ -45,7 +45,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, onAdd }) => {
       }
 
       try {
-        const response = await axiosInstance.get("/admin/data-kategori-edukasi/", {
+        const response = await axiosInstance.get("/admin/data-kategori/", {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
