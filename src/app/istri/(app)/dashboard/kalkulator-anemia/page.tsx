@@ -37,8 +37,6 @@ export default function KalkulatorAnemiaPage() {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           });
 
-          console.log(userResponse);
-
           if (userResponse.data.success) {
             const { riwayat_hb } = userResponse.data.data.user;
 
