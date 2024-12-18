@@ -218,9 +218,6 @@ export default function EdukasiPage() {
                                       <h4 className="font-semibold text-lg">
                                         {edukasi.judul}
                                       </h4>
-                                      <p className="text-sm text-gray-600">
-                                        {edukasi.konten}
-                                      </p>
                                       <Link
                                         href={`/istri/edukasi/show/${edukasi.id}`}
                                         className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 mt-2"
@@ -306,9 +303,6 @@ export default function EdukasiPage() {
                             <h4 className="font-semibold text-lg">
                               {edukasi.judul}
                             </h4>
-                            <p className="text-sm text-gray-600">
-                              {edukasi.konten}
-                            </p>
                             <Link
                               href={`/istri/edukasi/show/${edukasi.id}`}
                               className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 mt-2"

@@ -45,8 +45,8 @@ export default function SuamiEdukasiPage() {
               },
             }
           );
-          
-          console.log(response.data.data)
+
+          console.log(response.data.data);
           if (Array.isArray(response.data.data)) {
             setKategoriData(response.data.data);
           } else {
@@ -82,18 +82,19 @@ export default function SuamiEdukasiPage() {
               <div className="flex items-center space-x-3">
                 {/* Skeleton for category title */}
                 <div className="h-6 bg-gray-300 rounded w-3/4"></div>
-                <div className="w-3 h-3 bg-gray-300 rounded-full"></div> {/* Arrow */}
+                <div className="w-3 h-3 bg-gray-300 rounded-full"></div>{" "}
+                {/* Arrow */}
               </div>
-
-              <div className="h-4 bg-gray-300 rounded mb-3 w-1/2"></div> {/* Skeleton for category description */}
-
+              <div className="h-4 bg-gray-300 rounded mb-3 w-1/2"></div>{" "}
+              {/* Skeleton for category description */}
               {/* Skeleton for edukasi items */}
               <div className="space-y-3 mt-4">
                 {Array.from({ length: 2 }).map((_, subIndex) => (
                   <div key={subIndex} className="space-y-2">
-                    <div className="h-5 bg-gray-300 rounded w-1/2"></div> {/* Skeleton for edukasi title */}
-                    <div className="h-4 bg-gray-300 rounded w-2/3"></div> {/* Skeleton for edukasi content */}
-
+                    <div className="h-5 bg-gray-300 rounded w-1/2"></div>{" "}
+                    {/* Skeleton for edukasi title */}
+                    <div className="h-4 bg-gray-300 rounded w-2/3"></div>{" "}
+                    {/* Skeleton for edukasi content */}
                     {/* Skeleton for thumbnail */}
                     <div className="h-24 w-24 bg-gray-300 rounded"></div>
                   </div>
@@ -118,7 +119,9 @@ export default function SuamiEdukasiPage() {
                       );
                       if (body) {
                         body.classList.toggle("hidden");
-                        body.style.height = body.classList.contains("hidden") ? "0" : `${body.scrollHeight}px`;
+                        body.style.height = body.classList.contains("hidden")
+                          ? "0"
+                          : `${body.scrollHeight}px`;
                       }
                     }}
                   >
@@ -174,9 +177,6 @@ export default function SuamiEdukasiPage() {
                               <h4 className="font-semibold text-lg">
                                 {edukasi.judul}
                               </h4>
-                              <p className="text-sm text-gray-600">
-                                {edukasi.konten}
-                              </p>
                               <Link
                                 href={`/suami/edukasi/show/${edukasi.id}`}
                                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 mt-2"

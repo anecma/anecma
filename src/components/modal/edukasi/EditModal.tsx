@@ -30,7 +30,38 @@ interface EditModalProps {
   defaultThumbnail: File | string | null;
 }
 
-const EditModal: React.FC<EditModalProps> = ({ onClose, onEdit, item, defaultThumbnail }) => {
+function buildSelectOptions(
+  categories: Kategori[],
+  parentId: number | null = null,
+  depth: number = 0
+): JSX.Element[] {
+  const options: JSX.Element[] = [];
+
+  categories.forEach((category) => {
+    if (category.parent_id === parentId) {
+      const padding = `${" ".repeat(depth * 2)}${"-".repeat(depth)} `;
+      const label = `${padding}${category.nama_kategori} - (${category.gender})`;
+
+      options.push(
+        <option key={category.id} value={category.id}>
+          {label}
+        </option>
+      );
+
+      // Recursive call for child categories
+      options.push(...buildSelectOptions(categories, category.id, depth + 1));
+    }
+  });
+
+  return options;
+}
+
+const EditModal: React.FC<EditModalProps> = ({
+  onClose,
+  onEdit,
+  item,
+  defaultThumbnail,
+}) => {
   const [judul, setJudul] = useState(item.judul);
   const [konten, setKonten] = useState(item.konten);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -127,7 +158,11 @@ const EditModal: React.FC<EditModalProps> = ({ onClose, onEdit, item, defaultThu
 
           {/* CKEditor for Konten */}
           <div className="my-3">
-            <CustomCKEditor data={konten} onChange={setKonten} setImages={() => {}} />
+            <CustomCKEditor
+              data={konten}
+              onChange={setKonten}
+              setImages={() => {}}
+            />
           </div>
 
           {/* Thumbnail Input */}
@@ -141,13 +176,23 @@ const EditModal: React.FC<EditModalProps> = ({ onClose, onEdit, item, defaultThu
             />
             {imagePreview && (
               <div className="mt-2 h-32 w-32">
-                <Image src={imagePreview} alt="Preview" width={300} height={200} className="w-full h-auto rounded" />
+                <Image
+                  src={imagePreview}
+                  alt="Preview"
+                  width={300}
+                  height={200}
+                  className="w-full h-auto rounded"
+                />
               </div>
             )}
             {!imagePreview && defaultThumbnail && (
               <div className="mt-2 h-32 w-32">
                 <Image
-                  src={typeof defaultThumbnail === "string" ? defaultThumbnail : URL.createObjectURL(defaultThumbnail)}
+                  src={
+                    typeof defaultThumbnail === "string"
+                      ? defaultThumbnail
+                      : URL.createObjectURL(defaultThumbnail)
+                  }
                   alt="Current Thumbnail"
                   width={300}
                   height={200}
@@ -176,26 +221,22 @@ const EditModal: React.FC<EditModalProps> = ({ onClose, onEdit, item, defaultThu
             </label>
           </div>
 
-          {/* Parent Category Select */}
+          {/* Kategori Select */}
           <div className="relative my-2.5">
             <select
-              id="parentCategory"
-              value={parentCategory || ""}
-              onChange={(e) => setParentCategory(e.target.value ? parseInt(e.target.value) : null)}
-              disabled={loading}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              value={kategori}
+              onChange={(e) => setKategori(e.target.value)}
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              required
             >
-              <option value="">Pilih Kategori Induk</option>
-              {categories
-                .filter((category) => category.parent_id === null) // Only top-level categories
-                .map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.nama_kategori}
-                  </option>
-                ))}
+              <option value="" disabled>
+                Pilih Kategori
+              </option>
+              <option value="pencegahan">Pencegahan</option>
+              <option value="edukasi">Edukasi</option>
             </select>
-            <label htmlFor="parentCategory" className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
-              Kategori Induk
+            <label className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
+              Kategori
             </label>
           </div>
 
@@ -207,16 +248,12 @@ const EditModal: React.FC<EditModalProps> = ({ onClose, onEdit, item, defaultThu
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               required
             >
-              <option value="" disabled>Pilih Kategori ID</option>
-              {categories
-                .filter((cat) => cat.parent_id === parentCategory) // Only show subcategories based on parent
-                .map((subcategory) => (
-                  <option key={subcategory.id} value={subcategory.id}>
-                    {subcategory.nama_kategori} - ({subcategory.gender})
-                  </option>
-                ))}
+              <option value="" disabled>
+                Pilih Kategori ID
+              </option>
+              {buildSelectOptions(categories)}
             </select>
-            <label className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
+            <label className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4">
               Kategori ID
             </label>
           </div>
