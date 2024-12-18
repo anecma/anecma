@@ -7,7 +7,7 @@ import { IoChatbubblesOutline } from "react-icons/io5";
 import NavLink from "./nav-link";
 import { usePathname } from "next/navigation";
 
-export default function BottomNavigation() {
+export default function BottomNavigationIstri() {
   const path = usePathname();
 
   const linkActive = "w-5 h-5 mb-2 text-blue-600";

@@ -40,7 +40,7 @@ const Petugas: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authTokenAdmin");
       if (!token) return;
 
       try {
@@ -71,7 +71,7 @@ const Petugas: React.FC = () => {
   }, []);
 
   const handleAdd = async (newPetugas: Partial<PetugasData>) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authTokenAdmin");
     if (!token) return;
 
     try {
@@ -113,7 +113,7 @@ const Petugas: React.FC = () => {
   };
 
   const handleUpdate = async (updatedPetugas: Partial<PetugasData>) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authTokenAdmin");
     if (!token) return;
 
     try {
@@ -158,7 +158,7 @@ const Petugas: React.FC = () => {
       confirmButtonText: "Ya, hapus!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("authTokenAdmin");
         if (!token) return;
 
         try {

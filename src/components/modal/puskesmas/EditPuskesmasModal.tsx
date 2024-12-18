@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 interface PuskesmasItem {
   id: number;
@@ -14,12 +14,17 @@ interface EditPuskesmasModalProps {
   puskesmasData: PuskesmasItem | null; // Data yang diedit
 }
 
-const EditPuskesmasModal: React.FC<EditPuskesmasModalProps> = ({ isOpen, onClose, onEdit, puskesmasData }) => {
+const EditPuskesmasModal: React.FC<EditPuskesmasModalProps> = ({
+  isOpen,
+  onClose,
+  onEdit,
+  puskesmasData,
+}) => {
   const [formData, setFormData] = useState<PuskesmasItem>({
     id: 0,
-    nama_puskesmas: '',
-    alamat: '',
-    status: ''
+    nama_puskesmas: "",
+    alamat: "",
+    status: "",
   });
 
   useEffect(() => {
@@ -47,13 +52,15 @@ const EditPuskesmasModal: React.FC<EditPuskesmasModalProps> = ({ isOpen, onClose
               value={formData.nama_puskesmas}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
-              onChange={(e) => setFormData({ ...formData, nama_puskesmas: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, nama_puskesmas: e.target.value })
+              }
               required
             />
             <label
               htmlFor="nama_puskesmas"
               className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
-          >
+            >
               Nama Puskesmas
             </label>
           </div>
@@ -65,28 +72,33 @@ const EditPuskesmasModal: React.FC<EditPuskesmasModalProps> = ({ isOpen, onClose
               value={formData.alamat}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
-              onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, alamat: e.target.value })
+              }
               required
             />
             <label
               htmlFor="alamat"
               className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
-          >
+            >
               Alamat
             </label>
           </div>
 
-         
-          <div className="flex justify-end">
+          <div className="flex justify-end space-x-3 mt-12">
+            
+            <button
+              type="submit"
+              className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center hover:bg-purple-700 transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Perbarui Puskesmas
+            </button>
             <button
               type="button"
-              className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md mr-2"
+              className="px-4 py-2 bg-gray-300 text-black rounded-lg flex items-center hover:bg-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
               onClick={onClose}
             >
-              Batal
-            </button>
-            <button type="submit" className="bg-purple-600 text-white py-2 px-4 rounded-md">
-              Simpan
+              Tutup
             </button>
           </div>
         </form>

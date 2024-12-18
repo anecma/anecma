@@ -78,7 +78,7 @@ function LoginPage() {
       <div className="flex items-center justify-center bg-white  md:bg-gray-100 relative sm:flex-1 sm:h-auto h-60">
         <div className="absolute inset-0 flex items-center justify-center sm:relative sm:w-auto sm:h-auto">
           <Image
-            src="/images/red-blood-cells-3.png"
+            src="/images/anecma-login-logo.png"
             alt="Red Blood Cells"
             className="object-contain w-40 h-40 sm:w-auto sm:h-auto" 
             width={270}

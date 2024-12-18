@@ -39,6 +39,8 @@ const getTitle = (pathname: string) => {
       return 'Data Petugas';
     case '/admin/edukasi':
       return 'Data Edukasi';
+    case '/admin/kategori':
+      return 'Data Kategori';
     case '/admin/settings':
       return 'Settings';
     default:

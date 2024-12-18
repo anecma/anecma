@@ -4,7 +4,7 @@ const nextConfig = {
     return [{ source: "/", destination: "/pilih-gender", permanent: false }];
   },
   images: {
-    domains: ["res.cloudinary.com ","images.remotePatterns"],
+    domains: ["res.cloudinary.com ","res.cloudinary.com","images.remotePatterns"],
   },
 };
 

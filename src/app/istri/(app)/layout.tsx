@@ -1,4 +1,4 @@
-import BottomNavigation from "@/components/bottom-navigation/bottom-navigation";
+import BottomNavigationIstri from "@/components/bottom-navigation/bottom-navigation-istri";
 
 export default function IstriLayout({
   children, // will be a page or nested layout
@@ -8,7 +8,7 @@ export default function IstriLayout({
   return (
     <section>
       {children}
-      <BottomNavigation />
+      <BottomNavigationIstri/>
     </section>
   );
 }

@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const authToken = localStorage.getItem("authToken");
+        const authToken = localStorage.getItem("authTokenAdmin");
 
         if (!authToken) {
           setError("No token found");
@@ -127,11 +127,26 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                   "/admin/edukasi"
                 )}`}
               >
-                <FaBook className="text-xl mr-3" /> {/* Updated icon */}
+                <FaBook className="text-xl mr-3" />
                 <span className="text-lg">Data Edukasi</span>
               </span>
             </Link>
           </li>
+
+          {/* Added Category Menu Item */}
+          <li className="mb-6">
+            <Link href="/admin/kategori">
+              <span
+                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                  "/admin/kategori"
+                )}`}
+              >
+                <FaBook className="text-xl mr-3" /> {/* Icon for Kategori */}
+                <span className="text-lg">Kategori</span>
+              </span>
+            </Link>
+          </li>
+
           <li>
             <Link href="/admin/settings">
               <span

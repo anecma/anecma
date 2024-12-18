@@ -4,6 +4,7 @@ export interface Edukasi {
   konten: string;
   jenis: string;
   kategori: string;
+  kategori_id:string;
   thumbnail: File | string | null;
 
 }

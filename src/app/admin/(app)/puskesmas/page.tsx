@@ -30,7 +30,7 @@ const Puskesmas: React.FC = () => {
     const fetchPuskesmasData = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("authTokenAdmin");
         if (!token) {
           throw new Error("No token found");
         }
@@ -59,7 +59,7 @@ const Puskesmas: React.FC = () => {
 
   const handleAdd = async (data: PuskesmasItem) => {
     try {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authTokenAdmin");
       if (!token) {
         throw new Error("No token found");
       }
@@ -105,7 +105,7 @@ const Puskesmas: React.FC = () => {
 
   const confirmDelete = async (id: number) => {
     try {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authTokenAdmin");
       if (!token) {
         throw new Error("No token found");
       }
@@ -133,7 +133,7 @@ const Puskesmas: React.FC = () => {
 
   const handleEdit = async (data: PuskesmasItem) => {
     try {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authTokenAdmin");
       if (!token) {
         throw new Error("No token found");
       }
@@ -169,7 +169,7 @@ const Puskesmas: React.FC = () => {
 
   const openShowModal = async (id: number) => {
     try {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authTokenAdmin");
       if (!token) {
         throw new Error("No token found");
       }

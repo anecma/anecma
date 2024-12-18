@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "@/libs/axios";
 import dynamic from "next/dynamic";
 import { AiOutlineEye, AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
+import { FaPlus } from "react-icons/fa";
 import parse from "html-react-parser";
 import Swal, { SweetAlertResult } from "sweetalert2";
 import { Edukasi } from "@/components/datatable/DataTable";
@@ -48,7 +49,7 @@ const DataTable: React.FC = () => {
   };
 
   const fetchData = async () => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authTokenAdmin");
     try {
       const response = await axiosInstance.get("/admin/data-edukasi", {
         headers: { Authorization: `Bearer ${token}` },
@@ -67,7 +68,7 @@ const DataTable: React.FC = () => {
   };
 
   const handleShow = async (id: number) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authTokenAdmin");
     try {
       const response = await axiosInstance.get(
         `/admin/data-edukasi/show/${id}`,
@@ -92,16 +93,19 @@ const DataTable: React.FC = () => {
   }, []);
 
   const handleAdd = async (
-    newData: Omit<Edukasi, "id"> & { thumbnail: File }
+    newData: Omit<Edukasi, "id"> & { thumbnail: File | null } // Allowing thumbnail to be File or null
   ) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authTokenAdmin");
     const formData = new FormData();
 
     formData.append("judul", newData.judul);
     formData.append("konten", newData.konten);
-    formData.append("thumbnail", newData.thumbnail);
+    if (newData.thumbnail) {
+      formData.append("thumbnail", newData.thumbnail);
+    }
     formData.append("jenis", newData.jenis);
     formData.append("kategori", newData.kategori);
+    formData.append("kategori_id", newData.kategori_id);
 
     try {
       const response = await axiosInstance.post(
@@ -136,9 +140,10 @@ const DataTable: React.FC = () => {
     thumbnail: File | string | null;
     jenis: string;
     kategori: string;
+    kategori_id: string;
   }) => {
     const { id, ...rest } = editData;
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authTokenAdmin");
     const formData = new FormData();
 
     formData.append("judul", rest.judul);
@@ -148,6 +153,7 @@ const DataTable: React.FC = () => {
     }
     formData.append("jenis", rest.jenis);
     formData.append("kategori", rest.kategori);
+    formData.append("kategori_id", rest.kategori_id);
 
     try {
       const response = await axiosInstance.post(
@@ -176,7 +182,7 @@ const DataTable: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authTokenAdmin");
     const result = await Swal.fire({
       title: "Apakah Anda yakin?",
       text: "Anda tidak akan dapat mengembalikannya!",
@@ -207,10 +213,10 @@ const DataTable: React.FC = () => {
     }
   };
 
-  const renderKonten = (konten: string) => {
-    const firstParagraph = konten.split(/<\/?p>/)[1] || "";
-    return parse(`<p>${firstParagraph}</p>`);
-  };
+  // const renderKonten = (konten: string) => {
+  //   const firstParagraph = konten.split(/<\/?p>/)[1] || "";
+  //   return parse(`<p>${firstParagraph}</p>`);
+  // };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -221,7 +227,8 @@ const DataTable: React.FC = () => {
             className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center hover:bg-purple-700 transition duration-300 ease-in-out transform hover:scale-105"
             onClick={() => setModalState({ isOpen: true, type: "add" })}
           >
-            Tambah Data
+            <FaPlus className="mr-2" />
+            Tambahkan
           </button>
         </div>
         {modalState.isOpen && modalState.type === "add" && (
@@ -257,8 +264,9 @@ const DataTable: React.FC = () => {
                   <th className="px-4 py-2 text-left text-gray-600">Judul</th>
                   <th className="px-4 py-2 text-left text-gray-600">Jenis</th>
                   <th className="px-4 py-2 text-left text-gray-600">
-                    Kategori
+                    Kategori Edukasi
                   </th>
+                  <th className="px-4 py-2 text-left text-gray-600">Parent ID</th>
                   <th className="px-4 py-2 text-left text-gray-600">Aksi</th>
                 </tr>
               </thead>
@@ -271,6 +279,7 @@ const DataTable: React.FC = () => {
                     <td className="px-4 py-2">{item.judul}</td>
                     <td className="px-4 py-2">{item.jenis}</td>
                     <td className="px-4 py-2">{item.kategori}</td>
+                    <td className="px-4 py-2">{item.kategori_id}</td>
                     <td className="px-4 py-2">
                       <button
                         className="text-purple-500 mr-2"

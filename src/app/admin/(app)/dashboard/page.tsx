@@ -47,7 +47,7 @@ const HomePage: React.FC = () => {
     };
 
     const fetchTableData = async () => {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authTokenAdmin");
       try {
         const response = await axiosInstance.get(
           "/admin/dashboard-data-terbaru",

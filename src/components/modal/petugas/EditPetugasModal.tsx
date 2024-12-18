@@ -152,13 +152,13 @@ const EditPetugasModal: React.FC<EditPetugasModalProps> = ({
             </label>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end space-x-3 mt-12">
             <button
               type="button"
               onClick={handleUpdate}
               className="bg-blue-500 text-white px-4 py-2 rounded mr-2 hover:bg-blue-600 transition duration-200"
             >
-              Update Petugas
+              Perbarui Petugas
             </button>
             <button
               type="button"

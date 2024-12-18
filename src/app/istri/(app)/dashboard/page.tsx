@@ -67,11 +67,11 @@ export default function DashboardPage() {
   }, [session, status]);
 
   // Ambil nilai HB dan risiko dari userData
-  const hbValue = userData?.resiko_anemia[0]?.hasil_hb || null;
-  const anemiaRisk = userData?.resiko_anemia[0]?.resiko || null;
+  const hbValue = userData?.resiko_anemia[0]?.hasil_hb || "-";
+  const anemiaRisk = userData?.resiko_anemia[0]?.resiko || "Data tidak tersedia";
 
   return (
-    <main>
+    <main> 
       {/* Header */}
       <div className="m-5">
         <div className="flex flex-row justify-between items-center">
@@ -110,7 +110,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <Image
-              src="/images/Anecma_0E.png"
+              src="/images/Anecma_1C.png"
               alt="Blood Pressure Image"
               width={90}
               height={90}

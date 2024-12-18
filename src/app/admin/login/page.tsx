@@ -49,7 +49,7 @@ function LoginPage() {
   
         if (token) {
           // Save the token in localStorage
-          localStorage.setItem('authToken', token);
+          localStorage.setItem('authTokenAdmin', token);
   
           // Clear the input fields upon successful login
           setEmail('');

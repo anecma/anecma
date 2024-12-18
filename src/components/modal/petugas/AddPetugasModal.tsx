@@ -131,20 +131,20 @@ const AddPetugasModal: React.FC<AddPetugasModalProps> = ({
             </label>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end space-x-3 mt-12">
             <button
               type="button"
               onClick={handleAdd}
-              className="bg-blue-500 text-white px-4 py-2 rounded mr-2 hover:bg-blue-600 transition duration-200"
+              className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center hover:bg-purple-700 transition duration-300 ease-in-out transform hover:scale-105"
             >
-              Add Petugas
+              Tambahkan
             </button>
             <button
               type="button"
               onClick={resetForm}
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition duration-200"
+              className="px-4 py-2 bg-gray-300 text-black rounded-lg flex items-center hover:bg-gray-400 transition duration-300 ease-in-out transform hover:scale-105"
             >
-              Cancel
+              Tutup
             </button>
           </div>
         </form>
