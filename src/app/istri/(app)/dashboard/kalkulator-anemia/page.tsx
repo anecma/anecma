@@ -37,12 +37,14 @@ export default function KalkulatorAnemiaPage() {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           });
 
+          console.log(userResponse);
+
           if (userResponse.data.success) {
             const { riwayat_hb } = userResponse.data.data.user;
 
             setUserData((prevState) => ({
               ...prevState,
-              usia_kehamilan: riwayat_hb?.usia_kehamilan || "",
+              usia_kehamilan: userResponse.data.data.usia_kehamilan || "",
               hasil_hb_terakhir: riwayat_hb?.nilai_hb || "",
             }));
 
