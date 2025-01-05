@@ -153,7 +153,7 @@ export default function DashboardPage() {
       <Link href="/istri/dashboard/kalkulator-anemia">
         <div className="flex flex-col items-center max-w-sm min-h-28 p-4 bg-blue-light border border-gray-200 rounded-lg shadow hover:bg-blue-light/80 hover:shadow-lg transition duration-300 ease-in-out">
         <LuCalculator className="h-10 w-10 text-white mb-3 opacity-80" />
-          <p className="text-white font-bold">Kalkulator Anemia</p>
+          <p className="text-white font-bold text-center">Kalkulator Anemia</p>
         </div>
       </Link>
     </div>

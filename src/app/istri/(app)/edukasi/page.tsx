@@ -34,30 +34,24 @@ interface Kategori {
   created_at: string;
   updated_at: string;
   kategori_child: Kategori[];
-  edukasi: Edukasi[];
+  edukasi: Edukasi[] | null; // Ensure edukasi can be null or an array
 }
 
 interface UserData {
   user: {
     id: number;
-    resiko_anemia: {
-      id: number;
-      user_id: number;
-      resiko: string;
-    }[];
+    resiko_anemia: { id: number; user_id: number; resiko: string }[];
   };
 }
 
 export default function EdukasiPage() {
   const [kategoriData, setKategoriData] = useState<Kategori[]>([]);
-  const [userResiko, setUserResiko] = useState<string>(""); // To store the user's resiko value
+  const [edukasiData, setEdukasiData] = useState<Edukasi[]>([]);
+  const [userResiko, setUserResiko] = useState<string | null>(""); // User's resiko or null
   const [loading, setLoading] = useState(true);
   const [openedCategory, setOpenedCategory] = useState<number | null>(null);
-  const [openedSubcategory, setOpenedSubcategory] = useState<number | null>(
-    null
-  );
-  const [isMounted, setIsMounted] = useState(false); // Add a flag to check if the component is mounted
-  const [showModal, setShowModal] = useState(false); // Modal state to show confirmation dialog
+  const [openedSubcategory, setOpenedSubcategory] = useState<number | null>(null);
+  const [isMounted, setIsMounted] = useState(false); // To check if component is mounted
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -76,13 +70,8 @@ export default function EdukasiPage() {
           });
           if (response.data.success && response.data.data.user) {
             const resiko =
-              response.data.data.user.resiko_anemia[0]?.resiko || "";
+              response.data.data.user.resiko_anemia[0]?.resiko || null;
             setUserResiko(resiko);
-
-            // Check if resiko_anemia is empty or null
-            if (!resiko) {
-              setShowModal(true); // Show modal if resiko is empty or null
-            }
           } else {
             console.error("Unexpected response format:", response.data);
           }
@@ -109,7 +98,9 @@ export default function EdukasiPage() {
           );
           if (Array.isArray(response.data.data)) {
             setKategoriData(response.data.data);
+            setEdukasiData(response.data.data)
           }
+          console.log(response.data.data)
         } catch (error) {
           console.error("Error fetching data:", error);
         } finally {
@@ -136,10 +127,6 @@ export default function EdukasiPage() {
   if (!isMounted) {
     return null;
   }
-
-  const handleModalClose = () => {
-    setShowModal(false);
-  };
 
   // Conditional rendering based on user's resiko
   const renderContent = () => {
@@ -201,7 +188,7 @@ export default function EdukasiPage() {
                               <p className="mb-2 text-gray-500 dark:text-gray-400">
                                 {subkategori.deskripsi}
                               </p>
-                              {subkategori.edukasi.length > 0 ? (
+                              {subkategori.edukasi && Array.isArray(subkategori.edukasi) ? (
                                 subkategori.edukasi.map((edukasi) => (
                                   <div
                                     key={edukasi.id}
@@ -286,7 +273,7 @@ export default function EdukasiPage() {
                     <p className="mb-2 text-gray-500 dark:text-gray-400">
                       {kategori.deskripsi}
                     </p>
-                    {kategori.edukasi.length > 0 ? (
+                    {kategori.edukasi && Array.isArray(kategori.edukasi) ? (
                       kategori.edukasi.map((edukasi) => (
                         <div
                           key={edukasi.id}
@@ -328,6 +315,48 @@ export default function EdukasiPage() {
           )}
         </div>
       );
+    } else {
+      // Case where resiko is null, render the education content as specified
+      return (
+        <div className="space-y-5">
+          {loading ? (
+            <>
+              <SkeletonLoader height="50px" />
+              <SkeletonLoader height="50px" />
+              <SkeletonLoader height="50px" />
+            </>
+          ) : edukasiData.length > 0 ? (
+            edukasiData.map((edukasi) => (
+              <div key={edukasi.id} className="space-y-3">
+                <div className="flex items-center bg-white p-4 border rounded-lg shadow-sm hover:shadow-md">
+                  <Image
+                    src={edukasi.thumbnail}
+                    alt={edukasi.judul}
+                    width={100}
+                    height={100}
+                    className="rounded-lg"
+                  />
+                  <div className="ml-4 flex-1">
+                <h3 className="text-xl font-semibold">{edukasi.judul}</h3>
+                    <p className="text-gray-500">{edukasi.konten}</p>
+                    <Link
+                      href={`/istri/edukasi/show/${edukasi.id}`}
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 mt-2"
+                    >
+                      Lihat Detail
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))
+            
+          ) : (
+            <div className="text-center text-gray-700">
+              Tidak ada data edukasi ditemukan.
+            </div>
+          )}
+        </div>
+      );
     }
   };
 
@@ -335,42 +364,7 @@ export default function EdukasiPage() {
     <main className="m-5 mb-20">
       <h1 className="text-2xl font-bold mb-5">Edukasi</h1>
       <hr className="mb-5 h-0.5 border-t-0 bg-gray-300" />
-
       {renderContent()}
-
-      {/* Modal for empty or null resiko */}
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4 ">
-              Peringatan!!!
-            </h2>
-            <hr className=" h-0.5 border-t-0 bg-gray-300 mb-10" />
-            <p className="text-sm text-gray-700 text-center mb-10">
-              Silakan mengisi kalkulator anemia untuk dapat mengakses materi
-              edukasi yang tersedia.
-            </p>
-            <div className="flex justify-around gap-4">
-              <Link href="/istri/dashboard/kalkulator-anemia">
-                <span
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 text-center w-full sm:w-auto transition duration-300 ease-in-out transform hover:scale-105"
-                  onClick={handleModalClose} // Close modal when navigating
-                >
-                  Ke Kalkulator
-                </span>
-              </Link>
-              <Link href="/istri/dashboard">
-                <span
-                  className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 text-center w-full sm:w-auto transition duration-300 ease-in-out transform hover:scale-105"
-                  onClick={handleModalClose} // Close modal when navigating
-                >
-                  Kembali ke Dashboard
-                </span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

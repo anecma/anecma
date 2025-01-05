@@ -5,6 +5,7 @@ import axiosInstance from "@/libs/axios";
 import { FaRegEdit } from "react-icons/fa";
 import { Toaster, toast } from "sonner";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
+import EditSaveButton from "@/components/edit-save-button.tsx/edit-save-button";
 
 interface UserData {
   hari_pertama_haid: string;
@@ -118,7 +119,6 @@ export default function ProfilPage() {
           setKelurahanOptions(
             kelurahanData[response.data.data.user.wilayah_binaan] || []
           );
-          // Set desa options based on user's kelurahan
           setDesaOptions(desaData[response.data.data.user.kelurahan] || []);
         } catch (error) {
           setError("Failed to load user data.");
@@ -163,25 +163,21 @@ export default function ProfilPage() {
   ) => {
     const { id, value } = e.target;
 
-    // Memperbarui data yang dapat diedit
     setEditableData((prev) => (prev ? { ...prev, [id]: value } : null));
 
-    // Reset kelurahan dan desa jika wilayah_binaan berubah
     if (id === "wilayah_binaan") {
       setKelurahanOptions(kelurahanData[value] || []);
       setEditableData((prev) =>
         prev ? { ...prev, kelurahan: "", desa: "" } : null
       );
-      setDesaOptions([]); // Reset opsi desa
+      setDesaOptions([]); 
     }
 
-    // Set opsi desa berdasarkan kelurahan yang dipilih
     if (id === "kelurahan") {
       setDesaOptions(desaData[value] || []);
-      setEditableData((prev) => (prev ? { ...prev, desa: "" } : null)); // Reset desa saat kelurahan berubah
+      setEditableData((prev) => (prev ? { ...prev, desa: "" } : null)); 
     }
 
-    // Logika untuk tempat pemeriksaan kehamilan
     if (id === "tempat_periksa_kehamilan") {
       if (value === "Puskesmas") {
         setEditableData((prev) =>
@@ -200,9 +196,8 @@ export default function ProfilPage() {
           prev ? { ...prev, someOtherField: "" } : null
         );
       }
-      //
+      
       if (!value) {
-        // Misalnya, jika tidak ada yang dipilih, kita bisa memberikan peringatan
         setError("Silakan pilih tempat pemeriksaan kehamilan.");
       }
     }
@@ -211,18 +206,22 @@ export default function ProfilPage() {
   return (
     <main>
       <Toaster richColors position="top-center" />
-      <div className="m-5 flex flex-row items-center">
-        <BackButtonNavigation className="w-10 h-10" />
+      <div className="m-5 flex flex-row justify-between items-center">
         <p className="text-2xl font-bold">Halaman Profil</p>
+        {/* Edit/Save Button */}
+        <EditSaveButton
+          isEditing={isEditing}
+          saving={saving}
+          onEditToggle={handleEditToggle}
+          onSave={handleSave}
+        />
       </div>
 
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
 
       <div className="mx-5 mb-32">
         <p className="text-xl font-semibold">Data Kehamilan</p>
-        {error ? (
-          <p className="text-red-500">{error}</p>
-        ) : (
+        
           <form className="flex flex-col gap-2.5">
             <div className="relative my-2.5">
               <input
@@ -334,35 +333,7 @@ export default function ProfilPage() {
                 Tempat Pemeriksaan Kehamilan
               </label>
             </div>
-
-            {isEditing ? (
-              <button
-                type="button"
-                onClick={handleSave}
-                className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-                disabled={saving}
-              >
-                {saving ? (
-                  <span>Saving...</span>
-                ) : (
-                  <>
-                    <FaRegEdit />
-                    Simpan
-                  </>
-                )}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleEditToggle}
-                className="max-w-fit self-center text-white bg-blue-500 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-              >
-                <FaRegEdit />
-                Edit
-              </button>
-            )}
           </form>
-        )}
       </div>
     </main>
   );

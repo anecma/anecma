@@ -13,6 +13,9 @@ interface UserData {
   hasil_gizi: string;
   riwayat_anemia: number; // 0 for Rendah, 1 for Tinggi
   lingkar_lengan_atas: string;
+  maxjumlahanak: number;
+  maxLingkarLenganAtas: number;
+  maxkosumsitdd7hari: number;
 }
 
 export default function KalkulatorAnemiaPage() {
@@ -24,6 +27,9 @@ export default function KalkulatorAnemiaPage() {
     hasil_gizi: "",
     riwayat_anemia: 0, // 0 for Rendah, 1 for Tinggi
     lingkar_lengan_atas: "",
+    maxjumlahanak: 20,
+    maxLingkarLenganAtas: 20,
+    maxkosumsitdd7hari: 7,
   });
 
   const { data: session, status } = useSession();
@@ -80,10 +86,55 @@ export default function KalkulatorAnemiaPage() {
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { id, value } = event.target;
-    setUserData((prevData) => ({
-      ...prevData,
-      [id]: value,
-    }));
+
+    if (id === "lingkar_lengan_atas") {
+      // Validate for maximum value
+      const numericValue = parseFloat(value);
+      if (numericValue > userData.maxLingkarLenganAtas) {
+        setUserData((prevData) => ({
+          ...prevData,
+          [id]: userData.maxLingkarLenganAtas.toString(),
+        }));
+      } else {
+        setUserData((prevData) => ({
+          ...prevData,
+          [id]: value,
+        }));
+      }
+    } else if (id === "konsumsi_ttd_7hari") {
+      // Validate for maximum consumption of TTD
+      const numericValue = parseFloat(value);
+      if (numericValue > userData.maxkosumsitdd7hari) {
+        setUserData((prevData) => ({
+          ...prevData,
+          [id]: userData.maxkosumsitdd7hari.toString(),
+        }));
+      } else {
+        setUserData((prevData) => ({
+          ...prevData,
+          [id]: value,
+        }));
+      }
+    } else if (id === "jumlah_anak") {
+      // Validate for maximum value of jumlah_anak
+      const numericValue = parseInt(value, 10);
+      if (numericValue > userData.maxjumlahanak) {
+        setUserData((prevData) => ({
+          ...prevData,
+          [id]: userData.maxjumlahanak.toString(),
+        }));
+      } else {
+        setUserData((prevData) => ({
+          ...prevData,
+          [id]: value,
+        }));
+      }
+    } else {
+      setUserData((prevData) => ({
+        ...prevData,
+        [id]: value,
+      }));
+    }
   };
 
   const handleCalculateRisk = async () => {
@@ -142,8 +193,8 @@ export default function KalkulatorAnemiaPage() {
               value={userData.usia_kehamilan}
               onChange={handleInputChange}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              readOnly // Keep as read-only if the value is fetched
+              placeholder=" Usia Kehamilan (Minggu)"
+              readOnly
             />
             <label
               htmlFor="usia_kehamilan"
@@ -155,12 +206,13 @@ export default function KalkulatorAnemiaPage() {
 
           <div className="relative my-2.5">
             <input
-              type="text"
+              type="number"
               id="jumlah_anak"
               value={userData.jumlah_anak}
               onChange={handleInputChange}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
+              placeholder=" Jumlah Anak"
+              max={userData.maxjumlahanak}
             />
             <label
               htmlFor="jumlah_anak"
@@ -172,12 +224,13 @@ export default function KalkulatorAnemiaPage() {
 
           <div className="relative my-2.5">
             <input
-              type="text"
+              type="number"
               id="konsumsi_ttd_7hari"
               value={userData.konsumsi_ttd_7hari}
               onChange={handleInputChange}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
+              placeholder=" Jumlah Konsumsi TTD selama 7 hari"
+              max={userData.maxkosumsitdd7hari}
             />
             <label
               htmlFor="konsumsi_ttd_7hari"
@@ -189,13 +242,14 @@ export default function KalkulatorAnemiaPage() {
 
           <div className="relative my-2.5">
             <input
-              type="text"
+              type="number"
               id="hasil_hb_terakhir"
               value={userData.hasil_hb_terakhir}
               onChange={handleInputChange}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
+              placeholder=" Hasil HB terakhir"
               readOnly // Keep as read-only if the value is fetched
+              max={20}
             />
             <label
               htmlFor="hasil_hb_terakhir"
@@ -212,7 +266,7 @@ export default function KalkulatorAnemiaPage() {
               value={userData.hasil_gizi}
               onChange={handleInputChange}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
+              placeholder=" Hasil gizi"
               readOnly // Keep as read-only if the value is fetched
             />
             <label
@@ -243,12 +297,13 @@ export default function KalkulatorAnemiaPage() {
 
           <div className="relative my-2.5">
             <input
-              type="text"
+              type="number"
               id="lingkar_lengan_atas"
               value={userData.lingkar_lengan_atas}
               onChange={handleInputChange}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
+              placeholder=" Lingkar lengan atas"
+              max={userData.maxLingkarLenganAtas}
             />
             <label
               htmlFor="lingkar_lengan_atas"

@@ -8,6 +8,7 @@ import ImageModal from "@/components/modal/imagemodal/ImageModal";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import Swal from "sweetalert2";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
+import TextModal from "@/components/modal/textmodal/textmodal";
 
 // Opsi waktu makan
 const mealOptions = [
@@ -19,18 +20,21 @@ const mealOptions = [
 // Opsi porsi
 const portionSizes = {
   default: [
+    { value: "0", label: "tidak makan" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
   karbohidrat: [
+    { value: "0", label: "tidak makan" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
   lauk_hewani: [
+    { value: "0", label: "tidak makan" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
@@ -41,18 +45,21 @@ const portionSizes = {
     { value: "4", label: "4 Porsi" },
   ],
   lauk_nabati: [
+    { value: "0", label: "tidak makan" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
   sayur: [
+    { value: "0", label: "tidak makan" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
   buah: [
+    { value: "0", label: "tidak makan" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
@@ -250,6 +257,7 @@ const mealCategories = {
 };
 
 const mapPortionValue = (value: number) => {
+  if (value === 0) return "0";
   if (value === 0.5) return "0.5";
   if (value === 1) return "1";
   if (value === 1.5) return "1.5";
@@ -275,6 +283,7 @@ const FoodLogForm = () => {
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
   const [savedImageSrc, setSavedImageSrc] = useState("");
   const [imageSrc, setImageSrc] = useState("");
+  const [textContent, setTextContent] = useState<string>("");
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -367,6 +376,7 @@ const FoodLogForm = () => {
         );
 
         formattedData.jam_makan = jamMakan || "";
+        console.log("Formatted Data to Send:", formattedData);
 
         let endpoint = "";
         switch (selectedTab) {
@@ -427,26 +437,27 @@ const FoodLogForm = () => {
   };
 
   const openModal = () => {
-    let imageSrc = "";
+    const content = `
+     <h3 class="text-xl text-center font-semibold mb-4 border-b-2 border-gray-200 pb-2">Petunjuk Pengisian Jurnal Makan</h3>
+      <ol class="list-decimal pl-6">
+        <li>Ibu harus mengisi untuk jurnal berdasarkan makanan yang dimakan pada sehari sebelumnya atau hari saat pengisian.</li>
+        <li>Ibu harus mengisi jenis dan porsi yang dimakan dalam tiga kali waktu makan, yaitu sarapan, makan siang, dan makan malam untuk dapat mengetahui apakah ibu telah mengonsumsi sesuai pedoman gizi seimbang.</li>
+        <li>Makanan yang dimaksud adalah yang dimakan dalam masing-masing waktu (sarapan/makan siang/makan malam), termasuk cemilan/snack atau selingan mendekati waktu makan tersebut.</li>
+        <li>Ibu mengisi berapa porsi pada setiap jenis makanan.</li>
+        <li>Acuan ukuran satu porsi tiap-tiap bahan makanan yaitu sesuai dengan contoh dalam foto.</li>
+        <li>Contoh pengisian pada bagian karbohidrat:
+          <ul class="list-inside list-disc pl-6">
+            <li>Silahkan pilih 0,5 porsi jika ibu mengonsumsi setengah dari 100gr nasi atau 50gr Nasi/Kentang/Mie/Ubi/Roti seperti yang ada pada gambar.</li>
+            <li>Silahkan pilih 1.5 porsi jika ibu mengonsumsi 150 gr nasi atau 4,5 lembar roti.</li>
+          </ul>
+        </li>
+        <li>Jangan lupa untuk klik simpan jika ibu sudah mengisi semua jenis bahan makanan pada setiap waktu makan.</li>
+        <li>Hasil konsumsi akan muncul jika ibu sudah mengisi lengkap 3 waktu makan.</li>
+      </ol>
+    `;
 
-    // Validasi usia kehamilan
-    if (typeof usiakehamilan !== "number") {
-      console.error("Usia kehamilan harus berupa angka");
-      return;
-    }
-
-    if (usiakehamilan < 12) {
-      imageSrc = "/images/TM1/Edukasi-isi-piringku-TM1.png";
-    } else {
-      imageSrc = "/images/TM2/Edukasi-isi-piringku-TM2-TM3.png";
-    }
-
-    if (imageSrc) {
-      setImageSrc(imageSrc);
-      setIsGuideModalOpen(true);
-    } else {
-      console.error("Image source is not set");
-    }
+    setTextContent(content); // Setting the modal content dynamically
+    setIsGuideModalOpen(true); // Opening the modal
   };
 
   const closeSaveModal = () => {
@@ -455,6 +466,7 @@ const FoodLogForm = () => {
 
   const closeGuideModal = () => {
     setIsGuideModalOpen(false);
+    setTextContent(""); // Clear content when closing the modal
   };
 
   const categories = Object.keys(mealCategories) as Array<
@@ -479,10 +491,10 @@ const FoodLogForm = () => {
           Petunjuk
         </button>
 
-        <ImageModal
+        <TextModal
           isOpen={isGuideModalOpen}
           onClose={closeGuideModal}
-          imageSrc={imageSrc}
+          textContent={textContent} // Pass the dynamic content here
         />
       </div>
 
@@ -556,11 +568,13 @@ const FoodLogForm = () => {
                           type="radio"
                           id={`porsi-${size.value}`}
                           name={`${selectedTab}-radio-${category}`}
-                          value={size.value}
+                          value={size.value ?? ""} // Jika size.value bisa null, pastikan tidak null
                           className="w-7 h-7 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                          checked={getCheckedValue(category) === size.value}
+                          checked={
+                            getCheckedValue(category) === size.value || false
+                          } // Pastikan checked adalah boolean
                           onChange={() =>
-                            handleRadioChange(category, size.value)
+                            handleRadioChange(category, size.value ?? "")
                           }
                         />
                       </label>

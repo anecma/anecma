@@ -5,6 +5,7 @@ import axiosInstance from "@/libs/axios";
 import { FaRegEdit } from "react-icons/fa";
 import { Toaster, toast } from "sonner";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
+import EditSaveButton from "@/components/edit-save-button.tsx/edit-save-button";
 
 interface UserData {
   nama_suami?: string;
@@ -50,7 +51,6 @@ export default function ProfilPage() {
 
   const handleEditToggle = () => {
     if (!isEditing && userData) {
-      // Copy userData to editableData when entering edit mode
       setEditableData({ ...userData });
     }
     setIsEditing((prev) => !prev);
@@ -67,7 +67,7 @@ export default function ProfilPage() {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           }
         );
-        setUserData(editableData); // Update userData with editableData after saving
+        setUserData(editableData); 
         setIsEditing(false);
         setError(null);
         toast.success("Berhasil Menyimpan.", { duration: 2000 });
@@ -90,18 +90,22 @@ export default function ProfilPage() {
   return (
     <main>
       <Toaster richColors position="top-center" />
-      <div className="m-5 flex flex-row items-center">
-        <BackButtonNavigation className="w-10 h-10" />
+      <div className="m-5 flex flex-row justify-between items-center">
         <p className="text-2xl font-bold">Halaman Profil</p>
+        {/* Edit/Save Button */}
+        <EditSaveButton
+          isEditing={isEditing}
+          saving={saving}
+          onEditToggle={handleEditToggle}
+          onSave={handleSave}
+        />
       </div>
 
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
 
       <div className="mx-5">
         <p className="text-xl font-semibold">Data Suami</p>
-        {error ? (
-          <p className="text-red-500">{error}</p>
-        ) : (
+       
           <form className="flex flex-col gap-2.5">
             <div className="relative my-2.5">
               <input
@@ -122,7 +126,7 @@ export default function ProfilPage() {
             </div>
             <div className="relative my-2.5">
               <input
-                type="text"
+                type="number"
                 id="no_hp_suami"
                 className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
@@ -139,7 +143,7 @@ export default function ProfilPage() {
             </div>
             <div className="relative my-2.5 mb-6">
               <input
-                type="text"
+                type="email"
                 id="email_suami"
                 className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
@@ -154,33 +158,8 @@ export default function ProfilPage() {
                 Email Suami
               </label>
             </div>
-            {isEditing ? (
-              <button
-                type="button"
-                onClick={handleSave}
-                className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-                disabled={saving}
-              >
-                {saving ? (
-                  <span>Saving...</span>
-                ) : (
-                  <>
-                    <FaRegEdit /> Simpan
-                  </>
-                )}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleEditToggle}
-                className="max-w-fit self-center text-white bg-blue-500 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-              >
-                <FaRegEdit />
-                Edit
-              </button>
-            )}
+           
           </form>
-        )}
       </div>
     </main>
   );
