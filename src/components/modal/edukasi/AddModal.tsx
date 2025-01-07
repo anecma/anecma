@@ -15,12 +15,12 @@ interface AddModalProps {
     thumbnail: File | null;
     jenis: string;
     kategori: string;
-    kategori_id: string;
+    kategori_id: string | null;
   }) => void;
 }
 
 function buildSelectOptions(
-  categories: Kategori[],
+  categories: Kategori[] ,
   parentId: number | null = null,
   depth: number = 0
 ): JSX.Element[] {
@@ -51,7 +51,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, onAdd }) => {
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [jenis, setJenis] = useState("");
   const [kategori, setKategori] = useState("");
-  const [kategori_id, setKategoriId] = useState("");
+  const [kategori_id, setKategoriId] = useState<string | null>(null); 
   const [categories, setCategories] = useState<Kategori[]>([]);
   const [parentCategory, setParentCategory] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -96,15 +96,9 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, onAdd }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !judul ||
-      !konten ||
-      !thumbnail ||
-      !jenis ||
-      !kategori ||
-      !kategori_id
-    ) {
-      Swal.fire("Gagal!", "ISI SEMUA INPUTAN!!!", "error");
+    // Allow kategori_id to be empty or null (no validation for kategori_id)
+    if (!judul || !konten || !thumbnail || !jenis || !kategori) {
+      Swal.fire("Gagal!", "ISI SEMUA INPUTAN YANG WAJIB!!!", "error");
       return;
     }
 
@@ -114,7 +108,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, onAdd }) => {
       thumbnail,
       jenis,
       kategori,
-      kategori_id,
+      kategori_id: kategori_id || null,
     };
 
     onAdd(data);
@@ -213,18 +207,17 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, onAdd }) => {
           {/* Kategori ID Select */}
           <div className="relative my-2.5">
             <select
-              value={kategori_id}
+              value={kategori_id || ""} // Empty string for null value
               onChange={(e) => setKategoriId(e.target.value)}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              required
             >
-              <option value="" disabled>
-                Pilih Kategori ID
+              <option value="">
+                Pilih Kategori ID (Opsional)
               </option>
               {buildSelectOptions(categories)}
             </select>
             <label className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4">
-              Kategori ID
+              Kategori ID (Opsional)
             </label>
           </div>
 

@@ -104,8 +104,14 @@ const DataTable: React.FC = () => {
       formData.append("thumbnail", newData.thumbnail);
     }
     formData.append("jenis", newData.jenis);
-    formData.append("kategori", newData.kategori);
-    formData.append("kategori_id", newData.kategori_id);
+    formData.append("kategori", newData.kategori);// Check if kategori_id exists (i.e., not null or undefined) before appending it
+    if (newData.kategori_id != null) {
+      formData.append("kategori_id", String(newData.kategori_id)); // Convert to string if necessary
+    } else {
+      // Optionally append an empty string or handle null values as per your logic
+      formData.append("kategori_id", "");
+    }
+    
 
     try {
       const response = await axiosInstance.post(
@@ -140,21 +146,28 @@ const DataTable: React.FC = () => {
     thumbnail: File | string | null;
     jenis: string;
     kategori: string;
-    kategori_id: string;
+    kategori_id: string | null; 
   }) => {
     const { id, ...rest } = editData;
     const token = localStorage.getItem("authTokenAdmin");
+    if (!token) {
+      Swal.fire("Error", "Token not found", "error");
+      return;
+    }
+  
     const formData = new FormData();
-
+  
     formData.append("judul", rest.judul);
     formData.append("konten", rest.konten);
+    
     if (rest.thumbnail) {
       formData.append("thumbnail", rest.thumbnail);
     }
+    
     formData.append("jenis", rest.jenis);
     formData.append("kategori", rest.kategori);
-    formData.append("kategori_id", rest.kategori_id);
-
+    formData.append("kategori_id", rest.kategori_id ?? ""); 
+    
     try {
       const response = await axiosInstance.post(
         `/admin/data-edukasi/update/${id}`,
@@ -166,10 +179,10 @@ const DataTable: React.FC = () => {
           },
         }
       );
-
+  
       if (response.data.success) {
         Swal.fire("Berhasil!", "Data berhasil diperbarui.", "success");
-        fetchData();
+        fetchData(); // Refresh data after a successful update
       } else {
         Swal.fire("Error!", response.data.message, "error");
       }
@@ -177,9 +190,10 @@ const DataTable: React.FC = () => {
       console.error(err);
       Swal.fire("Error!", "Terjadi kesalahan saat memperbarui data", "error");
     } finally {
-      setModalState({ isOpen: false, type: null });
+      setModalState({ isOpen: false, type: null }); // Close modal after operation
     }
   };
+  
 
   const handleDelete = async (id: number) => {
     const token = localStorage.getItem("authTokenAdmin");
