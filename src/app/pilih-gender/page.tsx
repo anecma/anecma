@@ -44,7 +44,7 @@ const GenderPicker = () => {
             onClick={() => handleGenderSelect('Suami')}
             className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg bg-blue-400 text-white transition-transform transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg w-full"
           >
-            <FaMale size={24} /> =
+            <FaMale size={24} />
             <span className="text-lg">Suami</span>
           </button>
         </div>
