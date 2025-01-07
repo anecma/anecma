@@ -2,14 +2,16 @@
 import { useState, useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import axiosInstance from "@/libs/axios";
-import { FaRegEdit } from "react-icons/fa";  // Import ikon untuk tombol edit
+import { FaRegEdit } from "react-icons/fa";
+import EditSaveButton from "@/components/edit-save-button.tsx/edit-save-button";
+import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
 export default function ChangePasswordPage() {
   const [password, setPassword] = useState<string>("");
   const [passwordConfirmation, setPasswordConfirmation] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);  // Untuk toggle edit/simpan
-  const [saving, setSaving] = useState<boolean>(false);  // Untuk memantau proses penyimpanan
+  const [isEditing, setIsEditing] = useState<boolean>(false); // Untuk toggle edit/simpan
+  const [saving, setSaving] = useState<boolean>(false); // Untuk memantau proses penyimpanan
 
   // Menggunakan toast dari Sonner untuk menangani error dan success
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +58,7 @@ export default function ChangePasswordPage() {
         toast.success("Password berhasil diperbarui.");
         setPassword("");
         setPasswordConfirmation("");
-        setIsEditing(false);  // Matikan mode edit setelah berhasil simpan
+        setIsEditing(false); // Matikan mode edit setelah berhasil simpan
       } catch (err) {
         console.error("Error updating password:", err);
         toast.error("Gagal memperbarui password.");
@@ -72,7 +74,7 @@ export default function ChangePasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // Validasi input password
     if (password.length < 8) {
       toast.error("Password harus memiliki minimal 8 karakter.");
@@ -115,8 +117,22 @@ export default function ChangePasswordPage() {
       {/* ToastContainer untuk menampilkan toast notifications */}
       <Toaster richColors position="top-center" />
 
-      <div className="m-5 flex flex-row">
-        <p className="text-2xl font-bold">Ubah Password</p>
+      <div className="m-5 flex justify-between items-center">
+        {/* Align Back button to the left */}
+        <div className="flex items-center">
+          <BackButtonNavigation className="w-10 h-10" />
+          <p className="text-2xl font-bold">Halaman Profil</p>
+        </div>
+
+        {/* Align Edit/Save Button to the right */}
+        <div className="flex items-center">
+          <EditSaveButton
+            isEditing={isEditing}
+            saving={saving}
+            onEditToggle={handleEditToggle}
+            onSave={handleSave}
+          />
+        </div>
       </div>
 
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
@@ -131,7 +147,7 @@ export default function ChangePasswordPage() {
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
               onChange={handlePasswordChange}
-              disabled={!isEditing}  // Disable input jika tidak dalam mode edit
+              disabled={!isEditing} // Disable input jika tidak dalam mode edit
             />
             <label
               htmlFor="password"
@@ -149,7 +165,7 @@ export default function ChangePasswordPage() {
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
               onChange={handlePasswordChange}
-              disabled={!isEditing}  // Disable input jika tidak dalam mode edit
+              disabled={!isEditing} // Disable input jika tidak dalam mode edit
             />
             <label
               htmlFor="password_confirmation"
@@ -158,33 +174,6 @@ export default function ChangePasswordPage() {
               Konfirmasi Password Baru
             </label>
           </div>
-
-          {/* Tombol Simpan hanya muncul saat dalam mode edit */}
-          {isEditing ? (
-            <button
-              type="button"
-              onClick={handleSave}
-              className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-              disabled={saving}
-            >
-              {saving ? (
-                <span>Sedang Menyimpan...</span>
-              ) : (
-                <>
-                  <FaRegEdit /> Simpan
-                </>
-              )}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleEditToggle}
-              className="max-w-fit self-center text-white bg-blue-500 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-            >
-              <FaRegEdit />
-              Edit
-            </button>
-          )}
         </form>
       </div>
     </main>
