@@ -28,6 +28,13 @@ const bidans = [
     imageUrl: "/images/bidan.png",
     whatsappNumber: "6281909178154", 
   },
+  {
+    id: 4,
+    name: "Bidan Puskesmas Bukit Kemuning",
+    puskesmas: "Nakes Bukit Kemuning",
+    imageUrl: "/images/bidan.png",
+    whatsappNumber: "6282281517138", 
+  },
 ];
 
 export default function KonsultasiPage() {
