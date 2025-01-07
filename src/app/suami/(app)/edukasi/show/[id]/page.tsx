@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import axiosInstance from "@/libs/axios";
 import Image from "next/image";
-import { useSession } from "next-auth/react"; // Import useSession
-import axiosInstance from "@/libs/axios"; // Ensure this is your configured axios instance
-
 import "ckeditor5/ckeditor5-content.css";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 
@@ -26,34 +24,44 @@ interface EdukasiShowPageProps {
 export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
   const [edukasi, setEdukasi] = useState<Edukasi | null>(null); // State for single item
   const [loading, setLoading] = useState(true);
-  const { data: session, status } = useSession(); // Get session data
+  const [authToken, setAuthToken] = useState<string | null>(null); // State to store authToken
   const { id } = params; // Get ID from props
+
+  // Get the token from localStorage on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      setAuthToken(token); // Set token to state if available
+    } else {
+      setLoading(false); // If no token found, stop loading
+    }
+  }, []); // Only run once on mount
 
   useEffect(() => {
     const fetchData = async () => {
-      if (status === "authenticated" && session?.accessToken && id) {
+      if (authToken && id) {
         try {
           const response = await axiosInstance.get(
-            `/suami/edukasi/show-edukasi/${id}`,
+            `/suami/edukasi/show-edukasi/${id}`, // API call for fetching the single edukasi
             {
               headers: {
-                Authorization: `Bearer ${session.accessToken}`, // Set token in headers
+                Authorization: `Bearer ${authToken}`, // Use the authToken from state
               },
             }
           );
-          setEdukasi(response.data.data); // Assuming API returns the item
+          setEdukasi(response.data.data); // Assuming the API response has data in the format `{ data: { ... } }`
         } catch (error) {
           console.error("Error fetching data:", error);
         } finally {
           setLoading(false); // Set loading to false once fetching is done
         }
       } else {
-        setLoading(false); // If not authenticated or no ID, just stop loading
+        setLoading(false); // If no token or ID, just stop loading
       }
     };
 
     fetchData();
-  }, [session, status, id]); // Include id in dependencies
+  }, [authToken, id]); // Include authToken and id in dependencies
 
   if (loading) {
     return (
@@ -99,9 +107,18 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
         <div className="flex flex-col items-center mt-4">
           <h1 className="text-2xl font-bold text-center">{edukasi.judul}</h1>
         </div>
+        <div className="flex justify-center mt-4">
+          <Image
+            src={edukasi.thumbnail}
+            alt={edukasi.judul}
+            width={400}
+            height={300}
+            className="rounded-lg"
+          />
+        </div>
         <article
           className="ck-content prose prose-base mt-4"
-          dangerouslySetInnerHTML={{ __html: edukasi.konten }}
+          dangerouslySetInnerHTML={{ __html: edukasi.konten }} // Render HTML content
         />
       </div>
     </main>
