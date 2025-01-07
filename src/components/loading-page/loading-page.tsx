@@ -62,7 +62,7 @@ const Loading = () => {
 
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
         <Image
-          src="/images/Anecma_0b.png"
+          src="/images/Anecma_0B.png"
           alt="Main Logo"
           width={240}
           height={240}
