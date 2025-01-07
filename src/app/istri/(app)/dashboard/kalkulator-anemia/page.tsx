@@ -28,8 +28,8 @@ export default function KalkulatorAnemiaPage() {
     riwayat_anemia: 0, // 0 for Rendah, 1 for Tinggi
     lingkar_lengan_atas: "",
     maxjumlahanak: 20,
-    maxLingkarLenganAtas: 20,
-    maxkosumsitdd7hari: 7,
+    maxLingkarLenganAtas: 30,
+    maxkosumsitdd7hari: 14,
   });
 
   const { data: session, status } = useSession();
