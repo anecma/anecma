@@ -25,14 +25,13 @@ interface EditModalProps {
     thumbnail: File | string | null;
     jenis: string;
     kategori: string;
-    kategori_id: string | null; // Update kategori_id to accept string | null
+    kategori_id: string | null;
   };
   defaultThumbnail: File | string | null;
 }
 
-
 function buildSelectOptions(
-  categories: Kategori[],
+  categories: Kategori[] ,
   parentId: number | null = null,
   depth: number = 0
 ): JSX.Element[] {
@@ -49,7 +48,6 @@ function buildSelectOptions(
         </option>
       );
 
-      // Recursive call for child categories
       options.push(...buildSelectOptions(categories, category.id, depth + 1));
     }
   });
@@ -70,12 +68,10 @@ const EditModal: React.FC<EditModalProps> = ({
   const [kategori, setKategori] = useState(item.kategori || "");
   const [kategori_id, setKategoriId] = useState<string | null>(item.kategori_id ?? null);
   const [categories, setCategories] = useState<Kategori[]>([]);
-  const [parentCategory, setParentCategory] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch categories when component mounts
   useEffect(() => {
     const fetchCategories = async () => {
       const authToken = localStorage.getItem("authTokenAdmin");
@@ -119,6 +115,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
     const finalThumbnail = !thumbnail ? defaultThumbnail : thumbnail;
 
+    // Ensure that the required fields are filled and handle optional kategori_id
     if (!judul || !konten || !jenis || !kategori) {
       Swal.fire("Gagal!", "ISI SEMUA INPUTAN!!!", "error");
       return;
@@ -131,7 +128,8 @@ const EditModal: React.FC<EditModalProps> = ({
       thumbnail: finalThumbnail,
       jenis,
       kategori,
-      kategori_id: kategori_id || null, // Ensure kategori_id can be null
+      // Make kategori_id optional, can be null if empty
+      kategori_id: kategori_id === "" ? null : kategori_id,
     };
 
     onEdit(data);
@@ -246,11 +244,8 @@ const EditModal: React.FC<EditModalProps> = ({
               value={kategori_id ?? ""}
               onChange={(e) => setKategoriId(e.target.value)}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              required
             >
-              <option value="" >
-                Pilih Kategori ID (Opsional)
-              </option>
+              <option value="">Pilih Kategori ID (Opsional)</option>
               {buildSelectOptions(categories)}
             </select>
             <label className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4">

@@ -104,11 +104,10 @@ const DataTable: React.FC = () => {
       formData.append("thumbnail", newData.thumbnail);
     }
     formData.append("jenis", newData.jenis);
-    formData.append("kategori", newData.kategori);// Check if kategori_id exists (i.e., not null or undefined) before appending it
+    formData.append("kategori", newData.kategori);
     if (newData.kategori_id != null) {
-      formData.append("kategori_id", String(newData.kategori_id)); // Convert to string if necessary
+      formData.append("kategori_id", String(newData.kategori_id));
     } else {
-      // Optionally append an empty string or handle null values as per your logic
       formData.append("kategori_id", "");
     }
     
@@ -182,7 +181,7 @@ const DataTable: React.FC = () => {
   
       if (response.data.success) {
         Swal.fire("Berhasil!", "Data berhasil diperbarui.", "success");
-        fetchData(); // Refresh data after a successful update
+        fetchData();
       } else {
         Swal.fire("Error!", response.data.message, "error");
       }
