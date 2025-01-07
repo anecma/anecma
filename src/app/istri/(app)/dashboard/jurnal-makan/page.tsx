@@ -398,67 +398,56 @@ const FoodLogForm = () => {
         });
 
         if (selectedTab === "makan_malam") {
-          // Check if user is logged in by checking if session.accessToken exists
-          const authToken = session.accessToken;  // Ensure session contains the access token
-        
+          const authToken = session.accessToken;
           if (!authToken) {
-            // If no token is found, alert the user to log in
             alert("Anda harus masuk untuk menyimpan data.");
             return;
           }
-        
-          // If user is logged in, proceed to fetch user data (age of pregnancy)
-          axiosInstance.get("/istri/get-user", {
-            headers: { Authorization: `Bearer ${authToken}` },
-          })
-          .then(response => {
-            // Assuming the pregnancy age is in response.data.data.usia_kehamilan
-            const pregnancyAge = response.data.data.usia_kehamilan;
-            console.log(pregnancyAge);  // For debugging purposes, log the pregnancy age
-        
-            let links = [];
-        
-            // Check if it's Trimester 1 or Trimester 2/3 based on pregnancy age
-            if (pregnancyAge < 12) {
-              // Trimester 1 (less than 12 weeks)
-              links = ["https://www.anecma.id/istri/edukasi/show/61"];
-            } else {
-              // Trimester 2 & 3 (12 weeks or more)
-              links = ["https://www.anecma.id/istri/edukasi/show/64"];
-            }
-        
-            // Randomly select one of the links (though we have only one link in each array)
-            const randomLink = links[Math.floor(Math.random() * links.length)];
-        
-            // Display SweetAlert with the recommendation link
-            Swal.fire({
-              icon: "info",
-              html: `
+          axiosInstance
+            .get("/istri/get-user", {
+              headers: { Authorization: `Bearer ${authToken}` },
+            })
+            .then((response) => {
+              const pregnancyAge = response.data.data.usia_kehamilan;
+              // console.log(pregnancyAge);
+              let links = [];
+
+              if (pregnancyAge < 12) {
+                links = ["https://www.anecma.id/istri/edukasi/show/61"];
+              } else {
+                links = ["https://www.anecma.id/istri/edukasi/show/64"];
+              }
+
+              const randomLink =
+                links[Math.floor(Math.random() * links.length)];
+
+              Swal.fire({
+                icon: "info",
+                html: `
                 ${
-                  response.data.data.pesan || "Berhasil menyimpan data untuk makan malam."
+                  response.data.data.pesan ||
+                  "Berhasil menyimpan data untuk makan malam."
                 }
                 <br><br> Rekomendasi Makanan Untuk Bunda:
                 <a href="${randomLink}" target="_blank">Klik Disini</a>
               `,
-              showCloseButton: true,
-              focusConfirm: false,
+                showCloseButton: true,
+                focusConfirm: false,
+              });
+            })
+            .catch((error) => {
+              // Handle error from the API request
+              console.error("Error fetching user data:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Terjadi Kesalahan",
+                text: "Gagal mengambil data usia kehamilan.",
+              });
             });
-          })
-          .catch(error => {
-            // Handle error from the API request
-            console.error("Error fetching user data:", error);
-            Swal.fire({
-              icon: "error",
-              title: "Terjadi Kesalahan",
-              text: "Gagal mengambil data usia kehamilan.",
-            });
-          });
-        
         } else {
           // If the selected tab is not "makan_malam", handle success notification
           toast.success("Berhasil Menyimpan.", { duration: 2000 });
         }
-        
       } catch (error) {
         console.error("Error saving data:", error);
       }
