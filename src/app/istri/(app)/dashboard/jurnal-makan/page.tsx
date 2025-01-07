@@ -20,21 +20,21 @@ const mealOptions = [
 // Opsi porsi
 const portionSizes = {
   default: [
-    { value: "0", label: "tidak makan" },
+    { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
   karbohidrat: [
-    { value: "0", label: "tidak makan" },
+    { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
   lauk_hewani: [
-    { value: "0", label: "tidak makan" },
+    { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
@@ -45,21 +45,21 @@ const portionSizes = {
     { value: "4", label: "4 Porsi" },
   ],
   lauk_nabati: [
-    { value: "0", label: "tidak makan" },
+    { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
   sayur: [
-    { value: "0", label: "tidak makan" },
+    { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
   buah: [
-    { value: "0", label: "tidak makan" },
+    { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
@@ -397,9 +397,7 @@ const FoodLogForm = () => {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
 
-        // Customize the SweetAlert for "makan malam"
         if (selectedTab === "makan_malam") {
-          // Array of predefined links
           const links = [
             "https://www.anecma.id/istri/edukasi/show/61",
             "https://www.anecma.id/istri/edukasi/show/62",
@@ -409,7 +407,6 @@ const FoodLogForm = () => {
             "https://www.anecma.id/istri/edukasi/show/66",
           ];
 
-          // Select a random link from the array
           const randomLink = links[Math.floor(Math.random() * links.length)];
 
           Swal.fire({

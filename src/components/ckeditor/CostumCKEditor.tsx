@@ -113,7 +113,7 @@ class MyCustomUploadAdapter implements UploadAdapter {
           .post("/admin/upload-single-image", data, {
             headers: {
               "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              Authorization: `Bearer ${localStorage.getItem("authTokenAdmin")}`,
             },
           })
           .then((response) => {
