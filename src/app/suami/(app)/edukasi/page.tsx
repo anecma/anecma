@@ -41,7 +41,7 @@ export default function SuamiEdukasiPage() {
             "/suami/edukasi/get-edukasi",
             {
               headers: {
-                Authorization: `Bearer ${authToken}`, // Use token from localStorage
+                Authorization: `Bearer ${authToken}`,
               },
             }
           );

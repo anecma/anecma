@@ -366,7 +366,7 @@ const FoodLogForm = () => {
           (option) => option.name === selectedTab
         );
         const jamMakan = currentMealOption?.jam_makan;
-
+  
         const formattedData = Object.keys(selectedPortions).reduce(
           (acc, category) => {
             acc[`${jamMakan}_${category}`] = selectedPortions[category] || "";
@@ -374,10 +374,10 @@ const FoodLogForm = () => {
           },
           {} as Record<string, string>
         );
-
+  
         formattedData.jam_makan = jamMakan || "";
         console.log("Formatted Data to Send:", formattedData);
-
+  
         let endpoint = "";
         switch (selectedTab) {
           case "makan_malam":
@@ -392,51 +392,52 @@ const FoodLogForm = () => {
           default:
             throw new Error("Tab tidak dikenali");
         }
-
+  
         const response = await axiosInstance.post(endpoint, formattedData, {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
-
+  
+        // Menampilkan hasil setelah pengiriman data makan malam
         if (selectedTab === "makan_malam") {
           const authToken = session.accessToken;
           if (!authToken) {
             alert("Anda harus masuk untuk menyimpan data.");
             return;
           }
+          
+          const pesan = response.data.data.pesan || "Berhasil menyimpan data untuk makan malam.";
+          // console.log(pesan)
+  
           axiosInstance
             .get("/istri/get-user", {
               headers: { Authorization: `Bearer ${authToken}` },
             })
             .then((response) => {
               const pregnancyAge = response.data.data.usia_kehamilan;
-              // console.log(pregnancyAge);
               let links = [];
-
+  
+              // Tentukan link rekomendasi berdasarkan usia kehamilan
               if (pregnancyAge < 12) {
                 links = ["https://www.anecma.id/istri/edukasi/show/61"];
               } else {
                 links = ["https://www.anecma.id/istri/edukasi/show/64"];
               }
-
-              const randomLink =
-                links[Math.floor(Math.random() * links.length)];
-
+  
+              const randomLink = links[Math.floor(Math.random() * links.length)];
+  
+              // Menampilkan hasil respon menggunakan SweetAlert
               Swal.fire({
                 icon: "info",
                 html: `
-                ${
-                  response.data.data.pesan ||
-                  "Berhasil menyimpan data untuk makan malam."
-                }
-                <br><br> Rekomendasi Makanan Untuk Bunda:
-                <a href="${randomLink}" target="_blank">Klik Disini</a>
-              `,
+                  ${pesan}
+                  <br><br> Rekomendasi Makanan Untuk Bunda:
+                  <a href="${randomLink}" target="_self">Klik Disini</a>
+                `,
                 showCloseButton: true,
                 focusConfirm: false,
               });
             })
             .catch((error) => {
-              // Handle error from the API request
               console.error("Error fetching user data:", error);
               Swal.fire({
                 icon: "error",
@@ -445,17 +446,22 @@ const FoodLogForm = () => {
               });
             });
         } else {
-          // If the selected tab is not "makan_malam", handle success notification
+          // Jika tab yang dipilih bukan "makan_malam", tampilkan toast sukses
           toast.success("Berhasil Menyimpan.", { duration: 2000 });
         }
       } catch (error) {
         console.error("Error saving data:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Terjadi Kesalahan",
+          text: "Gagal menyimpan data.",
+        });
       }
     } else {
       alert("Anda harus masuk untuk menyimpan data.");
     }
   };
-
+  
   const openModal = () => {
     const content = `
      <h3 class="text-xl text-center font-semibold mb-4 border-b-2 border-gray-200 pb-2">Petunjuk Pengisian Jurnal Makan</h3>

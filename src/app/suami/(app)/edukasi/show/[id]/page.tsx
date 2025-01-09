@@ -107,7 +107,7 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
         <div className="flex flex-col items-center mt-4">
           <h1 className="text-2xl font-bold text-center">{edukasi.judul}</h1>
         </div>
-        <div className="flex justify-center mt-4">
+        {/* <div className="flex justify-center mt-4">
           <Image
             src={edukasi.thumbnail}
             alt={edukasi.judul}
@@ -115,7 +115,7 @@ export default function EdukasiShowPage({ params }: EdukasiShowPageProps) {
             height={300}
             className="rounded-lg"
           />
-        </div>
+        </div> */}
         <article
           className="ck-content prose prose-base mt-4"
           dangerouslySetInnerHTML={{ __html: edukasi.konten }} // Render HTML content

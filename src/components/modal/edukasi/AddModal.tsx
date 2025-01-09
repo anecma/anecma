@@ -207,7 +207,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, onAdd }) => {
           {/* Kategori ID Select */}
           <div className="relative my-2.5">
             <select
-              value={kategori_id || ""} // Empty string for null value
+              value={kategori_id || ""} 
               onChange={(e) => setKategoriId(e.target.value)}
               className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             >
