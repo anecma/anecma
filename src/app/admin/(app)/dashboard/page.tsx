@@ -36,6 +36,7 @@ const HomePage: React.FC = () => {
           }
         );
 
+        console.log("data:", response.data)
         if (response.data.success) {
           setDashboardData(response.data.data);
         }
@@ -76,7 +77,7 @@ const HomePage: React.FC = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen flex flex-col">
+    <div className="p-6 bg-gray-100  flex flex-col">
       {/* Dashboard Card */}
       <div className="bg-gray-100 p-6 rounded-lg mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
