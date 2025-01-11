@@ -30,6 +30,7 @@ interface Kategori {
 export default function SuamiEdukasiPage() {
   const [kategoriData, setKategoriData] = useState<Kategori[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openAccordion, setOpenAccordion] = useState<number | null>(null); // Store which accordion is open
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,6 +65,20 @@ export default function SuamiEdukasiPage() {
     };
 
     fetchData();
+  }, []);
+
+  // Handle the accordion state toggling
+  const handleAccordionToggle = (id: number) => {
+    setOpenAccordion(prevState => (prevState === id ? null : id)); // Toggle the accordion open state
+    localStorage.setItem("openAccordion", JSON.stringify(openAccordion === id ? null : id)); // Persist the state in localStorage
+  };
+
+  // Load the accordion state from localStorage on initial load
+  useEffect(() => {
+    const savedOpenAccordion = localStorage.getItem("openAccordion");
+    if (savedOpenAccordion) {
+      setOpenAccordion(JSON.parse(savedOpenAccordion));
+    }
   }, []);
 
   return (
@@ -110,27 +125,14 @@ export default function SuamiEdukasiPage() {
                   <button
                     type="button"
                     className="flex items-center justify-between w-full p-5 font-medium text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3"
-                    data-accordion-target={`#accordion-collapse-body-${kategori.id}`}
-                    aria-expanded="false"
-                    aria-controls={`accordion-collapse-body-${kategori.id}`}
-                    onClick={() => {
-                      const body = document.getElementById(
-                        `accordion-collapse-body-${kategori.id}`
-                      );
-                      if (body) {
-                        body.classList.toggle("hidden");
-                        body.style.height = body.classList.contains("hidden")
-                          ? "0"
-                          : `${body.scrollHeight}px`;
-                      }
-                    }}
+                    onClick={() => handleAccordionToggle(kategori.id)}
                   >
                     <span className="text-lg text-black font-semibold">
                       {kategori.nama_kategori}
                     </span>
                     <svg
                       data-accordion-icon
-                      className="w-3 h-3 rotate-180 shrink-0"
+                      className={`w-3 h-3 transform ${openAccordion === kategori.id ? 'rotate-180' : ''} shrink-0`}
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -141,7 +143,7 @@ export default function SuamiEdukasiPage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
-                        d="M9 5 5 1 1 5"
+                        d="M9 5 5 1 1 5" // This is the right-pointing arrow
                       />
                     </svg>
                   </button>
@@ -149,9 +151,8 @@ export default function SuamiEdukasiPage() {
 
                 <div
                   id={`accordion-collapse-body-${kategori.id}`}
-                  className="overflow-hidden transition-all duration-300 ease-in-out hidden"
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${openAccordion === kategori.id ? '' : 'hidden'}`}
                   aria-labelledby={`accordion-collapse-heading-${kategori.id}`}
-                  style={{ height: 0 }}
                 >
                   <div className="p-5 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
                     <p className="mb-2 text-gray-500 dark:text-gray-400">

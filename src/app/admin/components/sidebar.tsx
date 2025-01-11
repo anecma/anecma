@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaHospitalAlt, FaUserMd, FaCog, FaBook } from "react-icons/fa";
+import { FaHospitalAlt, FaUserMd, FaCog, FaBook, FaList, FaTh, FaChalkboardTeacher, FaDatabase, FaChevronRight, FaChevronDown } from "react-icons/fa"; // Import icons
 import { LuLayoutDashboard } from "react-icons/lu";
 import Image from "next/image";
 import axiosInstance from "@/libs/axios";
@@ -20,6 +20,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isDataMenuOpen, setIsDataMenuOpen] = useState<boolean>(false); 
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -54,6 +55,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
     return currentPath === path
       ? "bg-indigo-400 text-white"
       : "hover:bg-indigo-300";
+  };
+
+  const handleDataMenuClick = () => {
+    setIsDataMenuOpen(!isDataMenuOpen); // Toggle the visibility of the Data submenu
   };
 
   return (
@@ -96,6 +101,79 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               </span>
             </Link>
           </li>
+
+          {/* Data Menu with submenus and arrow toggle */}
+          <li className="mb-6">
+            <button
+              onClick={handleDataMenuClick}
+              className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                "/admin/data"
+              )}`}
+            >
+              <FaDatabase className="text-xl mr-3" />
+              <span className="text-lg">Data</span>
+              {/* Add the arrow icon that toggles direction */}
+              {isDataMenuOpen ? (
+                <FaChevronDown className="ml-auto text-lg" />
+              ) : (
+                <FaChevronRight className="ml-auto text-lg" /> // Right arrow when closed
+              )}
+            </button>
+           
+          </li>
+
+           {isDataMenuOpen && (
+              <ul className="pl-6 mt-4">
+                <li className="mb-4">
+                  <Link href="/admin/data/rekap-hb">
+                    <span
+                      className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                        "/admin/data/rekap-hb"
+                      )}`}
+                    >
+                      <FaList className="text-xl mr-3" />
+                      <span className="text-lg">Rekap HB</span>
+                    </span>
+                  </Link>
+                </li>
+                <li className="mb-4">
+                  <Link href="/admin/data/rekap-TTD">
+                    <span
+                      className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                        "/admin/data/rekap-TTDd"
+                      )}`}
+                    >
+                      <FaList className="text-xl mr-3" />
+                      <span className="text-lg">Rekap TTD</span>
+                    </span>
+                  </Link>
+                </li>
+                <li className="mb-4">
+                  <Link href="/admin/data/rekap-TTD-90">
+                    <span
+                      className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                        "/admin/data/rekap-TTD-90"
+                      )}`}
+                    >
+                      <FaList className="text-xl mr-3" />
+                      <span className="text-lg">Rekap TTD {">"}90</span>
+                    </span>
+                  </Link>
+                </li>
+                <li className="mb-4">
+                  <Link href="/admin/data/rekap-gizi">
+                    <span
+                      className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                        "/admin/data/rekap-gizi"
+                      )}`}
+                    >
+                      <FaList className="text-xl mr-3" />
+                      <span className="text-lg">Rekap Gizi</span>
+                    </span>
+                  </Link>
+                </li>
+              </ul>
+            )}
           <li className="mb-6">
             <Link href="/admin/puskesmas">
               <span
@@ -104,7 +182,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                 )}`}
               >
                 <FaHospitalAlt className="text-xl mr-3" />
-                <span className="text-lg">Data Puskesmas</span>
+                <span className="text-lg">Puskesmas</span>
               </span>
             </Link>
           </li>
@@ -116,7 +194,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                 )}`}
               >
                 <FaUserMd className="text-xl mr-3" />
-                <span className="text-lg">Data Petugas</span>
+                <span className="text-lg">Petugas</span>
               </span>
             </Link>
           </li>
@@ -127,13 +205,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                   "/admin/edukasi"
                 )}`}
               >
-                <FaBook className="text-xl mr-3" />
-                <span className="text-lg">Data Edukasi</span>
+                <FaChalkboardTeacher className="text-xl mr-3" />
+                <span className="text-lg">Edukasi</span>
               </span>
             </Link>
           </li>
 
-          {/* Added Category Menu Item */}
+          {/* Updated Category Menu Item with FaTh Icon */}
           <li className="mb-6">
             <Link href="/admin/kategori">
               <span
@@ -141,12 +219,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                   "/admin/kategori"
                 )}`}
               >
-                <FaBook className="text-xl mr-3" /> {/* Icon for Kategori */}
+                <FaTh className="text-xl mr-3" />
                 <span className="text-lg">Kategori</span>
               </span>
             </Link>
           </li>
-
           <li>
             <Link href="/admin/settings">
               <span

@@ -281,7 +281,7 @@ const FoodLogForm = () => {
   const [usiakehamilan, setUsiaKehamilan] = useState(0);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
-  const [savedImageSrc, setSavedImageSrc] = useState("");
+  // const [savedImageSrc, setSavedImageSrc] = useState("");
   const [imageSrc, setImageSrc] = useState("");
   const [textContent, setTextContent] = useState<string>("");
   const { data: session, status } = useSession();
@@ -366,7 +366,7 @@ const FoodLogForm = () => {
           (option) => option.name === selectedTab
         );
         const jamMakan = currentMealOption?.jam_makan;
-  
+
         const formattedData = Object.keys(selectedPortions).reduce(
           (acc, category) => {
             acc[`${jamMakan}_${category}`] = selectedPortions[category] || "";
@@ -374,10 +374,10 @@ const FoodLogForm = () => {
           },
           {} as Record<string, string>
         );
-  
+
         formattedData.jam_makan = jamMakan || "";
         console.log("Formatted Data to Send:", formattedData);
-  
+
         let endpoint = "";
         switch (selectedTab) {
           case "makan_malam":
@@ -392,11 +392,11 @@ const FoodLogForm = () => {
           default:
             throw new Error("Tab tidak dikenali");
         }
-  
+
         const response = await axiosInstance.post(endpoint, formattedData, {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
-  
+
         // Menampilkan hasil setelah pengiriman data makan malam
         if (selectedTab === "makan_malam") {
           const authToken = session.accessToken;
@@ -404,10 +404,12 @@ const FoodLogForm = () => {
             alert("Anda harus masuk untuk menyimpan data.");
             return;
           }
-          
-          const pesan = response.data.data.pesan || "Berhasil menyimpan data untuk makan malam.";
+
+          const pesan =
+            response.data.data.pesan ||
+            "Berhasil menyimpan data untuk makan malam.";
           // console.log(pesan)
-  
+
           axiosInstance
             .get("/istri/get-user", {
               headers: { Authorization: `Bearer ${authToken}` },
@@ -415,16 +417,17 @@ const FoodLogForm = () => {
             .then((response) => {
               const pregnancyAge = response.data.data.usia_kehamilan;
               let links = [];
-  
+
               // Tentukan link rekomendasi berdasarkan usia kehamilan
               if (pregnancyAge < 12) {
                 links = ["https://www.anecma.id/istri/edukasi/show/61"];
               } else {
                 links = ["https://www.anecma.id/istri/edukasi/show/64"];
               }
-  
-              const randomLink = links[Math.floor(Math.random() * links.length)];
-  
+
+              const randomLink =
+                links[Math.floor(Math.random() * links.length)];
+
               // Menampilkan hasil respon menggunakan SweetAlert
               Swal.fire({
                 icon: "info",
@@ -461,7 +464,7 @@ const FoodLogForm = () => {
       alert("Anda harus masuk untuk menyimpan data.");
     }
   };
-  
+
   const openModal = () => {
     const content = `
      <h3 class="text-xl text-center font-semibold mb-4 border-b-2 border-gray-200 pb-2">Petunjuk Pengisian Jurnal Makan</h3>
@@ -482,17 +485,18 @@ const FoodLogForm = () => {
       </ol>
     `;
 
-    setTextContent(content); // Setting the modal content dynamically
-    setIsGuideModalOpen(true); // Opening the modal
+    setTextContent(content);
+    setIsGuideModalOpen(true);
   };
 
-  const closeSaveModal = () => {
+  const closeModal = () => {
     setIsSaveModalOpen(false);
+    setImageSrc("");
   };
 
   const closeGuideModal = () => {
     setIsGuideModalOpen(false);
-    setTextContent(""); // Clear content when closing the modal
+    setTextContent("");
   };
 
   const categories = Object.keys(mealCategories) as Array<
@@ -552,29 +556,38 @@ const FoodLogForm = () => {
                   .toLowerCase()}{" "}
                 yang Anda konsumsi saat ini?
               </h2>
-              <div className="flex overflow-x-auto gap-5 py-2.5">
-                {mealCategories[category].map((image, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center bg-white w-40 p-5 rounded-2xl flex-shrink-0 cursor-pointer"
-                    onClick={() => {
-                      setImageSrc(image.src); // Set the image source to the clicked image
-                      setIsGuideModalOpen(true); // Open the modal
-                    }}
-                  >
-                    <Image
-                      src={image.src}
-                      alt={image.alt}
-                      width={100}
-                      height={100}
-                      className="w-32 h-32 rounded-3xl"
-                    />
-                    <p className="mt-2 text-center">{image.title}</p>
-                    <p className="text-center text-sm text-gray-500">
-                      {image.description}
-                    </p>
-                  </div>
-                ))}
+              <div>
+                <div className="flex overflow-x-auto gap-5 py-2.5">
+                  {mealCategories[category].map((image, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center bg-white w-40 p-5 rounded-2xl flex-shrink-0 cursor-pointer"
+                      onClick={() => {
+                        setImageSrc(image.src); // Set the image source to the clicked image
+                        setIsSaveModalOpen(true); // Open the modal
+                      }}
+                    >
+                      <Image
+                        src={image.src}
+                        alt={image.alt}
+                        width={100}
+                        height={100}
+                        className="w-32 h-32 rounded-3xl"
+                      />
+                      <p className="mt-2 text-center">{image.title}</p>
+                      <p className="text-center text-sm text-gray-500">
+                        {image.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* The Image Modal is rendered outside the loop */}
+                <ImageModal
+                  isOpen={isSaveModalOpen}
+                  onClose={closeModal}
+                  imageSrc={imageSrc}
+                />
               </div>
               <div className="my-2.5">
                 <form action="" className="flex flex-col gap-2.5">

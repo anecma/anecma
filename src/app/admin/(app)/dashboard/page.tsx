@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authTokenAdmin");
       setLoading(true); // Start loading
       try {
         const response = await axiosInstance.get(
@@ -35,11 +35,11 @@ const HomePage: React.FC = () => {
             },
           }
         );
-
-        console.log("data:", response.data)
+        
         if (response.data.success) {
           setDashboardData(response.data.data);
         }
+        console.log("data:", response.data)
       } catch (error) {
         console.error("Failed to fetch dashboard data", error);
       } finally {
