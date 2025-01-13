@@ -40,7 +40,7 @@ interface Kategori {
 interface UserData {
   user: {
     id: number;
-    resiko_anemia: { id: number; user_id: number; resiko: string }[]; 
+    resiko_anemia: { id: number; user_id: number; resiko: string }[];
   };
 }
 
@@ -98,9 +98,9 @@ export default function EdukasiPage() {
           );
           if (Array.isArray(response.data.data)) {
             setKategoriData(response.data.data);
-            setEdukasiData(response.data.data);
+            setEdukasiData(response.data.data)
           }
-          console.log(response.data.data);
+          console.log(response.data.data)
         } catch (error) {
           console.error("Error fetching data:", error);
         } finally {
@@ -257,8 +257,83 @@ export default function EdukasiPage() {
           )}
         </div>
       );
+    } else if (userResiko === "rendah") {
+      return (
+        <div className="space-y-5">
+          {loading ? (
+            <>
+              <SkeletonLoader height="50px" />
+              <SkeletonLoader height="50px" />
+              <SkeletonLoader height="50px" />
+            </>
+          ) : kategoriData.length > 0 ? (
+            kategoriData.map((kategori) => (
+              <div key={kategori.id} className="accordion">
+                <h2>
+                  <button
+                    type="button"
+                    className="flex items-center justify-between w-full p-5 font-medium text-gray-500 border border-b-0 border-gray-200 rounded-t-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3"
+                    onClick={() => toggleCategory(kategori.id)}
+                  >
+                    <span className="text-lg text-black font-semibold">
+                      {kategori.nama_kategori}
+                    </span>
+                    <FaChevronDown
+                      className={`${
+                        openedCategory === kategori.id ? "rotate-180" : ""
+                      } w-3 h-3`}
+                    />
+                  </button>
+                </h2>
+
+                {openedCategory === kategori.id && (
+                  <div className="space-y-3 p-5 border-t-0 border-l-2 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+                    <p className="mb-2 text-gray-500 dark:text-gray-400">
+                      {kategori.deskripsi}
+                    </p>
+                    {kategori.edukasi && Array.isArray(kategori.edukasi) ? (
+                      kategori.edukasi.map((edukasi) => (
+                        <div
+                          key={edukasi.id}
+                          className="flex items-center bg-white p-4 border rounded-lg shadow-sm hover:shadow-md"
+                        >
+                          <Image
+                            src={edukasi.thumbnail}
+                            alt={edukasi.judul}
+                            width={100}
+                            height={100}
+                            className="rounded-lg"
+                          />
+                          <div className="ml-4 flex-1">
+                            <h4 className="font-semibold text-lg">
+                              {edukasi.judul}
+                            </h4>
+                            <Link
+                              href={`/istri/edukasi/show/${edukasi.id}`}
+                              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 mt-2"
+                            >
+                              Lihat Detail
+                            </Link>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-gray-500">
+                        Tidak ada edukasi untuk kategori ini.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-gray-700">
+              Tidak ada data edukasi ditemukan.
+            </div>
+          )}
+        </div>
+      );
     } else {
-      // Case where resiko is null, render the education content as specified
       return (
         <div className="space-y-5">
           {loading ? (
