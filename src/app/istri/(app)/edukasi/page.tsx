@@ -361,7 +361,7 @@ export default function EdukasiPage() {
                     className="rounded-lg"
                   />
                   <div className="ml-4 flex-1">
-                    <h3 className="text-xl font-semibold">{edukasi.judul}</h3>
+                    <h3 className="text-lg font-semibold">{edukasi.judul}</h3>
                     {/* <p className="text-gray-500">{edukasi.konten}</p> */}
                     <Link
                       href={`/istri/edukasi/show/${edukasi.id}`}
