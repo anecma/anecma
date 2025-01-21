@@ -50,7 +50,9 @@ export default function EdukasiPage() {
   const [userResiko, setUserResiko] = useState<string | null>(""); // User's resiko or null
   const [loading, setLoading] = useState(true);
   const [openedCategory, setOpenedCategory] = useState<number | null>(null);
-  const [openedSubcategory, setOpenedSubcategory] = useState<number | null>(null);
+  const [openedSubcategory, setOpenedSubcategory] = useState<number | null>(
+    null
+  );
   const [isMounted, setIsMounted] = useState(false); // To check if component is mounted
   const { data: session, status } = useSession();
 
@@ -98,9 +100,9 @@ export default function EdukasiPage() {
           );
           if (Array.isArray(response.data.data)) {
             setKategoriData(response.data.data);
-            setEdukasiData(response.data.data)
+            setEdukasiData(response.data.data);
           }
-          console.log(response.data.data)
+          console.log(response.data.data);
         } catch (error) {
           console.error("Error fetching data:", error);
         } finally {
@@ -116,8 +118,12 @@ export default function EdukasiPage() {
 
   useEffect(() => {
     // Get saved state from localStorage
-    const savedCategory = JSON.parse(localStorage.getItem("openedCategory") || "null");
-    const savedSubcategory = JSON.parse(localStorage.getItem("openedSubcategory") || "null");
+    const savedCategory = JSON.parse(
+      localStorage.getItem("openedCategory") || "null"
+    );
+    const savedSubcategory = JSON.parse(
+      localStorage.getItem("openedSubcategory") || "null"
+    );
 
     setOpenedCategory(savedCategory);
     setOpenedSubcategory(savedSubcategory);
@@ -206,7 +212,8 @@ export default function EdukasiPage() {
                               <p className="mb-2 text-gray-500 dark:text-gray-400">
                                 {subkategori.deskripsi}
                               </p>
-                              {subkategori.edukasi && Array.isArray(subkategori.edukasi) ? (
+                              {subkategori.edukasi &&
+                              Array.isArray(subkategori.edukasi) ? (
                                 subkategori.edukasi.map((edukasi) => (
                                   <div
                                     key={edukasi.id}
@@ -354,8 +361,8 @@ export default function EdukasiPage() {
                     className="rounded-lg"
                   />
                   <div className="ml-4 flex-1">
-                <h3 className="text-xl font-semibold">{edukasi.judul}</h3>
-                    <p className="text-gray-500">{edukasi.konten}</p>
+                    <h3 className="text-lg font-semibold">{edukasi.judul}</h3>
+                    {/* <p className="text-gray-500">{edukasi.konten}</p> */}
                     <Link
                       href={`/istri/edukasi/show/${edukasi.id}`}
                       className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 mt-2"
@@ -366,7 +373,6 @@ export default function EdukasiPage() {
                 </div>
               </div>
             ))
-            
           ) : (
             <div className="text-center text-gray-700">
               Tidak ada data edukasi ditemukan.
