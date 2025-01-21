@@ -151,6 +151,18 @@ const mealCategories = {
       description: "1 buah sedang",
     },
     {
+      src: "/images/lauk-hewani/Lauk_Rendang.png",
+      alt: "Rendang",
+      title: "Lauk Rendang",
+      description: "1 buah sedang",
+    },
+    {
+      src: "/images/lauk-hewani/Lauk_Ayam_Goreng.png",
+      alt: "Ayam Goreng",
+      title: "Ayam Goremg",
+      description: "1 buah sedang",
+    },
+    {
       src: "/images/lauk-hewani/Lauk_Udang.png",
       alt: "Seafood",
       title: "Seafood Udang",
