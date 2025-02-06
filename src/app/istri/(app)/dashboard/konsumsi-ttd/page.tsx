@@ -26,7 +26,7 @@ export default function KonsumsiTtdPage() {
   interface ApiResponseItem {
     tanggal_waktu: string;
     total_tablet_diminum: number;
-    minum_vit_c: number; // Assuming this is a number (0 or 1)
+    minum_vit_c: number; 
   }
 
   const fetchTabletData = useCallback(async () => {
@@ -59,7 +59,7 @@ export default function KonsumsiTtdPage() {
   }, [session]);
 
   useEffect(() => {
-    fetchTabletData(); // Call fetchTabletData on component mount
+    fetchTabletData(); 
   }, [fetchTabletData]);
 
   const handleSave = async () => {
@@ -67,20 +67,18 @@ export default function KonsumsiTtdPage() {
       setErrorMessage("User is not authenticated.");
       return;
     }
-
+  
     setIsSaving(true);
-
+  
     try {
-      const formattedDate = selectedDate
-        ? selectedDate.toISOString().split("T")[0]
-        : null;
-
-      if (!formattedDate) {
+      if (!selectedDate) {
         setErrorMessage("Tanggal tidak boleh kosong.");
         setIsSaving(false);
         return;
       }
-
+  
+      const formattedDate = selectedDate.toLocaleDateString("en-CA");
+  
       await axiosInstance.post(
         "/istri/dashboard/konsumsi-ttd",
         {
@@ -92,9 +90,9 @@ export default function KonsumsiTtdPage() {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         }
       );
-
+  
       toast.success("TTD Berhasil Ditambahkan!", { position: "top-center" });
-      fetchTabletData(); // Refresh data after saving
+      fetchTabletData(); 
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || "Gagal menyimpan data.";
@@ -103,6 +101,7 @@ export default function KonsumsiTtdPage() {
       setIsSaving(false);
     }
   };
+  
 
   const handleClear = () => {
     setSelectedDate(null);
@@ -226,17 +225,14 @@ export default function KonsumsiTtdPage() {
                 >
                   <td className="px-4 py-2 text-sm text-gray-700 w-1/3">
                     {" "}
-                    {/* Wider width for the date column */}
                     {item.tanggal_waktu.split(" ")[0]}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-700 w-1/4">
                     {" "}
-                    {/* Fixed width for tablet column */}
                     {item.total_tablet_diminum}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-700 w-1/4">
                     {" "}
-                    {/* Fixed width for vit C column */}
                     {item.minum_vit_c ? "Ya" : "Tidak"}
                   </td>
                 </tr>

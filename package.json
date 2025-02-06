@@ -19,6 +19,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "ckeditor5": "^43.2.0",
+    "date-fns-tz": "^3.2.0",
     "flowbite": "^2.5.1",
     "flowbite-react": "^0.10.2",
     "html-react-parser": "^5.1.18",
