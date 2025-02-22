@@ -5,7 +5,6 @@ import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import axiosInstance from "@/libs/axios";
 import { AxiosError } from "axios";
 import Image from "next/image";
-import { FaBell, FaCog, FaHeart, FaSearch } from "react-icons/fa";
 
 interface ErrorMessage {
   email?: string;
@@ -40,19 +39,19 @@ function LoginPage() {
 
     if (Object.keys(errors).length === 0) {
       try {
-        const response = await axiosInstance.post("/admin/login", {
+        const response = await axiosInstance.post("/petugas/login", {
           email,
           password,
         });
 
         const token = response.data.data?.token;
         if (token) {
-          localStorage.setItem("authTokenAdmin", token);
+          localStorage.setItem("authTokenPetugas", token);
 
           setEmail("");
           setPassword("");
 
-          window.location.href = "/admin/dashboard";
+          window.location.href = "/petugas/dashboard";
         } else {
           setLoginError("Token tidak ditemukan.");
         }
@@ -77,7 +76,7 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 flex items-center justify-center bg-gray-100 relative">
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 flex justify-center w-full px-6 mt-4 space-x-14">
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 flex justify-center w-full px-6 mt-6 space-x-14">
           <Image
             src="/images/Logo_Dikti.png"
             alt="Small Image 1"

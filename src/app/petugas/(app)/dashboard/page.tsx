@@ -44,10 +44,10 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("authTokenAdmin");
+      const token = localStorage.getItem("authTokenPetugas");
       setLoading(true);
       try {
-        const dashboardResponse = await axiosInstance.get("/admin/dashboard-card-hitung-data", {
+        const dashboardResponse = await axiosInstance.get("/petugas/dashboard-card-hitung-data", {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         });
 
@@ -56,10 +56,10 @@ const HomePage: React.FC = () => {
         } else {
           setError("Failed to load dashboard data.");
         }
-
-        const tableResponse = await axiosInstance.get("/admin/dashboard-data-terbaru", {
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        const tableResponse = await axiosInstance.get("/petugas/dashboard-data-terbaru", {
+            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         });
+        console.log(tableData)
 
         if (tableResponse.data.success) {
           setTableData(tableResponse.data.data);

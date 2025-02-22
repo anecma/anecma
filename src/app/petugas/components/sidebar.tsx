@@ -1,16 +1,35 @@
 "use client";
- 
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaHospitalAlt, FaUserMd, FaCog, FaList, FaTh, FaChalkboardTeacher, FaDatabase, FaChevronRight, FaChevronDown, FaUser } from "react-icons/fa"; // Import icons
+import {
+  FaHospitalAlt,
+  FaUserMd,
+  FaCog,
+  FaList,
+  FaTh,
+  FaChalkboardTeacher,
+  FaDatabase,
+  FaChevronRight,
+  FaChevronDown,
+  FaUser,
+} from "react-icons/fa"; // Import icons
 import { LuLayoutDashboard } from "react-icons/lu";
 import Image from "next/image";
 import axiosInstance from "@/libs/axios";
 
+interface ApiResponse {
+  data: {
+    user: User;
+};
+}
+
 interface User {
   name: string;
-  image: string;
+  image: string | null;
   role: string;
+  kelurahan: string | null;
+  wilayah_binaan: string | null;
 }
 
 interface SidebarProps {
@@ -28,29 +47,33 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
       setIsDataMenuOpen(JSON.parse(savedMenuStatus));
     }
 
-    if (
-      currentPath.includes("/admin/data") && 
-      !isDataMenuOpen
-    ) {
+    if (currentPath.includes("/petugas/data") && !isDataMenuOpen) {
       setIsDataMenuOpen(true);
     }
 
     const fetchUserData = async () => {
       try {
-        const authToken = localStorage.getItem("authTokenAdmin");
-
+        const authToken = localStorage.getItem("authTokenPetugas");
+    
         if (!authToken) {
           setError("No token found");
           return;
         }
-
-        const response = await axiosInstance.get<User>("/user", {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-
-        setUser(response.data);
+    
+        const response = await axiosInstance.get<ApiResponse>(
+          "petugas/get-user",
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+  
+        if (response.data && response.data.data && response.data.data.user) {
+          setUser(response.data.data.user); 
+        } else {
+          setError("User data is missing or invalid");
+        }
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -59,6 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
         }
       }
     };
+    
 
     fetchUserData();
   }, [currentPath]);
@@ -72,8 +96,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
   const handleDataMenuClick = () => {
     const newStatus = !isDataMenuOpen;
     setIsDataMenuOpen(newStatus);
+    localStorage.setItem("isDataMenuOpen", JSON.stringify(newStatus)); 
   };
-  
 
   return (
     <div className="fixed top-0 left-0 bg-white w-64 h-screen flex flex-col shadow-lg border-r overflow-x-auto">
@@ -93,9 +117,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               <h2 className="text-lg font-semibold">
                 {user?.name || "Default User"}
               </h2>
-              <h2 className="text-lg font-semibold">
+              <h2 className="text-sm text-gray-600">
                 {user?.role || "Default Role"}
               </h2>
+
             </div>
           </>
         )}
@@ -104,10 +129,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
       <nav className="flex-1 p-6">
         <ul>
           <li className="mb-6">
-            <Link href="/admin/dashboard">
+            <Link href="/petugas/dashboard">
               <span
                 className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/dashboard"
+                  "/petugas/dashboard"
                 )}`}
               >
                 <LuLayoutDashboard className="text-xl mr-3" />
@@ -120,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
             <button
               onClick={handleDataMenuClick}
               className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                "/admin/data"
+                "/petugas/data"
               )}`}
             >
               <FaDatabase className="text-xl mr-3" />
@@ -128,7 +153,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               {isDataMenuOpen ? (
                 <FaChevronDown className="ml-auto text-lg" />
               ) : (
-                <FaChevronRight className="ml-auto text-lg" /> 
+                <FaChevronRight className="ml-auto text-lg" />
               )}
             </button>
           </li>
@@ -136,10 +161,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
           {isDataMenuOpen && (
             <ul className="pl-6 mt-4">
               <li className="mb-4">
-                <Link href="/admin/data/rekap-hb">
+                <Link href="/petugas/data/rekap-hb">
                   <span
                     className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                      "/admin/data/rekap-hb"
+                      "/petugas/data/rekap-hb"
                     )}`}
                   >
                     <FaList className="text-xl mr-3" />
@@ -148,10 +173,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                 </Link>
               </li>
               <li className="mb-4">
-                <Link href="/admin/data/rekap-TTD">
+                <Link href="/petugas/data/rekap-TTD">
                   <span
                     className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                      "/admin/data/rekap-TTD"
+                      "/petugas/data/rekap-TTD"
                     )}`}
                   >
                     <FaList className="text-xl mr-3" />
@@ -160,10 +185,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                 </Link>
               </li>
               <li className="mb-4">
-                <Link href="/admin/data/rekap-TTD-90">
+                <Link href="/petugas/data/rekap-TTD-90">
                   <span
                     className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                      "/admin/data/rekap-TTD-90"
+                      "/petugas/data/rekap-TTD-90"
                     )}`}
                   >
                     <FaList className="text-xl mr-3" />
@@ -172,10 +197,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                 </Link>
               </li>
               <li className="mb-4">
-                <Link href="/admin/data/rekap-gizi">
+                <Link href="/petugas/data/rekap-gizi">
                   <span
                     className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                      "/admin/data/rekap-gizi"
+                      "/petugas/data/rekap-gizi"
                     )}`}
                   >
                     <FaList className="text-xl mr-3" />
@@ -185,77 +210,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               </li>
             </ul>
           )}
-
           <li className="mb-6">
-            <Link href="/admin/puskesmas">
+            <Link href="/petugas/user">
               <span
                 className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/puskesmas"
-                )}`}
-              >
-                <FaHospitalAlt className="text-xl mr-3" />
-                <span className="text-lg">Puskesmas</span>
-              </span>
-            </Link>
-          </li>
-          <li className="mb-6">
-            <Link href="/admin/petugas">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/petugas"
-                )}`}
-              >
-                <FaUserMd className="text-xl mr-3" />
-                <span className="text-lg">Petugas</span>
-              </span>
-            </Link>
-          </li>
-          <li className="mb-6">
-            <Link href="/admin/edukasi">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/edukasi"
-                )}`}
-              >
-                <FaChalkboardTeacher className="text-xl mr-3" />
-                <span className="text-lg">Edukasi</span>
-              </span>
-            </Link>
-          </li>
-
-          <li className="mb-6">
-            <Link href="/admin/kategori">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/kategori"
-                )}`}
-              >
-                <FaTh className="text-xl mr-3" />
-                <span className="text-lg">Kategori</span>
-              </span>
-            </Link>
-          </li>
-          <li className="mb-6">
-            <Link href="/admin/user">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/user"
+                  "/petugas/user"
                 )}`}
               >
                 <FaUser className="text-xl mr-3" />
                 <span className="text-lg">User</span>
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link href="/admin/settings">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/settings"
-                )}`}
-              >
-                <FaCog className="text-xl mr-3" />
-                <span className="text-lg">Settings</span>
               </span>
             </Link>
           </li>

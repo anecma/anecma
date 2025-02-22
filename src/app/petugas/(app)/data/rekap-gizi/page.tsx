@@ -2,12 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { FaCalendarAlt, FaHamburger, FaSearch, FaSun } from "react-icons/fa";
 import axiosInstance from "@/libs/axios";
-import {
-  FaChevronLeft,
-  FaChevronRight,
-  FaEye,
-  FaUser,
-} from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaEye, FaUser } from "react-icons/fa6";
 import { GiHealthNormal } from "react-icons/gi";
 
 interface User {
@@ -70,36 +65,14 @@ const RekapHb = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
-  const [selectedPuskesmas, setSelectedPuskesmas] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<RekapData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
-  const kelurahanOptions = [
-    "Sangkrah",
-    "Kedunglumbu",
-    "Mojo",
-    "Semanggi",
-    "Kratonan",
-    "Danukusuman",
-    "Joyotakan",
-    "Gilingan",
-    "Kestalan",
-    "Punggawan",
-    "Sukamenanti",
-  ];
-  const puskesmasOptions = [
-    "Sangkrah",
-    "Kratonan",
-    "Gilingan",
-    "Bukit Kemuning",
-  ];
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const authToken = localStorage.getItem("authTokenAdmin");
+        const authToken = localStorage.getItem("authTokenPetugas");
 
         if (!authToken) {
           setError("No authorization token found.");
@@ -107,7 +80,7 @@ const RekapHb = () => {
         }
 
         const response = await axiosInstance.get(
-          "/admin/data/rekap-konsumsi-gizi",
+          "/petugas/data/rekap-konsumsi-gizi",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -134,7 +107,7 @@ const RekapHb = () => {
   const handleExportToExcel = async () => {
     setIsLoading(true);
 
-    const authToken = localStorage.getItem("authTokenAdmin");
+    const authToken = localStorage.getItem("authTokenPetugas");
 
     if (!authToken) {
       setError("No authorization token found.");
@@ -144,7 +117,7 @@ const RekapHb = () => {
 
     try {
       const response = await axiosInstance.get(
-        "/admin/rekap-gizi/export-data",
+        "/petugas/rekap-gizi/export-data",
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -153,22 +126,31 @@ const RekapHb = () => {
         }
       );
 
-      const currentDate = new Date();
-      const month = currentDate.toLocaleString("default", { month: "long" });
-      const year = currentDate.getFullYear();
-      const filename = `rekap-Konsumsi-Gizi-${month}-${year}.xlsx`;
-      const blob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
+      if (
+        response.headers["content-type"].includes(
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+      ) {
+        const currentDate = new Date();
+        const month = currentDate.toLocaleString("default", { month: "long" });
+        const year = currentDate.getFullYear();
+        const filename = `rekap-gizi-${month}-${year}.xlsx`;
+
+        const blob = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+      } else {
+        setError("Failed to download file. Server returned an invalid file.");
+      }
     } catch (err) {
       console.error("Error exporting data:", err);
       setError("Error exporting data. Please try again.");
-    }
-    finally{
+    } finally {
       setIsLoading(false);
     }
   };
@@ -177,25 +159,12 @@ const RekapHb = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedKelurahan(e.target.value);
-  };
-
-  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPuskesmas(e.target.value);
-  };
-
   const filteredData = data.filter((item) => {
     const nameMatch = item.user.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const kelurahanMatch =
-      selectedKelurahan === "" || item.user.kelurahan === selectedKelurahan;
-    const puskesmasMatch =
-      selectedPuskesmas === "" ||
-      item.user.wilayah_binaan === selectedPuskesmas;
 
-    return nameMatch && kelurahanMatch && puskesmasMatch;
+    return nameMatch;
   });
 
   const indexOfLastRecord = currentPage * rowsPerPage;
@@ -251,56 +220,6 @@ const RekapHb = () => {
   return (
     <div className="bg-white p-4">
       <div className="flex justify-between items-center mb-4 p-2">
-        <div className="flex space-x-4">
-          {/* Kelurahan Dropdown */}
-
-          <div className="relative w-full">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedKelurahan}
-              onChange={handleKelurahanChange}
-            >
-              <option value="">Pilih Kelurahan</option>
-              {kelurahanOptions.map((kelurahan, index) => (
-                <option key={index} value={kelurahan}>
-                  {kelurahan}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/icon/Vector.png"
-                alt="Sort by Kelurahan"
-                className="w-5 h-5"
-              />
-            </div>
-          </div>
-
-          {/* Puskesmas Dropdown */}
-          <div className="relative w-full max-w-xs">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedPuskesmas}
-              onChange={handlePuskesmasChange}
-            >
-              <option value="">Pilih Puskesmas</option>
-              {puskesmasOptions.map((puskesmas, index) => (
-                <option key={index} value={puskesmas}>
-                  {puskesmas}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/icon/Vector.png"
-                alt="Sort by Puskesmas"
-                className="w-5 h-5"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Search Input with Icon */}
         <div className="relative ml-auto w-1/3">
           <input
             type="text"
@@ -413,7 +332,6 @@ const RekapHb = () => {
           </button>
         </div>
 
-        {/* Export to Excel Button */}
         <div className="flex justify-end mt-4">
           <button
             onClick={handleExportToExcel}

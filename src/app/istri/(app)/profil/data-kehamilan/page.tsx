@@ -26,7 +26,7 @@ const kelurahanData: { [key: string]: string[] } = {
   Sangkrah: ["Sangkrah", "Kedunglumbu", "Mojo", "Semanggi"],
   Kratonan: ["Kratonan", "Danukusuman", "Joyotakan"],
   Gilingan: ["Gilingan", "Kestalan", "Punggawan"],
-  "Bukit Kemuning": ["Sukamenanti"],
+  "Bukit Kemuning": ["Sukamenanti"], 
 };
 
 const desaData: { [key: string]: string[] } = {

@@ -42,41 +42,19 @@ const RekapTTD = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
-  const [selectedPuskesmas, setSelectedPuskesmas] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const kelurahanOptions = [
-    "Sangkrah",
-    "Kedunglumbu",
-    "Mojo",
-    "Semanggi",
-    "Kratonan",
-    "Danukusuman",
-    "Joyotakan",
-    "Gilingan",
-    "Kestalan",
-    "Punggawan",
-    "Sukamenanti",
-  ];
-  const puskesmasOptions = [
-    "Sangkrah",
-    "Kratonan",
-    "Gilingan",
-    "Bukit Kemuning",
-  ];
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const authToken = localStorage.getItem("authTokenAdmin");
+        const authToken = localStorage.getItem("authTokenPetugas");
 
         if (!authToken) {
           setError("No authorization token found.");
           return;
         }
 
-        const response = await axiosInstance.get("/admin/data/rekap-ttd", {
+        const response = await axiosInstance.get("/petugas/data/rekap-ttd", {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -101,14 +79,6 @@ const RekapTTD = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedKelurahan(e.target.value);
-  };
-
-  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPuskesmas(e.target.value);
-  };
-
   const bulanNames = [
     "Januari",
     "Februari",
@@ -128,15 +98,10 @@ const RekapTTD = () => {
         const nameMatch = item.user.name
           .toLowerCase()
           .includes(searchQuery.toLowerCase());
-        const kelurahanMatch =
-          selectedKelurahan === "" || item.user.kelurahan === selectedKelurahan;
-        const puskesmasMatch =
-          selectedPuskesmas === "" ||
-          item.user.wilayah_binaan === selectedPuskesmas;
         const monthMatch =
           selectedMonth === "" || bulanNames[item.bulan - 1] === selectedMonth;
 
-        return nameMatch && kelurahanMatch && puskesmasMatch && monthMatch;
+        return nameMatch && monthMatch;
       })
     : [];
 
@@ -162,7 +127,8 @@ const RekapTTD = () => {
 
   const handleExportToExcel = async () => {
     setIsLoading(true);
-    const authToken = localStorage.getItem("authTokenAdmin");
+
+    const authToken = localStorage.getItem("authTokenPetugas");
 
     if (!authToken) {
       setError("No authorization token found.");
@@ -171,27 +137,41 @@ const RekapTTD = () => {
     }
 
     try {
-      const response = await axiosInstance.get("/admin/rekap-ttd/export-data", {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-        responseType: "blob",
-      });
-      const currentDate = new Date();
-      const month = currentDate.toLocaleString("default", { month: "long" });
-      const year = currentDate.getFullYear();
-      const filename = `rekap-ttd-${month}-${year}.xlsx`;
-      const blob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
+      const response = await axiosInstance.get(
+        "/petugas/rekap-ttd/export-data",
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          responseType: "blob",
+        }
+      );
+
+      if (
+        response.headers["content-type"].includes(
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+      ) {
+        const currentDate = new Date();
+        const month = currentDate.toLocaleString("default", { month: "long" });
+        const year = currentDate.getFullYear();
+        const filename = `rekap-ttd-${month}-${year}.xlsx`;
+
+        const blob = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+      } else {
+        setError("Failed to download file. Server returned an invalid file.");
+      }
     } catch (err) {
-      console.error("Kesalahan saat mengekspor data:", err);
-      setError("Kesalahan saat mengekspor data. Silakan coba lagi.");
-    }finally {
+      console.error("Error exporting data:", err);
+      setError("Error exporting data. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -214,52 +194,6 @@ const RekapTTD = () => {
     <div className="bg-white p-4">
       <div className="flex justify-between items-center mb-4 p-2 mr-2">
         <div className="flex space-x-4">
-          {/* Dropdown Kelurahan */}
-          <div className="relative w-full">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedKelurahan}
-              onChange={handleKelurahanChange}
-            >
-              <option value="">Pilih Kelurahan</option>
-              {kelurahanOptions.map((kelurahan, index) => (
-                <option key={index} value={kelurahan}>
-                  {kelurahan}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/icon/Vector.png"
-                alt="Sort by Kelurahan"
-                className="w-5 h-5"
-              />
-            </div>
-          </div>
-
-          {/* Dropdown Puskesmas */}
-          <div className="relative w-full max-w-xs">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedPuskesmas}
-              onChange={handlePuskesmasChange}
-            >
-              <option value="">Pilih Puskesmas</option>
-              {puskesmasOptions.map((puskesmas, index) => (
-                <option key={index} value={puskesmas}>
-                  {puskesmas}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/icon/Vector.png"
-                alt="Sort by Puskesmas"
-                className="w-5 h-5"
-              />
-            </div>
-          </div>
-
           {/* Dropdown Bulan */}
           <div className="relative w-full max-w-xs">
             <select
@@ -267,7 +201,7 @@ const RekapTTD = () => {
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
             >
-              <option value="">Pilih Bulan</option>
+              <option value="">Bulan</option>
               {[
                 "Januari",
                 "Februari",
@@ -363,7 +297,7 @@ const RekapTTD = () => {
           ) : (
             <tbody>
               {currentData.map((item, index) => (
-                <tr key={item.id}>
+                <tr key={item.id || `${item.id}-${index}`}>
                   <td className="border border-gray-300 p-2">
                     {indexOfFirstRecord + index + 1}
                   </td>
@@ -428,7 +362,7 @@ const RekapTTD = () => {
           <button
             onClick={handleExportToExcel}
             className="flex items-center bg-green-500 text-white p-2 rounded-md hover:bg-green-600 cursor-pointer relative"
-            disabled={isLoading}
+            disabled={isLoading} 
           >
             {isLoading ? (
               <>
@@ -437,7 +371,6 @@ const RekapTTD = () => {
                     <div className="w-4 h-4 border-4 border-t-4 border-white rounded-full animate-spin"></div>
                   </div>
                 </div>
-
                 <span className="text-sm">Downloading...</span>
               </>
             ) : (

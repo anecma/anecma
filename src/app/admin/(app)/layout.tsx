@@ -4,12 +4,44 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/sidebar'; 
 import TopBar from '../components/topbar';
 import { usePathname } from 'next/navigation'; 
+import axios from 'axios';
+import axiosInstance from '@/libs/axios';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname(); 
 
-  const userName = "User Name"; 
-  const userImage = "/images/bidan.png"; 
+  const [userName, setUserName] = useState<string>('');
+  const [userImage, setUserImage] = useState<string>('');
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Ambil token authTokenAdmin dari localStorage
+        const token = localStorage.getItem('authTokenAdmin');
+        
+        if (!token) {
+          console.error('Token tidak ditemukan');
+          return;
+        }
+
+        // Mengirimkan permintaan API untuk mengambil data pengguna
+        const response = await axiosInstance.get('/user', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Sertakan token di header
+          },
+        });
+
+        // Ambil nama dan gambar dari response
+        const { name, image } = response.data; // Sesuaikan dengan struktur data API Anda
+        setUserName(name);
+        setUserImage(image);
+      } catch (error) {
+        console.error('Gagal mengambil data pengguna', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
     <div className="flex h-screen flex-col">
@@ -47,7 +79,7 @@ const getTitle = (pathname: string) => {
     case '/admin/data/rekap-hb':
       return 'Rekap HB';
     case '/admin/data/rekap-TTD':
-      return 'Rekap TTD';
+      return 'Rekap TTD Per Bulan';
     case '/admin/data/rekap-TTD-90':
       return 'Rekap TTD > 90';
     case '/admin/data/rekap-gizi':
