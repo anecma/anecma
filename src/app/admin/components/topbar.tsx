@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { FaChevronDown } from "react-icons/fa";
-
+import { useRouter } from "next/navigation";
 interface TopBarProps {
   title: string;
   userName: string;
@@ -13,6 +13,7 @@ interface TopBarProps {
 const TopBar: React.FC<TopBarProps> = ({ title, userName, userImage }) => {
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -27,6 +28,12 @@ const TopBar: React.FC<TopBarProps> = ({ title, userName, userImage }) => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("authTokenAdmin");
+
+    router.push("/admin/login");
+  };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -35,9 +42,9 @@ const TopBar: React.FC<TopBarProps> = ({ title, userName, userImage }) => {
   }, []);
 
   return (
-    <div className="p-4 flex justify-between  items-center">
+    <div className="p-4 flex justify-between items-center">
       <h1 className="text-xl font-bold">{title}</h1>
-      <div className="flex items-center space-x-4  relative bg-white rounded-lg">
+      <div className="flex items-center space-x-4 relative bg-white rounded-lg">
         <button
           onClick={toggleDropdown}
           className="flex items-center space-x-2 p-1 rounded-sm"
@@ -74,7 +81,7 @@ const TopBar: React.FC<TopBarProps> = ({ title, userName, userImage }) => {
               </li>
               <li
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => setDropdownOpen(false)}
+                onClick={handleLogout} 
               >
                 Logout
               </li>

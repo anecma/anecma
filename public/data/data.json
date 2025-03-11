@@ -1,0 +1,962 @@
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "nilai_hb": 12.5,
+    "total_tablet_diminum": 31,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 60,
+    "user": {
+      "id": 1,
+      "name": "Siti Badriah",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-01",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 1,
+          "user_id": 1,
+          "tanggal": "2022-12-15",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 10,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 2,
+          "user_id": 1,
+          "tanggal": "2022-12-30",
+          "nilai_hb": 11.8,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 3,
+          "user_id": 1,
+          "tanggal": "2023-01-15",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 4,
+          "user_id": 1,
+          "tanggal": "2023-02-01",
+          "nilai_hb": 12.7,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 5,
+          "user_id": 1,
+          "tanggal": "2023-02-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "nilai_hb": 11.0,
+    "total_tablet_diminum": 40,
+    "minum_vit_c": "Tidak",
+    "total_jumlah_ttd_dikonsumsi": 80,
+    "user": {
+      "id": 2,
+      "name": "Nur Cahyani",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-05",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 6,
+          "user_id": 2,
+          "tanggal": "2022-12-16",
+          "nilai_hb": 11.0,
+          "usia_kehamilan": 12,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 7,
+          "user_id": 2,
+          "tanggal": "2023-01-02",
+          "nilai_hb": 10.8,
+          "usia_kehamilan": 16,
+          "hasil_pemeriksaan": "Anemia",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 8,
+          "user_id": 2,
+          "tanggal": "2023-01-20",
+          "nilai_hb": 11.3,
+          "usia_kehamilan": 20,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 9,
+          "user_id": 2,
+          "tanggal": "2023-02-05",
+          "nilai_hb": 11.2,
+          "usia_kehamilan": 24,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 10,
+          "user_id": 2,
+          "tanggal": "2023-02-25",
+          "nilai_hb": 11.5,
+          "usia_kehamilan": 28,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "user_id": 3,
+    "nilai_hb": 13.2,
+    "total_tablet_diminum": 25,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 50,
+    "user": {
+      "id": 3,
+      "name": "Mujiati ",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-10-15",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 11,
+          "user_id": 3,
+          "tanggal": "2022-12-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 12,
+          "user_id": 3,
+          "tanggal": "2023-01-05",
+          "nilai_hb": 12.8,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 13,
+          "user_id": 3,
+          "tanggal": "2023-01-25",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 14,
+          "user_id": 3,
+          "tanggal": "2023-02-10",
+          "nilai_hb": 12.0,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 15,
+          "user_id": 3,
+          "tanggal": "2023-02-28",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 30,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 1,
+    "user_id": 1,
+    "nilai_hb": 12.5,
+    "total_tablet_diminum": 30,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 60,
+    "user": {
+      "id": 1,
+      "name": "Siti Badriah",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-01",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 1,
+          "user_id": 1,
+          "tanggal": "2022-12-15",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 10,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 2,
+          "user_id": 1,
+          "tanggal": "2022-12-30",
+          "nilai_hb": 11.8,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 3,
+          "user_id": 1,
+          "tanggal": "2023-01-15",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 4,
+          "user_id": 1,
+          "tanggal": "2023-02-01",
+          "nilai_hb": 12.7,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 5,
+          "user_id": 1,
+          "tanggal": "2023-02-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "nilai_hb": 11.0,
+    "total_tablet_diminum": 40,
+    "minum_vit_c": "Tidak",
+    "total_jumlah_ttd_dikonsumsi": 80,
+    "user": {
+      "id": 2,
+      "name": "Nur Cahyani",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-05",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 6,
+          "user_id": 2,
+          "tanggal": "2022-12-16",
+          "nilai_hb": 11.0,
+          "usia_kehamilan": 12,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 7,
+          "user_id": 2,
+          "tanggal": "2023-01-02",
+          "nilai_hb": 10.8,
+          "usia_kehamilan": 16,
+          "hasil_pemeriksaan": "Anemia",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 8,
+          "user_id": 2,
+          "tanggal": "2023-01-20",
+          "nilai_hb": 11.3,
+          "usia_kehamilan": 20,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 9,
+          "user_id": 2,
+          "tanggal": "2023-02-05",
+          "nilai_hb": 11.2,
+          "usia_kehamilan": 24,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 10,
+          "user_id": 2,
+          "tanggal": "2023-02-25",
+          "nilai_hb": 11.5,
+          "usia_kehamilan": 28,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "user_id": 3,
+    "nilai_hb": 13.2,
+    "total_tablet_diminum": 25,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 50,
+    "user": {
+      "id": 3,
+      "name": "Mujiati ",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-10-15",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 11,
+          "user_id": 3,
+          "tanggal": "2022-12-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 12,
+          "user_id": 3,
+          "tanggal": "2023-01-05",
+          "nilai_hb": 12.8,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 13,
+          "user_id": 3,
+          "tanggal": "2023-01-25",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 14,
+          "user_id": 3,
+          "tanggal": "2023-02-10",
+          "nilai_hb": 12.0,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 15,
+          "user_id": 3,
+          "tanggal": "2023-02-28",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 30,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 1,
+    "user_id": 1,
+    "nilai_hb": 12.5,
+    "total_tablet_diminum": 30,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 60,
+    "user": {
+      "id": 1,
+      "name": "Siti Badriah",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-01",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 1,
+          "user_id": 1,
+          "tanggal": "2022-12-15",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 10,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 2,
+          "user_id": 1,
+          "tanggal": "2022-12-30",
+          "nilai_hb": 11.8,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 3,
+          "user_id": 1,
+          "tanggal": "2023-01-15",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 4,
+          "user_id": 1,
+          "tanggal": "2023-02-01",
+          "nilai_hb": 12.7,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 5,
+          "user_id": 1,
+          "tanggal": "2023-02-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "nilai_hb": 11.0,
+    "total_tablet_diminum": 40,
+    "minum_vit_c": "Tidak",
+    "total_jumlah_ttd_dikonsumsi": 80,
+    "user": {
+      "id": 2,
+      "name": "Nur Cahyani",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-05",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 6,
+          "user_id": 2,
+          "tanggal": "2022-12-16",
+          "nilai_hb": 11.0,
+          "usia_kehamilan": 12,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 7,
+          "user_id": 2,
+          "tanggal": "2023-01-02",
+          "nilai_hb": 10.8,
+          "usia_kehamilan": 16,
+          "hasil_pemeriksaan": "Anemia",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 8,
+          "user_id": 2,
+          "tanggal": "2023-01-20",
+          "nilai_hb": 11.3,
+          "usia_kehamilan": 20,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 9,
+          "user_id": 2,
+          "tanggal": "2023-02-05",
+          "nilai_hb": 11.2,
+          "usia_kehamilan": 24,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 10,
+          "user_id": 2,
+          "tanggal": "2023-02-25",
+          "nilai_hb": 11.5,
+          "usia_kehamilan": 28,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "user_id": 3,
+    "nilai_hb": 13.2,
+    "total_tablet_diminum": 25,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 50,
+    "user": {
+      "id": 3,
+      "name": "Mujiati ",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-10-15",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 11,
+          "user_id": 3,
+          "tanggal": "2022-12-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 12,
+          "user_id": 3,
+          "tanggal": "2023-01-05",
+          "nilai_hb": 12.8,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 13,
+          "user_id": 3,
+          "tanggal": "2023-01-25",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 14,
+          "user_id": 3,
+          "tanggal": "2023-02-10",
+          "nilai_hb": 12.0,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 15,
+          "user_id": 3,
+          "tanggal": "2023-02-28",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 30,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 1,
+    "user_id": 1,
+    "nilai_hb": 12.5,
+    "total_tablet_diminum": 31,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 60,
+    "user": {
+      "id": 1,
+      "name": "Siti Badriah",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-01",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 1,
+          "user_id": 1,
+          "tanggal": "2022-12-15",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 10,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 2,
+          "user_id": 1,
+          "tanggal": "2022-12-30",
+          "nilai_hb": 11.8,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 3,
+          "user_id": 1,
+          "tanggal": "2023-01-15",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 4,
+          "user_id": 1,
+          "tanggal": "2023-02-01",
+          "nilai_hb": 12.7,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 5,
+          "user_id": 1,
+          "tanggal": "2023-02-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "nilai_hb": 11.0,
+    "total_tablet_diminum": 40,
+    "minum_vit_c": "Tidak",
+    "total_jumlah_ttd_dikonsumsi": 80,
+    "user": {
+      "id": 2,
+      "name": "Nur Cahyani",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-05",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 6,
+          "user_id": 2,
+          "tanggal": "2022-12-16",
+          "nilai_hb": 11.0,
+          "usia_kehamilan": 12,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 7,
+          "user_id": 2,
+          "tanggal": "2023-01-02",
+          "nilai_hb": 10.8,
+          "usia_kehamilan": 16,
+          "hasil_pemeriksaan": "Anemia",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 8,
+          "user_id": 2,
+          "tanggal": "2023-01-20",
+          "nilai_hb": 11.3,
+          "usia_kehamilan": 20,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 9,
+          "user_id": 2,
+          "tanggal": "2023-02-05",
+          "nilai_hb": 11.2,
+          "usia_kehamilan": 24,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 10,
+          "user_id": 2,
+          "tanggal": "2023-02-25",
+          "nilai_hb": 11.5,
+          "usia_kehamilan": 28,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "user_id": 3,
+    "nilai_hb": 13.2,
+    "total_tablet_diminum": 25,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 50,
+    "user": {
+      "id": 3,
+      "name": "Mujiati ",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-10-15",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 11,
+          "user_id": 3,
+          "tanggal": "2022-12-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 12,
+          "user_id": 3,
+          "tanggal": "2023-01-05",
+          "nilai_hb": 12.8,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 13,
+          "user_id": 3,
+          "tanggal": "2023-01-25",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 14,
+          "user_id": 3,
+          "tanggal": "2023-02-10",
+          "nilai_hb": 12.0,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 15,
+          "user_id": 3,
+          "tanggal": "2023-02-28",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 30,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 1,
+    "user_id": 1,
+    "nilai_hb": 12.5,
+    "total_tablet_diminum": 30,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 60,
+    "user": {
+      "id": 1,
+      "name": "Siti Badriah",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-01",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 1,
+          "user_id": 1,
+          "tanggal": "2022-12-15",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 10,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 2,
+          "user_id": 1,
+          "tanggal": "2022-12-30",
+          "nilai_hb": 11.8,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 3,
+          "user_id": 1,
+          "tanggal": "2023-01-15",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 4,
+          "user_id": 1,
+          "tanggal": "2023-02-01",
+          "nilai_hb": 12.7,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 5,
+          "user_id": 1,
+          "tanggal": "2023-02-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "nilai_hb": 11.0,
+    "total_tablet_diminum": 40,
+    "minum_vit_c": "Tidak",
+    "total_jumlah_ttd_dikonsumsi": 80,
+    "user": {
+      "id": 2,
+      "name": "Nur Cahyani",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-11-05",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 6,
+          "user_id": 2,
+          "tanggal": "2022-12-16",
+          "nilai_hb": 11.0,
+          "usia_kehamilan": 12,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 7,
+          "user_id": 2,
+          "tanggal": "2023-01-02",
+          "nilai_hb": 10.8,
+          "usia_kehamilan": 16,
+          "hasil_pemeriksaan": "Anemia",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 8,
+          "user_id": 2,
+          "tanggal": "2023-01-20",
+          "nilai_hb": 11.3,
+          "usia_kehamilan": 20,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 9,
+          "user_id": 2,
+          "tanggal": "2023-02-05",
+          "nilai_hb": 11.2,
+          "usia_kehamilan": 24,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 10,
+          "user_id": 2,
+          "tanggal": "2023-02-25",
+          "nilai_hb": 11.5,
+          "usia_kehamilan": 28,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "user_id": 3,
+    "nilai_hb": 13.2,
+    "total_tablet_diminum": 25,
+    "minum_vit_c": "Ya",
+    "total_jumlah_ttd_dikonsumsi": 50,
+    "user": {
+      "id": 3,
+      "name": "Mujiati ",
+      "tanggal": 1672531199000,
+      "hari_pertama_haid": "2022-10-15",
+      "wilayah_binaan": "Sangkrah",
+      "kelurahan": "Sangkrah",
+      "tempat_periksa_kehamilan": "Sangkrah",
+      "riwayat_hb": [
+        {
+          "id": 11,
+          "user_id": 3,
+          "tanggal": "2022-12-20",
+          "nilai_hb": 13.2,
+          "usia_kehamilan": 14,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 1
+        },
+        {
+          "id": 12,
+          "user_id": 3,
+          "tanggal": "2023-01-05",
+          "nilai_hb": 12.8,
+          "usia_kehamilan": 18,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 2
+        },
+        {
+          "id": 13,
+          "user_id": 3,
+          "tanggal": "2023-01-25",
+          "nilai_hb": 12.5,
+          "usia_kehamilan": 22,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 3
+        },
+        {
+          "id": 14,
+          "user_id": 3,
+          "tanggal": "2023-02-10",
+          "nilai_hb": 12.0,
+          "usia_kehamilan": 26,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 4
+        },
+        {
+          "id": 15,
+          "user_id": 3,
+          "tanggal": "2023-02-28",
+          "nilai_hb": 13.0,
+          "usia_kehamilan": 30,
+          "hasil_pemeriksaan": "Normal",
+          "urutan_periksa": 5
+        }
+      ]
+    }
+  }
+]

@@ -1,14 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaCalendarAlt, FaHamburger, FaSearch, FaSun } from "react-icons/fa";
-import axiosInstance from "@/libs/axios";
 import {
-  FaChevronLeft,
-  FaChevronRight,
-  FaEye,
-  FaUser,
-} from "react-icons/fa6";
+  FaCalendarAlt,
+  FaHamburger,
+  FaSearch,
+  FaSortAlphaDown,
+  FaSortAlphaDownAlt,
+  FaSun,
+} from "react-icons/fa";
+import axiosInstance from "@/libs/axios";
+import { FaChevronLeft, FaChevronRight, FaEye, FaUser } from "react-icons/fa6";
 import { GiHealthNormal } from "react-icons/gi";
+import Image from "next/image";
 
 interface User {
   id: number;
@@ -63,6 +66,8 @@ interface RekapData {
   user: User;
 }
 
+type Puskesmas = "Sangkrah" | "Kratonan" | "Gilingan" | "Bukit Kemuning";
+
 const RekapHb = () => {
   const [data, setData] = useState<RekapData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,27 +79,21 @@ const RekapHb = () => {
   const [selectedPuskesmas, setSelectedPuskesmas] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<RekapData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
-  const kelurahanOptions = [
-    "Sangkrah",
-    "Kedunglumbu",
-    "Mojo",
-    "Semanggi",
-    "Kratonan",
-    "Danukusuman",
-    "Joyotakan",
-    "Gilingan",
-    "Kestalan",
-    "Punggawan",
-    "Sukamenanti",
-  ];
+  const [isAscending, setIsAscending] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
   const puskesmasOptions = [
     "Sangkrah",
     "Kratonan",
     "Gilingan",
     "Bukit Kemuning",
   ];
+  const puskesmasToKelurahanMap = {
+    Sangkrah: ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
+    Kratonan: ["Kratonan", "Danukusuman", "Joyotakan"],
+    Gilingan: ["Gilingan", "Kestalan", "Punggawan"],
+    "Bukit Kemuning": ["Sukamenanti"],
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,11 +115,16 @@ const RekapHb = () => {
         );
 
         if (response.data.success) {
-          setData(response.data.data);
+          const sortedData = response.data.data.sort(
+            (a: RekapData, b: RekapData) => {
+              return a.user.name.localeCompare(b.user.name);
+            }
+          );
+          setData(sortedData);
         } else {
           setError("Failed to fetch data.");
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error fetching data:", err);
         setError("Error fetching data.");
       } finally {
@@ -167,22 +171,43 @@ const RekapHb = () => {
     } catch (err) {
       console.error("Error exporting data:", err);
       setError("Error exporting data. Please try again.");
-    }
-    finally{
+    } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSort = () => {
+    setIsAscending(!isAscending);
+    const sortedData = [...data].sort((a, b) => {
+      const nameA = a.user.name.toLowerCase();
+      const nameB = b.user.name.toLowerCase();
+
+      if (nameA < nameB) return isAscending ? -1 : 1;
+      if (nameA > nameB) return isAscending ? 1 : -1;
+      return 0;
+    });
+
+    setData(sortedData);
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedKelurahan(e.target.value);
+  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPuskesmas = e.target.value as Puskesmas;
+    setSelectedPuskesmas(selectedPuskesmas);
+
+    if (selectedPuskesmas) {
+      setKelurahanOptions(puskesmasToKelurahanMap[selectedPuskesmas]);
+    } else {
+      setKelurahanOptions([]);
+    }
+    setSelectedKelurahan("");
   };
 
-  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPuskesmas(e.target.value);
+  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedKelurahan(e.target.value);
   };
 
   const filteredData = data.filter((item) => {
@@ -254,29 +279,6 @@ const RekapHb = () => {
         <div className="flex space-x-4">
           {/* Kelurahan Dropdown */}
 
-          <div className="relative w-full">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedKelurahan}
-              onChange={handleKelurahanChange}
-            >
-              <option value="">Pilih Kelurahan</option>
-              {kelurahanOptions.map((kelurahan, index) => (
-                <option key={index} value={kelurahan}>
-                  {kelurahan}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/icon/Vector.png"
-                alt="Sort by Kelurahan"
-                className="w-5 h-5"
-              />
-            </div>
-          </div>
-
-          {/* Puskesmas Dropdown */}
           <div className="relative w-full max-w-xs">
             <select
               className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
@@ -291,10 +293,36 @@ const RekapHb = () => {
               ))}
             </select>
             <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
+              <Image
                 src="/icon/Vector.png"
                 alt="Sort by Puskesmas"
-                className="w-5 h-5"
+                width={20}
+                height={20}
+                className="object-contain"
+              />
+            </div>
+          </div>
+          {/* Dropdown for Kelurahan */}
+          <div className="relative w-full">
+            <select
+              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
+              value={selectedKelurahan}
+              onChange={handleKelurahanChange}
+            >
+              <option value="">Pilih Kelurahan</option>
+              {kelurahanOptions.map((kelurahan, index) => (
+                <option key={index} value={kelurahan}>
+                  {kelurahan}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+              <Image
+                src="/icon/Vector.png"
+                alt="Sort by Kelurahan"
+                width={20}
+                height={20}
+                className="object-contain"
               />
             </div>
           </div>
@@ -312,16 +340,28 @@ const RekapHb = () => {
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 overflow-auto">
         <table className="table-auto w-full border-collapse border border-gray-200">
           <thead>
-            <tr>
-              <th className="border border-black p-2">No</th>
-              <th className="border border-black p-2">Nama Ibu Hamil</th>
-              <th className="border border-black p-2">Tanggal Input HB</th>
-              <th className="border border-black p-2">Usia Kehamilan</th>
-              <th className="border border-black p-2">Hasil Gizi</th>
-              <th className="border border-black p-2">Detail</th>
+            <tr className="bg-gray-100">
+              <th className="border border-black p-2 w-1/12 text-center">No</th>
+              <th
+                className="border border-black p-2 cursor-pointer text-center w-3/12"
+                onClick={handleSort}
+              >
+                Nama Ibu Hamil
+                {isAscending ? (
+                  <FaSortAlphaDownAlt className="inline ml-2" />
+                ) : (
+                  <FaSortAlphaDown className="inline ml-2" />
+                )}
+              </th>
+              <th className="border border-black p-2 w-2/12">
+                Tanggal Input HB
+              </th>
+              <th className="border border-black p-2 w-2/12">Usia Kehamilan</th>
+              <th className="border border-black p-2 w-2/12">Hasil Gizi</th>
+              <th className="border border-black p-2 w-1/12">Detail</th>
             </tr>
           </thead>
 
@@ -358,15 +398,21 @@ const RekapHb = () => {
             <tbody>
               {currentData.map((item, index) => (
                 <tr key={item.id} className="hover:bg-gray-100">
-                  <td className="border border-black p-2">{index + 1}</td>
+                  <td className="border border-black p-1 text-center">
+                    {index + 1}
+                  </td>
                   <td className="border border-black p-2">
                     {highlightText(item.user.name)}
                   </td>
-                  <td className="border border-black p-2">{item.tanggal}</td>
-                  <td className="border border-black p-2">
+                  <td className="border border-black p-2 text-center">
+                    {item.tanggal}
+                  </td>
+                  <td className="border border-black p-2 text-center">
                     {item.usia_kehamilan}
                   </td>
-                  <td className="border border-black p-2">{item.hasil_gizi}</td>
+                  <td className="border border-black p-2 text-center">
+                    {item.hasil_gizi}
+                  </td>
                   <td className="border border-black p-2 text-center">
                     <button
                       onClick={() => handleDetailClick(item)}
@@ -381,7 +427,7 @@ const RekapHb = () => {
           )}
         </table>
 
-        {/* Pagination  */}
+        {/* Pagination */}
         <div className="flex justify-end mt-4 space-x-4">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
@@ -418,7 +464,7 @@ const RekapHb = () => {
           <button
             onClick={handleExportToExcel}
             className="flex items-center bg-green-500 text-white p-2 rounded-md hover:bg-green-600 cursor-pointer relative"
-            disabled={isLoading} 
+            disabled={isLoading}
           >
             {isLoading ? (
               <>
@@ -427,17 +473,17 @@ const RekapHb = () => {
                     <div className="w-4 h-4 border-4 border-t-4 border-white rounded-full animate-spin"></div>
                   </div>
                 </div>
-              
+
                 <span className="text-sm">Downloading...</span>
               </>
             ) : (
               <>
-                <img
+                <Image
                   src="/icon/excel.svg"
                   alt="Excel Icon"
-                  width="20"
-                  height="20"
-                  className="mr-2"
+                  width={20}
+                  height={20}
+                  className="mr-2 object-contain"
                 />
                 <span className="text-sm">Export Excel</span>
               </>

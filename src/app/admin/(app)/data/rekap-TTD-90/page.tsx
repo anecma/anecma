@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaSortAlphaDown, FaSortAlphaDownAlt } from "react-icons/fa";
 import axiosInstance from "@/libs/axios";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import Image from "next/image";
 
 interface User {
   id: number;
@@ -27,12 +28,15 @@ interface RiwayatHb {
 interface RekapData {
   id: number;
   user_id: number;
+  tahun: number;
+  bulan: number;
   nilai_hb: number;
-  total_tablet_diminum: number;
-  minum_vit_c: string;
+  count_vit_c_0: number;
+  count_vit_c_1: number;
   total_jumlah_ttd_dikonsumsi: number;
   user: User;
 }
+type Puskesmas = "Sangkrah" | "Kratonan" | "Gilingan" | "Bukit Kemuning";
 
 const RekapTTD90 = () => {
   const [data, setData] = useState<RekapData[]>([]);
@@ -44,25 +48,20 @@ const RekapTTD90 = () => {
   const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
   const [selectedPuskesmas, setSelectedPuskesmas] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const kelurahanOptions = [
-    "Sangkrah",
-    "Kedunglumbu",
-    "Mojo",
-    "Semanggi",
-    "Kratonan",
-    "Danukusuman",
-    "Joyotakan",
-    "Gilingan",
-    "Kestalan",
-    "Punggawan",
-    "Sukamenanti",
-  ];
+  const [isAscending, setIsAscending] = useState(true);
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
   const puskesmasOptions = [
     "Sangkrah",
     "Kratonan",
     "Gilingan",
     "Bukit Kemuning",
   ];
+  const puskesmasToKelurahanMap = {
+    Sangkrah: ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
+    Kratonan: ["Kratonan", "Danukusuman", "Joyotakan"],
+    Gilingan: ["Gilingan", "Kestalan", "Punggawan"],
+    "Bukit Kemuning": ["Sukamenanti"],
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,7 +80,23 @@ const RekapTTD90 = () => {
         });
 
         if (response.data.success) {
-          setData(response.data.data);
+          const fetchedData: RekapData[] = response.data.data;
+          const groupedData: Record<number, RekapData> = {};
+
+          fetchedData.forEach((item) => {
+            if (groupedData[item.user_id]) {
+              groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
+                item.total_jumlah_ttd_dikonsumsi;
+            } else {
+              groupedData[item.user_id] = { ...item };
+            }
+          });
+
+          const sortedData = Object.values(groupedData).sort((a, b) =>
+            a.user.name.localeCompare(b.user.name)
+          );
+
+          setData(sortedData);
         } else {
           setError("Failed to fetch data.");
         }
@@ -96,16 +111,62 @@ const RekapTTD90 = () => {
     fetchData();
   }, []);
 
+  // Contoh dengan JSON
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch("/data/data.json"); // Sesuaikan path jika perlu
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch data");
+  //       }
+  //       const data: RekapData[] = await response.json();
+
+  //       const groupedData: Record<number, RekapData> = {};
+
+  //       data.forEach((item) => {
+  //         if (groupedData[item.user_id]) {
+  //           groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
+  //             item.total_jumlah_ttd_dikonsumsi;
+  //         } else {
+  //           groupedData[item.user_id] = { ...item };
+  //         }
+  //       });
+
+  //       const sortedData = Object.values(groupedData).sort((a, b) =>
+  //         a.user.name.localeCompare(b.user.name)
+  //       );
+
+  //       setData(sortedData);
+  //     } catch (err) {
+  //       console.error("Error fetching data:", err);
+  //       setError("Error fetching data.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedKelurahan(e.target.value);
+  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPuskesmas = e.target.value as Puskesmas;
+    setSelectedPuskesmas(selectedPuskesmas);
+
+    if (selectedPuskesmas) {
+      setKelurahanOptions(puskesmasToKelurahanMap[selectedPuskesmas]);
+    } else {
+      setKelurahanOptions([]);
+    }
+    setSelectedKelurahan("");
   };
 
-  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPuskesmas(e.target.value);
+  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedKelurahan(e.target.value);
   };
 
   const filteredData = data.filter((item) => {
@@ -129,6 +190,20 @@ const RekapTTD90 = () => {
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
+  };
+
+  const handleSort = () => {
+    setIsAscending(!isAscending);
+    const sortedData = [...data].sort((a, b) => {
+      const nameA = a.user.name.toLowerCase();
+      const nameB = b.user.name.toLowerCase();
+
+      if (nameA < nameB) return isAscending ? -1 : 1;
+      if (nameA > nameB) return isAscending ? 1 : -1;
+      return 0;
+    });
+
+    setData(sortedData);
   };
 
   const pageRange = () => {
@@ -202,29 +277,6 @@ const RekapTTD90 = () => {
       <div className="flex justify-between items-center mb-4 p-2">
         <div className="flex space-x-4">
           {/* Kelurahan Dropdown */}
-          <div className="relative w-full">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedKelurahan}
-              onChange={handleKelurahanChange}
-            >
-              <option value="">Pilih Kelurahan</option>
-              {kelurahanOptions.map((kelurahan, index) => (
-                <option key={index} value={kelurahan}>
-                  {kelurahan}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/icon/Vector.png"
-                alt="Sort by Kelurahan"
-                className="w-5 h-5"
-              />
-            </div>
-          </div>
-
-          {/* Puskesmas Dropdown */}
           <div className="relative w-full max-w-xs">
             <select
               className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
@@ -239,10 +291,36 @@ const RekapTTD90 = () => {
               ))}
             </select>
             <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
+              <Image
                 src="/icon/Vector.png"
                 alt="Sort by Puskesmas"
-                className="w-5 h-5"
+                width={20}
+                height={20}
+                className="object-contain"
+              />
+            </div>
+          </div>
+          {/* Dropdown for Kelurahan */}
+          <div className="relative w-full">
+            <select
+              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
+              value={selectedKelurahan}
+              onChange={handleKelurahanChange}
+            >
+              <option value="">Pilih Kelurahan</option>
+              {kelurahanOptions.map((kelurahan, index) => (
+                <option key={index} value={kelurahan}>
+                  {kelurahan}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+              <Image
+                src="/icon/Vector.png"
+                alt="Sort by Kelurahan"
+                width={20}
+                height={20}
+                className="object-contain"
               />
             </div>
           </div>
@@ -265,12 +343,24 @@ const RekapTTD90 = () => {
         <table className="table-auto w-full border-collapse border border-gray-200">
           <thead>
             <tr>
-              <th className="border border-black p-2">No</th>
-              <th className="border border-black p-2">Nama Ibu Hamil</th>
-              <th className="border border-black p-2">Jumlah Total TTD</th>
-              <th className="border border-black p-2">HB Terakhir (g/dL)</th>
-              <th className="border border-black p-2">Puskesmas</th>
-              <th className="border border-black p-2">Kelurahan</th>
+              <th className="border border-black p-2 w-20">No</th>
+              <th
+                className="border border-black p-2 cursor-pointer text-center w-48"
+                onClick={handleSort}
+              >
+                Nama Ibu Hamil
+                {isAscending ? (
+                  <FaSortAlphaDownAlt className="inline ml-2" />
+                ) : (
+                  <FaSortAlphaDown className="inline ml-2" />
+                )}
+              </th>
+              <th className="border border-black p-2 w-32">Jumlah Total TTD</th>
+              <th className="border border-black p-2 w-32">
+                HB Terakhir (g/dL)
+              </th>
+              <th className="border border-black p-2 w-32">Puskesmas</th>
+              <th className="border border-black p-2 w-32">Kelurahan</th>
             </tr>
           </thead>
 
@@ -315,12 +405,10 @@ const RekapTTD90 = () => {
                       {highlightText(item.user.name)}
                     </td>
                     <td className="border border-black text-end p-2">
-                      {item.total_tablet_diminum}
+                      {item.total_jumlah_ttd_dikonsumsi}
                     </td>
                     <td className="border border-black text-end p-2">
-                      {item.user.riwayat_hb
-                        ? item.user.riwayat_hb.nilai_hb
-                        : "Data Belum ada"}
+                      {item.user.riwayat_hb ? item.nilai_hb : "Data Belum ada"}
                     </td>
                     <td className="border border-black text-center p-2">
                       {item.user.wilayah_binaan}
@@ -384,12 +472,12 @@ const RekapTTD90 = () => {
             </>
           ) : (
             <>
-              <img
+              <Image
                 src="/icon/excel.svg"
                 alt="Excel Icon"
-                width="20"
-                height="20"
-                className="mr-2"
+                width={20}
+                height={20}
+                className="mr-2 object-contain"
               />
               <span className="text-sm">Export Excel</span>
             </>

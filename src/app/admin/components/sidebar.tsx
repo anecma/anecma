@@ -27,29 +27,29 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
     if (savedMenuStatus !== null) {
       setIsDataMenuOpen(JSON.parse(savedMenuStatus));
     }
-
+  
     if (
       currentPath.includes("/admin/data") && 
       !isDataMenuOpen
     ) {
       setIsDataMenuOpen(true);
     }
-
+  
     const fetchUserData = async () => {
       try {
         const authToken = localStorage.getItem("authTokenAdmin");
-
+  
         if (!authToken) {
           setError("No token found");
           return;
         }
-
+  
         const response = await axiosInstance.get<User>("/user", {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
-
+  
         setUser(response.data);
       } catch (err) {
         if (err instanceof Error) {
@@ -59,9 +59,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
         }
       }
     };
-
+  
     fetchUserData();
-  }, [currentPath]);
+  }, [currentPath, isDataMenuOpen]); // Add isDataMenuOpen here
+  
 
   const isActive = (path: string) => {
     return currentPath === path

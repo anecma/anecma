@@ -1,7 +1,16 @@
 "use client";
 import axiosInstance from "@/libs/axios";
+import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { FaChevronLeft, FaChevronRight, FaSearch } from "react-icons/fa";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaSearch,
+  FaSortAlphaDown,
+  FaSortAlphaDownAlt,
+} from "react-icons/fa";
+import { FaTrash } from "react-icons/fa6";
+import Swal from "sweetalert2";
 
 // Define the User interface
 interface User {
@@ -24,35 +33,34 @@ interface User {
   updated_at: string;
 }
 
+type Puskesmas = "Sangkrah" | "Kratonan" | "Gilingan" | "Bukit Kemuning";
+
 const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage] = useState<number>(10);
   const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
   const [selectedPuskesmas, setSelectedPuskesmas] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [sortedBy, setSortedBy] = useState<string>("name"); // Sorting by default is name
+  const [isAscending, setIsAscending] = useState(true);
+  const [sortedBy, setSortedBy] = useState<string>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-
-  const kelurahanOptions = [
-    "Sangkrah",
-    "Kedunglumbu",
-    "Mojo",
-    "Semanggi",
-    "Kratonan",
-    "Danukusuman",
-    "Joyotakan",
-    "Gilingan",
-    "Kestalan",
-    "Punggawan",
-    "Sukamenanti",
-  ];
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
   const puskesmasOptions = [
     "Sangkrah",
     "Kratonan",
     "Gilingan",
     "Bukit Kemuning",
   ];
+  const puskesmasToKelurahanMap = {
+    Sangkrah: ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
+    Kratonan: ["Kratonan", "Danukusuman", "Joyotakan"],
+    Gilingan: ["Gilingan", "Kestalan", "Punggawan"],
+    "Bukit Kemuning": ["Sukamenanti"],
+  };
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -90,19 +98,33 @@ const UsersPage = () => {
     fetchUsers();
   }, []);
 
-  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedKelurahan(e.target.value);
+  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPuskesmas = e.target.value as Puskesmas;
+    setSelectedPuskesmas(selectedPuskesmas);
+
+    if (selectedPuskesmas) {
+      setKelurahanOptions(puskesmasToKelurahanMap[selectedPuskesmas]);
+    } else {
+      setKelurahanOptions([]);
+    }
+    setSelectedKelurahan("");
   };
 
-  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPuskesmas(e.target.value);
+  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedKelurahan(e.target.value);
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
-
-  
+  const handleSort = (column: keyof User) => {
+    if (sortedBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortedBy(column);
+      setSortOrder("asc");
+    }
+  };
 
   const filteredUsers = users
     .filter((user) => {
@@ -131,6 +153,87 @@ const UsersPage = () => {
       return 0;
     });
 
+  const indexOfLastRecord = currentPage * rowsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - rowsPerPage;
+  const currentData = filteredUsers.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  const pageRange = () => {
+    const maxPagesToShow = 5;
+    const startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
+  };
+  const handleDelete = async (id: number) => {
+    const result = await Swal.fire({
+      title: "Apakah Anda Yakin?",
+      text: "Data yang dihapus tidak bisa dikembalikan.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, Hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const authToken = localStorage.getItem("authTokenPetugas");
+        if (!authToken) {
+          setError("No token found");
+          return;
+        }
+
+        const response = await axiosInstance.post(
+          `/admin/data-user/delete/${id}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          Swal.fire({
+            title: "Berhasil!",
+            text: "Data berhasil dihapus.",
+            icon: "success",
+          });
+
+          setUsers(users.filter((user) => user.id !== id));
+        } else {
+          Swal.fire({
+            title: "Gagal!",
+            text: "Terjadi kesalahan saat menghapus data.",
+            icon: "error",
+          });
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Error deleting user");
+        }
+
+        Swal.fire({
+          title: "Gagal!",
+          text: "Terjadi kesalahan saat menghapus data.",
+          icon: "error",
+        });
+      }
+    }
+  };
+
   const highlightText = (text: string) => {
     if (!searchQuery) return text;
     const parts = text.split(new RegExp(`(${searchQuery})`, "gi"));
@@ -150,28 +253,6 @@ const UsersPage = () => {
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-4 p-2">
           <div className="flex space-x-4">
-            <div className="relative w-full">
-              <select
-                className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-                value={selectedKelurahan}
-                onChange={handleKelurahanChange}
-              >
-                <option value="">Pilih Kelurahan</option>
-                {kelurahanOptions.map((kelurahan, index) => (
-                  <option key={index} value={kelurahan}>
-                    {kelurahan}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-                <img
-                  src="/icon/Vector.png"
-                  alt="Sort by Kelurahan"
-                  className="w-5 h-5"
-                />
-              </div>
-            </div>
-
             <div className="relative w-full max-w-xs">
               <select
                 className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
@@ -186,10 +267,35 @@ const UsersPage = () => {
                 ))}
               </select>
               <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-                <img
+                <Image
                   src="/icon/Vector.png"
                   alt="Sort by Puskesmas"
-                  className="w-5 h-5"
+                  width={20}
+                  height={20}
+                  className="object-contain"
+                />
+              </div>
+            </div>
+            <div className="relative w-full">
+              <select
+                className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
+                value={selectedKelurahan}
+                onChange={handleKelurahanChange}
+              >
+                <option value="">Pilih Kelurahan</option>
+                {kelurahanOptions.map((kelurahan, index) => (
+                  <option key={index} value={kelurahan}>
+                    {kelurahan}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+                <Image
+                  src="/icon/Vector.png"
+                  alt="Sort by Kelurahan"
+                  width={20}
+                  height={20}
+                  className="object-contain"
                 />
               </div>
             </div>
@@ -230,6 +336,9 @@ const UsersPage = () => {
                   <th className="p-4 border-b text-left cursor-pointer">
                     Kelurahaan
                   </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -263,7 +372,7 @@ const UsersPage = () => {
               </tbody>
             </table>
           </div>
-        ) : filteredUsers.length === 0 ? (
+        ) : currentData.length === 0 ? (
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <p className="text-center text-lg text-gray-500">
               Data Tidak Ditemukan
@@ -275,8 +384,16 @@ const UsersPage = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="p-4 border-b text-left cursor-pointer">ID</th>
-                  <th className="p-4 border-b text-left cursor-pointer">
+                  <th
+                    className="p-4 border-b text-left cursor-pointer"
+                    onClick={() => handleSort("name")}
+                  >
                     Nama
+                    {sortOrder === "asc" ? (
+                      <FaSortAlphaDownAlt className="inline ml-2" />
+                    ) : (
+                      <FaSortAlphaDown className="inline ml-2" />
+                    )}
                   </th>
                   <th className="p-4 border-b text-left cursor-pointer">
                     Email
@@ -293,15 +410,16 @@ const UsersPage = () => {
                   <th className="p-4 border-b text-left cursor-pointer">
                     Kelurahaan
                   </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id}>
+                {currentData.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-100">
                     <td className="p-4 border-b">{user.id}</td>
-                    <td className="p-4 border-b">
-                      {highlightText(user.name)}
-                    </td>
+                    <td className="p-4 border-b">{highlightText(user.name)}</td>
                     <td className="p-4 border-b">{user.email}</td>
                     <td className="p-4 border-b">{user.no_hp}</td>
                     <td className="p-4 border-b">
@@ -309,10 +427,48 @@ const UsersPage = () => {
                     </td>
                     <td className="p-4 border-b">{user.wilayah_binaan}</td>
                     <td className="p-4 border-b">{user.kelurahan}</td>
+                    <td className="p-4 border-b">
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            <div className="flex justify-end mt-8 space-x-4">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                className="btn btn-secondary p-2 border bg-gray-100 rounded-md hover:bg-gray-200"
+                disabled={currentPage === 1}
+              >
+                <FaChevronLeft />
+              </button>
+              {totalPages > 1 &&
+                pageRange().map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`btn ${
+                      page === currentPage
+                        ? "bg-indigo-500 text-white"
+                        : "bg-gray-100"
+                    } px-4 p-2 rounded-md transition-colors hover:bg-indigo-500`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                className="btn btn-secondary p-2 border bg-gray-100 rounded-md hover:bg-gray-200"
+                disabled={currentPage === totalPages}
+              >
+                <FaChevronRight />
+              </button>
+            </div>
           </div>
         )}
       </div>

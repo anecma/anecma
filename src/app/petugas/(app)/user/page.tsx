@@ -1,7 +1,9 @@
 "use client";
 import axiosInstance from "@/libs/axios";
+import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { FaSearch, FaTrash } from "react-icons/fa";
+import { FaChevronLeft, FaSearch, FaTrash } from "react-icons/fa";
+import { FaChevronRight } from "react-icons/fa6";
 import Swal from "sweetalert2";
 
 interface User {
@@ -27,10 +29,14 @@ interface User {
 const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage] = useState<number>(10);
   const [error, setError] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortedBy, setSortedBy] = useState<string>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
+  const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -49,16 +55,28 @@ const UsersPage = () => {
           },
         });
 
-        if (Array.isArray(response.data.data)) {
-          setUsers(response.data.data);
+        if (response.data.success) {
+          const sortedData = response.data.data.sort(
+            (a: User, b: User) =>
+              a.name.localeCompare(b.name) * (sortOrder === "asc" ? 1 : -1)
+          );
+
+          const kelurahanSet: Set<string> = new Set(
+            response.data.data.map((item: User) => item.kelurahan)
+          );
+
+          setKelurahanOptions(Array.from(kelurahanSet));
+          setUsers(sortedData);
         } else {
-          setError("Data tidak valid.");
+          setError("Failed to fetch data.");
         }
-      } catch (err) {
+      } catch (err: unknown) {
         if (err instanceof Error) {
-          setError(err.message);
+          console.error("Error fetching data:", err.message);
+          setError(`Error fetching data: ${err.message}`);
         } else {
-          setError("Error fetching user data");
+          console.error("Unknown error fetching data:", err);
+          setError("Unknown error fetching data.");
         }
       } finally {
         setLoading(false);
@@ -66,19 +84,10 @@ const UsersPage = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [sortOrder]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortedBy === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortedBy(column);
-      setSortOrder("asc");
-    }
   };
 
   const filteredUsers = users
@@ -86,8 +95,10 @@ const UsersPage = () => {
       const searchMatch =
         !searchQuery ||
         user.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return searchMatch;
+      const kelurahanMatch = selectedKelurahan
+        ? user.kelurahan === selectedKelurahan
+        : true;
+      return searchMatch && kelurahanMatch;
     })
     .sort((a, b) => {
       const column = sortedBy as keyof User;
@@ -103,6 +114,29 @@ const UsersPage = () => {
       }
       return 0;
     });
+
+  const indexOfLastRecord = currentPage * rowsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - rowsPerPage;
+  const currentData = filteredUsers.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  const pageRange = () => {
+    const maxPagesToShow = 5;
+    const startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
+  };
 
   const highlightText = (text: string) => {
     if (!searchQuery) return text;
@@ -180,13 +214,39 @@ const UsersPage = () => {
   return (
     <main className="bg-white min-h-screen rounded-lg py-8 px-6">
       <div className="container mx-auto">
-        <div className="flex justify-between items-center mb-4 p-2">
-          <div className="relative ml-auto w-1/3">
+        <div className="flex justify-between items-center mb-4 p-2 space-x-4">
+          {/* Kelurahan Dropdown */}
+          <div className="relative w-full max-w-xs">
+            <select
+              value={selectedKelurahan}
+              onChange={(e) => setSelectedKelurahan(e.target.value)}
+              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg w-full appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">Pilih Kelurahan</option>
+              {kelurahanOptions.map((kelurahan, index) => (
+                <option key={index} value={kelurahan}>
+                  {kelurahan}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+              <Image
+                src="/icon/Vector.png"
+                alt="Sort by Puskesmas"
+                width={20}
+                height={20}
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative w-full md:w-1/3">
             <input
               type="text"
-              placeholder="Cari berdasarkan Nama..."
+              placeholder="Search by Name..."
               onChange={handleSearch}
-              className="border p-3 bg-gray-200 rounded-lg w-full pr-12 focus:outline-none"
+              className="border p-3 bg-gray-200 rounded-lg w-full pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-500 p-2 rounded-full h-8 w-8 text-white" />
           </div>
@@ -199,13 +259,27 @@ const UsersPage = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="p-4 border-b text-left cursor-pointer">ID</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Nama</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Email</th>
-                  <th className="p-4 border-b text-left cursor-pointer">No HP</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Alamat</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Wilayah Binaan</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Kelurahaan</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Aksi</th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Nama
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Email
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    No HP
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Alamat
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Wilayah Binaan
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Kelurahaan
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -242,7 +316,7 @@ const UsersPage = () => {
               </tbody>
             </table>
           </div>
-        ) : filteredUsers.length === 0 ? (
+        ) : currentData.length === 0 ? (
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <p className="text-center text-lg text-gray-500">
               Data Tidak Ditemukan
@@ -254,23 +328,39 @@ const UsersPage = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="p-4 border-b text-left cursor-pointer">ID</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Nama</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Email</th>
-                  <th className="p-4 border-b text-left cursor-pointer">No HP</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Alamat</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Wilayah Binaan</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Kelurahaan</th>
-                  <th className="p-4 border-b text-left cursor-pointer">Aksi</th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Nama
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Email
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    No HP
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Alamat
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Wilayah Binaan
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Kelurahaan
+                  </th>
+                  <th className="p-4 border-b text-left cursor-pointer">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
+                {currentData.map((user) => (
                   <tr key={user.id}>
                     <td className="p-4 border-b">{user.id}</td>
                     <td className="p-4 border-b">{highlightText(user.name)}</td>
                     <td className="p-4 border-b">{user.email}</td>
                     <td className="p-4 border-b">{user.no_hp}</td>
-                    <td className="p-4 border-b">{user.tempat_tinggal_domisili}</td>
+                    <td className="p-4 border-b">
+                      {user.tempat_tinggal_domisili}
+                    </td>
                     <td className="p-4 border-b">{user.wilayah_binaan}</td>
                     <td className="p-4 border-b">{user.kelurahan}</td>
                     <td className="p-4 border-b">
@@ -285,6 +375,36 @@ const UsersPage = () => {
                 ))}
               </tbody>
             </table>
+            <div className="flex justify-end mt-8 space-x-4">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                className="btn btn-secondary p-2 border bg-gray-100 rounded-md hover:bg-gray-200"
+                disabled={currentPage === 1}
+              >
+                <FaChevronLeft />
+              </button>
+              {totalPages > 1 &&
+                pageRange().map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`btn ${
+                      page === currentPage
+                        ? "bg-indigo-500 text-white"
+                        : "bg-gray-100"
+                    } px-4 p-2 rounded-md transition-colors hover:bg-indigo-500`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                className="btn btn-secondary p-2 border bg-gray-100 rounded-md hover:bg-gray-200"
+                disabled={currentPage === totalPages}
+              >
+                <FaChevronRight />
+              </button>
+            </div>
           </div>
         )}
       </div>

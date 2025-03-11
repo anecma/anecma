@@ -1,9 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaCalendarAlt, FaHamburger, FaSearch, FaSun } from "react-icons/fa";
+import {
+  FaCalendarAlt,
+  FaHamburger,
+  FaSearch,
+  FaSortAlphaDown,
+  FaSortAlphaDownAlt,
+  FaSun,
+} from "react-icons/fa";
 import axiosInstance from "@/libs/axios";
 import { FaChevronLeft, FaChevronRight, FaEye, FaUser } from "react-icons/fa6";
 import { GiHealthNormal } from "react-icons/gi";
+import Image from "next/image";
 
 interface User {
   id: number;
@@ -64,10 +72,13 @@ const RekapHb = () => {
   const [error, setError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage] = useState<number>(10);
+  const [isAscending, setIsAscending] = useState(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<RekapData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
+  const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,13 +100,26 @@ const RekapHb = () => {
         );
 
         if (response.data.success) {
-          setData(response.data.data);
+          const sortedData = response.data.data.sort(
+            (a: RekapData, b: RekapData) =>
+              a.user.name.localeCompare(b.user.name)
+          );
+          const kelurahanSet: Set<string> = new Set(
+            response.data.data.map((item: RekapData) => item.user.kelurahan)
+          );
+          setKelurahanOptions(Array.from(kelurahanSet));
+          setData(sortedData);
         } else {
           setError("Failed to fetch data.");
         }
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
-        setError("Error fetching data.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Error fetching data:", err.message);
+          setError(`Error fetching data: ${err.message}`);
+        } else {
+          console.error("Unknown error fetching data:", err);
+          setError("Unknown error fetching data.");
+        }
       } finally {
         setLoading(false);
       }
@@ -164,8 +188,25 @@ const RekapHb = () => {
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
 
-    return nameMatch;
+    const kelurahanMatch =
+      selectedKelurahan === "" || item.user.kelurahan === selectedKelurahan;
+
+    return nameMatch && kelurahanMatch;
   });
+
+  const handleSort = () => {
+    setIsAscending(!isAscending);
+    const sortedData = [...data].sort((a, b) => {
+      const nameA = a.user.name.toLowerCase();
+      const nameB = b.user.name.toLowerCase();
+
+      if (nameA < nameB) return isAscending ? -1 : 1;
+      if (nameA > nameB) return isAscending ? 1 : -1;
+      return 0;
+    });
+
+    setData(sortedData);
+  };
 
   const indexOfLastRecord = currentPage * rowsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - rowsPerPage;
@@ -219,13 +260,39 @@ const RekapHb = () => {
 
   return (
     <div className="bg-white p-4">
-      <div className="flex justify-between items-center mb-4 p-2">
-        <div className="relative ml-auto w-1/3">
+      <div className="flex justify-between items-center mb-4 p-2 space-x-4">
+        {/* Kelurahan Dropdown */}
+        <div className="relative w-full max-w-xs">
+          <select
+            value={selectedKelurahan}
+            onChange={(e) => setSelectedKelurahan(e.target.value)}
+            className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg w-full appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">Pilih Kelurahan</option>
+            {kelurahanOptions.map((kelurahan, index) => (
+              <option key={index} value={kelurahan}>
+                {kelurahan}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+            <Image
+              src="/icon/Vector.png"
+              alt="Sort by Puskesmas"
+              width={20}
+              height={20}
+              className="object-contain"
+            />
+          </div>
+        </div>
+
+        {/* Search Input */}
+        <div className="relative w-full md:w-1/3">
           <input
             type="text"
             placeholder="Search by Name..."
             onChange={handleSearch}
-            className="border p-3 bg-gray-200 rounded-lg w-full pr-12 focus:outline-none"
+            className="border p-3 bg-gray-200 rounded-lg w-full pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-500 p-2 rounded-full h-8 w-8 text-white" />
         </div>
@@ -236,7 +303,17 @@ const RekapHb = () => {
           <thead>
             <tr>
               <th className="border border-black p-2">No</th>
-              <th className="border border-black p-2">Nama Ibu Hamil</th>
+              <th
+                className="border border-black p-2 cursor-pointer text-center w-3/12"
+                onClick={handleSort}
+              >
+                Nama Ibu Hamil
+                {isAscending ? (
+                  <FaSortAlphaDownAlt className="inline ml-2" />
+                ) : (
+                  <FaSortAlphaDown className="inline ml-2" />
+                )}
+              </th>
               <th className="border border-black p-2">Tanggal Input HB</th>
               <th className="border border-black p-2">Usia Kehamilan</th>
               <th className="border border-black p-2">Hasil Gizi</th>
@@ -277,15 +354,21 @@ const RekapHb = () => {
             <tbody>
               {currentData.map((item, index) => (
                 <tr key={item.id} className="hover:bg-gray-100">
-                  <td className="border border-black p-2">{index + 1}</td>
+                  <td className="border border-black p-2 text-center">
+                    {index + 1}
+                  </td>
                   <td className="border border-black p-2">
                     {highlightText(item.user.name)}
                   </td>
-                  <td className="border border-black p-2">{item.tanggal}</td>
-                  <td className="border border-black p-2">
+                  <td className="border border-black p-2 text-center">
+                    {item.tanggal}
+                  </td>
+                  <td className="border border-black p-2 text-center">
                     {item.usia_kehamilan}
                   </td>
-                  <td className="border border-black p-2">{item.hasil_gizi}</td>
+                  <td className="border border-black p-2 text-center">
+                    {item.hasil_gizi}
+                  </td>
                   <td className="border border-black p-2 text-center">
                     <button
                       onClick={() => handleDetailClick(item)}
@@ -336,7 +419,7 @@ const RekapHb = () => {
           <button
             onClick={handleExportToExcel}
             className="flex items-center bg-green-500 text-white p-2 rounded-md hover:bg-green-600 cursor-pointer relative"
-            disabled={isLoading} 
+            disabled={isLoading}
           >
             {isLoading ? (
               <>
@@ -345,17 +428,17 @@ const RekapHb = () => {
                     <div className="w-4 h-4 border-4 border-t-4 border-white rounded-full animate-spin"></div>
                   </div>
                 </div>
-              
+
                 <span className="text-sm">Downloading...</span>
               </>
             ) : (
               <>
-                <img
+                <Image
                   src="/icon/excel.svg"
                   alt="Excel Icon"
-                  width="20"
-                  height="20"
-                  className="mr-2"
+                  width={20}
+                  height={20}
+                  className="object-contain mr-2"
                 />
                 <span className="text-sm">Export Excel</span>
               </>

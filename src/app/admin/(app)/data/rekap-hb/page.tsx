@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaSortAlphaDown, FaSortAlphaDownAlt } from "react-icons/fa";
 import axiosInstance from "@/libs/axios";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import Image from "next/image";
 
 interface User {
   id: number;
@@ -26,6 +27,8 @@ interface RekapData {
   user: User;
 }
 
+type Puskesmas = "Sangkrah" | "Kratonan" | "Gilingan" | "Bukit Kemuning";
+
 const RekapHb = () => {
   const [data, setData] = useState<RekapData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -36,26 +39,20 @@ const RekapHb = () => {
   const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
   const [selectedPuskesmas, setSelectedPuskesmas] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const kelurahanOptions = [
-    "Sangkrah",
-    "Kedunglumbu",
-    "Mojo",
-    "Semanggi",
-    "Kratonan",
-    "Danukusuman",
-    "Joyotakan",
-    "Gilingan",
-    "Kestalan",
-    "Punggawan",
-    "Sukamenanti",
-  ];
+  const [isAscending, setIsAscending] = useState(true);
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
   const puskesmasOptions = [
     "Sangkrah",
     "Kratonan",
     "Gilingan",
     "Bukit Kemuning",
   ];
+  const puskesmasToKelurahanMap = {
+    Sangkrah: ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
+    Kratonan: ["Kratonan", "Danukusuman", "Joyotakan"],
+    Gilingan: ["Gilingan", "Kestalan", "Punggawan"],
+    "Bukit Kemuning": ["Sukamenanti"],
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,7 +71,12 @@ const RekapHb = () => {
         });
 
         if (response.data.success) {
-          setData(response.data.data);
+          const sortedData = response.data.data.sort(
+            (a: RekapData, b: RekapData) => {
+              return a.user.name.localeCompare(b.user.name);
+            }
+          );
+          setData(sortedData);
         } else {
           setError("Failed to fetch data.");
         }
@@ -93,12 +95,20 @@ const RekapHb = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedKelurahan(e.target.value);
+  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPuskesmas = e.target.value as Puskesmas;
+    setSelectedPuskesmas(selectedPuskesmas);
+
+    if (selectedPuskesmas) {
+      setKelurahanOptions(puskesmasToKelurahanMap[selectedPuskesmas]);
+    } else {
+      setKelurahanOptions([]);
+    }
+    setSelectedKelurahan("");
   };
 
-  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPuskesmas(e.target.value);
+  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedKelurahan(e.target.value);
   };
 
   const filteredData = data.filter((item) => {
@@ -122,6 +132,19 @@ const RekapHb = () => {
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
+  };
+  const handleSort = () => {
+    setIsAscending(!isAscending);
+    const sortedData = [...data].sort((a, b) => {
+      const nameA = a.user.name.toLowerCase();
+      const nameB = b.user.name.toLowerCase();
+
+      if (nameA < nameB) return isAscending ? -1 : 1;
+      if (nameA > nameB) return isAscending ? 1 : -1;
+      return 0;
+    });
+
+    setData(sortedData);
   };
 
   const pageRange = () => {
@@ -191,29 +214,6 @@ const RekapHb = () => {
         <div className="flex space-x-4">
           {/* Kelurahan Dropdown */}
 
-          <div className="relative w-full">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedKelurahan}
-              onChange={handleKelurahanChange}
-            >
-              <option value="">Pilih Kelurahan</option>
-              {kelurahanOptions.map((kelurahan, index) => (
-                <option key={index} value={kelurahan}>
-                  {kelurahan}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/icon/Vector.png"
-                alt="Sort by Kelurahan"
-                className="w-5 h-5"
-              />
-            </div>
-          </div>
-
-          {/* Puskesmas Dropdown */}
           <div className="relative w-full max-w-xs">
             <select
               className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
@@ -228,10 +228,36 @@ const RekapHb = () => {
               ))}
             </select>
             <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
+              <Image
                 src="/icon/Vector.png"
                 alt="Sort by Puskesmas"
-                className="w-5 h-5"
+                width={20}
+                height={20}
+                className="mr-2 object-contain"
+              />
+            </div>
+          </div>
+          {/* Dropdown for Kelurahan */}
+          <div className="relative w-full">
+            <select
+              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
+              value={selectedKelurahan}
+              onChange={handleKelurahanChange}
+            >
+              <option value="">Pilih Kelurahan</option>
+              {kelurahanOptions.map((kelurahan, index) => (
+                <option key={index} value={kelurahan}>
+                  {kelurahan}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+              <Image
+                src="/icon/Vector.png"
+                alt="Sort by Kelurahan"
+                width={20}
+                height={20}
+                className="object-contain"
               />
             </div>
           </div>
@@ -254,14 +280,24 @@ const RekapHb = () => {
         <table className="table-auto w-full border-collapse border border-gray-200">
           <thead>
             <tr>
-              <th className="border border-black p-2">No</th>
-              <th className="border border-black p-2">Nama Ibu Hamil</th>
-              <th className="border border-black p-2">Urutan Periksa</th>
-              <th className="border border-black p-2">Tanggal Input HB</th>
-              <th className="border border-black p-2">Hasil HB (g/dL)</th>
-              <th className="border border-black p-2">Status Anemia</th>
-              <th className="border border-black p-2">Puskesmas</th>
-              <th className="border border-black p-2">Kelurahan</th>
+              <th className="border border-black p-2 w-12">No</th>
+              <th
+                className="border border-black p-2 cursor-pointer text-center w-56"
+                onClick={handleSort}
+              >
+                Nama Ibu Hamil
+                {isAscending ? (
+                  <FaSortAlphaDownAlt className="inline ml-2" />
+                ) : (
+                  <FaSortAlphaDown className="inline ml-2" />
+                )}
+              </th>
+              <th className="border border-black p-2 w-32">Urutan Periksa</th>
+              <th className="border border-black p-2 w-36">Tanggal Input HB</th>
+              <th className="border border-black p-2 w-24">Hasil HB (g/dL)</th>
+              <th className="border border-black p-2 w-32">Status Anemia</th>
+              <th className="border border-black p-2 w-32">Puskesmas</th>
+              <th className="border border-black p-2 w-32">Kelurahan</th>
             </tr>
           </thead>
           {/* Tampilkan Skeleton jika loading */}
@@ -304,20 +340,20 @@ const RekapHb = () => {
               {currentData.map((item, index) => {
                 const statusAnemia = item.nilai_hb < 11.0 ? "Anemia" : "Normal";
                 return (
-                  <tr key={item.id}>
-                    <td className="border border-black text-end p-2">
+                  <tr key={item.id} className="hover:bg-gray-100">
+                    <td className="border border-black text-center p-2">
                       {index + 1 + indexOfFirstRecord}
                     </td>
-                    <td className="border border-black text-end p-2">
+                    <td className="border border-black p-2">
                       {highlightText(item.user.name)}
                     </td>
-                    <td className="border border-black text-end p-2">
+                    <td className="border border-black text-center p-2">
                       {item.urutan_periksa}
                     </td>
-                    <td className="border border-black text-end p-2">
+                    <td className="border border-black text-center p-2">
                       {new Date(item.tanggal).toLocaleDateString()}
                     </td>
-                    <td className="border border-black text-end p-2">
+                    <td className="border border-black text-center p-2">
                       {item.nilai_hb}
                     </td>
                     <td className="border border-black text-start p-2">
@@ -389,12 +425,12 @@ const RekapHb = () => {
             </>
           ) : (
             <>
-              <img
+              <Image
                 src="/icon/excel.svg"
                 alt="Excel Icon"
-                width="20"
-                height="20"
-                className="mr-2"
+                width={20}
+                height={20}
+                className="mr-2 object-contain"
               />
               <span className="text-sm">Export Excel</span>
             </>

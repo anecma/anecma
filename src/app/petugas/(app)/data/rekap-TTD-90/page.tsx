@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaSortAlphaDown, FaSortAlphaDownAlt } from "react-icons/fa";
 import axiosInstance from "@/libs/axios";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import Image from "next/image";
 
 interface User {
   id: number;
@@ -27,9 +28,11 @@ interface RiwayatHb {
 interface RekapData {
   id: number;
   user_id: number;
+  tahun: number;
+  bulan: number;
   nilai_hb: number;
-  total_tablet_diminum: number;
-  minum_vit_c: string;
+  count_vit_c_0: number;
+  count_vit_c_1: number;
   total_jumlah_ttd_dikonsumsi: number;
   user: User;
 }
@@ -40,8 +43,11 @@ const RekapTTD90 = () => {
   const [error, setError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage] = useState<number>(10);
+  const [isAscending, setIsAscending] = useState(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
+  const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,7 +66,23 @@ const RekapTTD90 = () => {
         });
 
         if (response.data.success) {
-          setData(response.data.data);
+          const fetchedData: RekapData[] = response.data.data;
+          const groupedData: Record<number, RekapData> = {};
+
+          fetchedData.forEach((item) => {
+            if (groupedData[item.user_id]) {
+              groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
+                item.total_jumlah_ttd_dikonsumsi;
+            } else {
+              groupedData[item.user_id] = { ...item };
+            }
+          });
+
+          const sortedData = Object.values(groupedData).sort((a, b) =>
+            a.user.name.localeCompare(b.user.name)
+          );
+
+          setData(sortedData);
         } else {
           setError("Failed to fetch data.");
         }
@@ -74,6 +96,44 @@ const RekapTTD90 = () => {
 
     fetchData();
   }, []);
+
+  // Contoh dengan JSON
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch("/data/data.json"); // Sesuaikan path jika perlu
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch data");
+  //       }
+  //       const data: RekapData[] = await response.json();
+
+  //       const groupedData: Record<number, RekapData> = {};
+
+  //       data.forEach((item) => {
+  //         if (groupedData[item.user_id]) {
+  //           groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
+  //             item.total_jumlah_ttd_dikonsumsi;
+  //         } else {
+  //           groupedData[item.user_id] = { ...item };
+  //         }
+  //       });
+
+  //      const sortedData = Object.values(groupedData).sort((a, b) =>
+  //         a.user.name.localeCompare(b.user.name)
+  //       );
+
+  //       setData(sortedData);
+  //     } catch (err) {
+  //       console.error("Error fetching data:", err);
+  //       setError("Error fetching data.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -95,6 +155,20 @@ const RekapTTD90 = () => {
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
+  };
+
+  const handleSort = () => {
+    setIsAscending(!isAscending);
+    const sortedData = [...data].sort((a, b) => {
+      const nameA = a.user.name.toLowerCase();
+      const nameB = b.user.name.toLowerCase();
+
+      if (nameA < nameB) return isAscending ? -1 : 1;
+      if (nameA > nameB) return isAscending ? 1 : -1;
+      return 0;
+    });
+
+    setData(sortedData);
   };
 
   const pageRange = () => {
@@ -176,6 +250,29 @@ const RekapTTD90 = () => {
     <div className="bg-white p-4 rounded-md">
       <div className="flex justify-between items-center mb-4 p-2">
         {/* Search Input with Icon */}
+        <div className="relative w-full max-w-xs">
+          <select
+            value={selectedKelurahan}
+            onChange={(e) => setSelectedKelurahan(e.target.value)}
+            className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg w-full appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">Pilih Kelurahan</option>
+            {kelurahanOptions.map((kelurahan, index) => (
+              <option key={index} value={kelurahan}>
+                {kelurahan}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+            <Image
+              src="/icon/Vector.png"
+              alt="Sort by Puskesmas"
+              height={20}
+              width={20}
+              className="object-contain"
+            />
+          </div>
+        </div>
         <div className="relative ml-auto w-1/3">
           <input
             type="text"
@@ -193,7 +290,17 @@ const RekapTTD90 = () => {
           <thead>
             <tr>
               <th className="border border-black p-2">No</th>
-              <th className="border border-black p-2">Nama Ibu Hamil</th>
+              <th
+                className="border border-black p-2 cursor-pointer text-center w-3/12"
+                onClick={handleSort}
+              >
+                Nama Ibu Hamil
+                {isAscending ? (
+                  <FaSortAlphaDownAlt className="inline ml-2" />
+                ) : (
+                  <FaSortAlphaDown className="inline ml-2" />
+                )}
+              </th>
               <th className="border border-black p-2">Jumlah Total TTD</th>
               <th className="border border-black p-2">HB Terakhir (g/dL)</th>
               <th className="border border-black p-2">Puskesmas</th>
@@ -242,12 +349,10 @@ const RekapTTD90 = () => {
                       {highlightText(item.user.name)}
                     </td>
                     <td className="border border-black text-end p-2">
-                      {item.total_tablet_diminum}
+                      {item.total_jumlah_ttd_dikonsumsi}
                     </td>
                     <td className="border border-black text-end p-2">
-                      {item.user.riwayat_hb
-                        ? item.user.riwayat_hb.nilai_hb
-                        : "Data Belum ada"}
+                      {item.user.riwayat_hb ? item.nilai_hb : "Data Belum ada"}
                     </td>
                     <td className="border border-black text-center p-2">
                       {item.user.wilayah_binaan}
@@ -310,12 +415,12 @@ const RekapTTD90 = () => {
             </>
           ) : (
             <>
-              <img
+              <Image
                 src="/icon/excel.svg"
                 alt="Excel Icon"
-                width="20"
-                height="20"
-                className="mr-2"
+                width={20}
+                height={20}
+                className="object-contain mr-2"
               />
               <span className="text-sm">Export Excel</span>
             </>

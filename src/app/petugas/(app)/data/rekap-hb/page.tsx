@@ -1,8 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import {
+  FaSearch,
+  FaSortAlphaDown,
+  FaSortAlphaDownAlt,
+  FaSortNumericDown,
+  FaSortNumericDownAlt,
+} from "react-icons/fa";
 import axiosInstance from "@/libs/axios";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import Image from "next/image";
 
 interface User {
   id: number;
@@ -32,8 +39,12 @@ const RekapHb = () => {
   const [error, setError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage] = useState<number>(10);
+  const [isAscending, setIsAscending] = useState(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isUrutanAscending, setIsUrutanAscending] = useState<boolean>(true);
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
+  const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,13 +63,27 @@ const RekapHb = () => {
         });
 
         if (response.data.success) {
-          setData(response.data.data);
+          const sortedData = response.data.data.sort(
+            (a: RekapData, b: RekapData) =>
+              a.user.name.localeCompare(b.user.name)
+          );
+
+          const kelurahanSet: Set<string> = new Set(
+            response.data.data.map((item: RekapData) => item.user.kelurahan)
+          );
+          setKelurahanOptions(Array.from(kelurahanSet));
+          setData(sortedData);
         } else {
           setError("Failed to fetch data.");
         }
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
-        setError("Error fetching data.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Error fetching data:", err.message);
+          setError(`Error fetching data: ${err.message}`);
+        } else {
+          console.error("Unknown error fetching data:", err);
+          setError("Unknown error fetching data.");
+        }
       } finally {
         setLoading(false);
       }
@@ -75,7 +100,10 @@ const RekapHb = () => {
     const nameMatch = item.user.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    return nameMatch;
+    const kelurahanMatch = selectedKelurahan
+      ? item.user.kelurahan === selectedKelurahan
+      : true;
+    return nameMatch && kelurahanMatch;
   });
 
   const indexOfLastRecord = currentPage * rowsPerPage;
@@ -149,6 +177,30 @@ const RekapHb = () => {
     }
   };
 
+  const handlesort = () => {
+    setIsAscending(!isAscending);
+    const sortedData = [...data].sort((a, b) => {
+      const nameA = a.user.name.toLowerCase();
+      const nameB = b.user.name.toLowerCase();
+
+      if (nameA < nameB) return isAscending ? -1 : 1;
+      if (nameA > nameB) return isAscending ? 1 : -1;
+      return 0;
+    });
+
+    setData(sortedData);
+  };
+  const handleSortUrutan = (key: string) => {
+    const sortedData = [...data].sort((a, b) => {
+      if (key === "urutan_periksa") {
+        return isUrutanAscending ? a[key] - b[key] : b[key] - a[key];
+      }
+      return 0;
+    });
+    setData(sortedData);
+    setIsUrutanAscending(!isUrutanAscending);
+  };
+
   const highlightText = (text: string) => {
     if (!searchQuery) return text;
     const parts = text.split(new RegExp(`(${searchQuery})`, "gi"));
@@ -165,13 +217,39 @@ const RekapHb = () => {
 
   return (
     <div className="bg-white p-4">
-      <div className="flex justify-between items-center mb-4 p-2">
-        <div className="relative ml-auto w-1/3">
+      <div className="flex justify-between items-center mb-4 p-2 space-x-4">
+        {/* Kelurahan Dropdown */}
+        <div className="relative w-full max-w-xs">
+          <select
+            value={selectedKelurahan}
+            onChange={(e) => setSelectedKelurahan(e.target.value)}
+            className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg w-full appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">Pilih Kelurahan</option>
+            {kelurahanOptions.map((kelurahan, index) => (
+              <option key={index} value={kelurahan}>
+                {kelurahan}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+            <Image
+              src="/icon/Vector.png"
+              alt="Sort by Puskesmas"
+              width={20}
+              height={20}
+              className="object-contain"
+            />
+          </div>
+        </div>
+
+        {/* Search Input */}
+        <div className="relative w-full md:w-1/3">
           <input
             type="text"
             placeholder="Search by Name..."
             onChange={handleSearch}
-            className="border p-3 bg-gray-200 rounded-lg w-full pr-12 focus:outline-none"
+            className="border p-3 bg-gray-200 rounded-lg w-full pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-500 p-2 rounded-full h-8 w-8 text-white" />
         </div>
@@ -179,19 +257,36 @@ const RekapHb = () => {
 
       {/* Table Section */}
       <div className="p-4">
-        <table className="table-auto w-full border-collapse border border-gray-200">
+        <table className="table-fixed w-full border-collapse border border-gray-200">
           <thead>
             <tr>
-              <th className="border border-black p-2">No</th>
-              <th className="border border-black p-2">Nama Ibu Hamil</th>
-              <th className="border border-black p-2">Urutan Periksa</th>
-              <th className="border border-black p-2">Tanggal Input HB</th>
-              <th className="border border-black p-2">Hasil HB (g/dL)</th>
-              <th className="border border-black p-2">Status Anemia</th>
-              <th className="border border-black p-2">Puskesmas</th>
-              <th className="border border-black p-2">Kelurahan</th>
+              <th className="border border-black p-2 w-10">No</th>
+              <th className="border border-black p-2 w-60" onClick={handlesort}>
+                Nama Ibu Hamil
+                {isAscending ? (
+                  <FaSortAlphaDownAlt className="inline ml-2" />
+                ) : (
+                  <FaSortAlphaDown className="inline ml-2" />
+                )}
+              </th>
+              <th
+                className="border border-black p-2 w-48 "
+                onClick={() => handleSortUrutan("urutan_periksa")}
+              >
+                Urutan Periksa
+                {isUrutanAscending ? (
+                  <FaSortNumericDownAlt className="inline ml-2" />
+                ) : (
+                  <FaSortNumericDown className="inline ml-2" />
+                )}
+              </th>
+              <th className="border border-black p-2 w-48">Tanggal Input HB</th>
+              <th className="border border-black p-2 w-40">Hasil HB (g/dL)</th>
+              <th className="border border-black p-2 w-44">Status Anemia</th>
+              <th className="border border-black p-2 w-40">Kelurahan</th>
             </tr>
           </thead>
+
           {loading ? (
             <tbody>
               {[...Array(rowsPerPage)].map((_, idx) => (
@@ -200,7 +295,7 @@ const RekapHb = () => {
                   className="animate-pulse border-b border-gray-200"
                 >
                   <td className="border border-black p-2">
-                    <div className="w-10 h-6 bg-gray-300 rounded-lg"></div>
+                    <div className="w-7 h-6 bg-gray-300 rounded-lg"></div>
                   </td>
                   <td className="border border-black p-2">
                     <div className="w-32 h-6 bg-gray-300 rounded-lg"></div>
@@ -220,9 +315,6 @@ const RekapHb = () => {
                   <td className="border border-black p-2">
                     <div className="w-32 h-6 bg-gray-300 rounded-lg"></div>
                   </td>
-                  <td className="border border-black p-2">
-                    <div className="w-32 h-6 bg-gray-300 rounded-lg"></div>
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -231,27 +323,24 @@ const RekapHb = () => {
               {currentData.map((item, index) => {
                 const statusAnemia = item.nilai_hb < 11.0 ? "Anemia" : "Normal";
                 return (
-                  <tr key={item.id}>
+                  <tr key={item.id} className="hover:bg-gray-100">
                     <td className="border border-black text-end p-2">
                       {index + 1 + indexOfFirstRecord}
                     </td>
-                    <td className="border border-black text-end p-2">
+                    <td className="border border-black text-start p-2">
                       {highlightText(item.user.name)}
                     </td>
-                    <td className="border border-black text-end p-2">
+                    <td className="border border-black text-center p-2">
                       {item.urutan_periksa}
                     </td>
-                    <td className="border border-black text-end p-2">
+                    <td className="border border-black text-center p-2">
                       {new Date(item.tanggal).toLocaleDateString()}
                     </td>
-                    <td className="border border-black text-end p-2">
+                    <td className="border border-black text-center p-2">
                       {item.nilai_hb}
                     </td>
-                    <td className="border border-black text-start p-2">
-                      {statusAnemia}
-                    </td>
                     <td className="border border-black text-center p-2">
-                      {item.user.wilayah_binaan}
+                      {statusAnemia}
                     </td>
                     <td className="border border-black text-center p-2">
                       {item.user.kelurahan}
@@ -314,12 +403,12 @@ const RekapHb = () => {
             </>
           ) : (
             <>
-              <img
+              <Image
                 src="/icon/excel.svg"
                 alt="Excel Icon"
-                width="20"
-                height="20"
-                className="mr-2"
+                width={20}
+                height={20}
+                className="object-contain mr-2"
               />
               <span className="text-sm">Export Excel</span>
             </>

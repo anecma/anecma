@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaSortAlphaDown, FaSortAlphaDownAlt } from "react-icons/fa";
 import axiosInstance from "@/libs/axios";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import Image from "next/image";
 
 interface User {
   id: number;
@@ -27,10 +28,13 @@ interface RiwayatHb {
 interface RekapData {
   id: number;
   user_id: number;
+  tahun: number;
   bulan: number;
   nilai_hb: number;
-  total_tablet_diminum: number;
-  lebih_banyak_vit_c: string;
+  max_tablet: number;
+  sum_tablet: number;
+  count_vit_c_0: number;
+  count_vit_c_1: number;
   total_jumlah_ttd_dikonsumsi: number;
   user: User;
 }
@@ -42,8 +46,12 @@ const RekapTTD = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isAscending, setIsAscending] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
+  const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,13 +69,26 @@ const RekapTTD = () => {
         });
 
         if (response.data.success) {
-          setData(response.data.data);
+          const sortedData = response.data.data.sort(
+            (a: RekapData, b: RekapData) =>
+              a.user.name.localeCompare(b.user.name)
+          );
+          const kelurahanSet: Set<string> = new Set(
+            response.data.data.map((item: RekapData) => item.user.kelurahan)
+          );
+          setKelurahanOptions(Array.from(kelurahanSet));
+          setData(sortedData);
         } else {
           setError("Failed to fetch data.");
         }
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
-        setError("Error fetching data.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Error fetching data:", err.message);
+          setError(`Error fetching data: ${err.message}`);
+        } else {
+          console.error("Unknown error fetching data:", err);
+          setError("Unknown error fetching data.");
+        }
       } finally {
         setLoading(false);
       }
@@ -101,7 +122,10 @@ const RekapTTD = () => {
         const monthMatch =
           selectedMonth === "" || bulanNames[item.bulan - 1] === selectedMonth;
 
-        return nameMatch && monthMatch;
+        const kelurahanMatch = selectedKelurahan
+          ? item.user.kelurahan === selectedKelurahan
+          : true;
+        return nameMatch && monthMatch && kelurahanMatch;
       })
     : [];
 
@@ -123,6 +147,20 @@ const RekapTTD = () => {
       { length: endPage - startPage + 1 },
       (_, i) => startPage + i
     );
+  };
+
+  const handleSort = () => {
+    setIsAscending(!isAscending);
+    const sortedData = [...data].sort((a, b) => {
+      const nameA = a.user.name.toLowerCase();
+      const nameB = b.user.name.toLowerCase();
+
+      if (nameA < nameB) return isAscending ? -1 : 1;
+      if (nameA > nameB) return isAscending ? 1 : -1;
+      return 0;
+    });
+
+    setData(sortedData);
   };
 
   const handleExportToExcel = async () => {
@@ -193,7 +231,30 @@ const RekapTTD = () => {
   return (
     <div className="bg-white p-4">
       <div className="flex justify-between items-center mb-4 p-2 mr-2">
-        <div className="flex space-x-4">
+        <div className="relative w-full max-w-xs">
+          <select
+            value={selectedKelurahan}
+            onChange={(e) => setSelectedKelurahan(e.target.value)}
+            className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg w-full appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">Pilih Kelurahan</option>
+            {kelurahanOptions.map((kelurahan, index) => (
+              <option key={index} value={kelurahan}>
+                {kelurahan}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+            <Image
+              src="/icon/Vector.png"
+              alt="Sort by Puskesmas"
+              width={20}
+              height={20}
+              className="object-contain"
+            />
+          </div>
+        </div>
+        <div className="flex space-x-4 ml-2">
           {/* Dropdown Bulan */}
           <div className="relative w-full max-w-xs">
             <select
@@ -222,10 +283,12 @@ const RekapTTD = () => {
               ))}
             </select>
             <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <img
+              <Image
                 src="/icon/Vector.png"
                 alt="Sort by Month"
-                className="w-5 h-5"
+                width={20}
+                height={20}
+                className="object-contain"
               />
             </div>
           </div>
@@ -247,18 +310,39 @@ const RekapTTD = () => {
       <div className="p-4">
         <table className="table-auto w-full border-collapse border border-gray-200">
           <thead>
-            <tr>
-              <th className="border border-gray-300 p-2">No</th>
-              <th className="border border-gray-300 p-2">Nama Ibu Hamil</th>
-              <th className="border border-gray-300 p-2">Kadar HB (g/dl)</th>
-              <th className="border border-gray-300 p-2">
+            <tr className="bg-gray-100">
+              <th className="border border-gray-300 p-4 w-10 text-center">
+                No
+              </th>
+              <th
+                className="border border-gray-300 p-2 cursor-pointer w-48 text-center"
+                onClick={handleSort}
+              >
+                Nama Ibu Hamil
+                {isAscending ? (
+                  <FaSortAlphaDownAlt className="inline ml-2" />
+                ) : (
+                  <FaSortAlphaDown className="inline ml-2" />
+                )}
+              </th>
+              <th className="border border-gray-300 p-2 w-32 text-center">
+                Kadar HB (g/dl)
+              </th>
+              <th className="border border-gray-300 p-2 w-48 text-center">
                 Jumlah Tablet TTD per Hari
               </th>
-              <th className="border border-gray-300 p-2">
+              <th className="border border-gray-300 p-2 w-48 text-center">
                 Total Jumlah TTD Dikonsumsi
               </th>
-              <th className="border border-gray-300 p-2">Minum Vit C</th>
-              <th className="border border-gray-300 p-2">Bulan</th>
+              <th className="border border-gray-300 p-2 w-48 text-center">
+                Minum Vit C
+              </th>
+              <th className="border border-gray-300 p-2 w-28 text-center">
+                Bulan
+              </th>
+              <th className="border border-gray-300 p-2 w-28 text-center">
+                Tahun
+              </th>
             </tr>
           </thead>
 
@@ -291,35 +375,52 @@ const RekapTTD = () => {
                   <td className="border border-gray-300 p-2">
                     <div className="w-24 h-6 bg-gray-300 rounded-lg"></div>
                   </td>
+                  <td className="border border-gray-300 p-2">
+                    <div className="w-24 h-6 bg-gray-300 rounded-lg"></div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           ) : (
             <tbody>
               {currentData.map((item, index) => (
-                <tr key={item.id || `${item.id}-${index}`}>
+                <tr className="hover:bg-gray-100" key={item.id || index}>
                   <td className="border border-gray-300 p-2">
                     {indexOfFirstRecord + index + 1}
                   </td>
                   <td className="border border-gray-300 p-2">
                     {highlightText(item.user.name)}
                   </td>
-                  <td className="border border-gray-300 p-2">
+                  <td className="border border-gray-300 text-center p-2">
                     {item.user.riwayat_hb
                       ? item.user.riwayat_hb.nilai_hb
                       : "Tidak ada data HB"}
                   </td>
-                  <td className="border border-gray-300 p-2">
-                    {item.total_tablet_diminum}
+                  <td className="border border-gray-300 text-center p-2">
+                    {item.max_tablet}
                   </td>
-                  <td className="border border-gray-300 p-2">
-                    {item.total_jumlah_ttd_dikonsumsi}
+                  <td className="border border-gray-300 text-center p-2">
+                    {item.sum_tablet}
                   </td>
-                  <td className="border border-gray-300 p-2">
-                    {item.lebih_banyak_vit_c}
+                  <td className="border border-gray-300 p-2 text-center">
+                    {item.count_vit_c_1 > item.count_vit_c_0 ? (
+                      <span>Vitamin C Diminum: {item.count_vit_c_1} Kali</span>
+                    ) : item.count_vit_c_0 > item.count_vit_c_1 ? (
+                      <span>
+                        Tidak minum Vitamin C : {item.count_vit_c_0} Kali
+                      </span>
+                    ) : (
+                      <span>
+                        Jumlah keduanya sama: {item.count_vit_c_1} minum Vitamin
+                        C, {item.count_vit_c_0} Kali
+                      </span>
+                    )}
                   </td>
-                  <td className="border border-gray-300 p-2">
+                  <td className="border border-gray-300 text-center p-2">
                     {bulanNames[item.bulan - 1]}
+                  </td>
+                  <td className="border border-gray-300 text-center p-2">
+                    {item.tahun}
                   </td>
                 </tr>
               ))}
@@ -362,7 +463,7 @@ const RekapTTD = () => {
           <button
             onClick={handleExportToExcel}
             className="flex items-center bg-green-500 text-white p-2 rounded-md hover:bg-green-600 cursor-pointer relative"
-            disabled={isLoading} 
+            disabled={isLoading}
           >
             {isLoading ? (
               <>
@@ -375,12 +476,12 @@ const RekapTTD = () => {
               </>
             ) : (
               <>
-                <img
+                <Image
                   src="/icon/excel.svg"
                   alt="Excel Icon"
-                  width="20"
-                  height="20"
-                  className="mr-2"
+                  width={20}
+                  height={20}
+                  className="object-contain mr-2"
                 />
                 <span className="text-sm">Export Excel</span>
               </>

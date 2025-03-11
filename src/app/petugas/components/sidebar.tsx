@@ -85,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
     
 
     fetchUserData();
-  }, [currentPath]);
+  }, [currentPath, isDataMenuOpen]);
 
   const isActive = (path: string) => {
     return currentPath === path
