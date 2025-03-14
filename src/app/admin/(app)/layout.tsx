@@ -24,15 +24,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           return;
         }
 
-        // Mengirimkan permintaan API untuk mengambil data pengguna
         const response = await axiosInstance.get('/user', {
           headers: {
-            Authorization: `Bearer ${token}`, // Sertakan token di header
+            Authorization: `Bearer ${token}`,
           },
         });
 
-        // Ambil nama dan gambar dari response
-        const { name, image } = response.data; // Sesuaikan dengan struktur data API Anda
+        const { name, image } = response.data;
         setUserName(name);
         setUserImage(image);
       } catch (error) {
@@ -45,10 +43,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="flex h-screen flex-col">
-      {/* Sidebar with current path */}
       <Sidebar currentPath={pathname} />
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col ml-64">
         <div className='p-4 bg-gray-100'>
           <TopBar title={getTitle(pathname)} userName={userName} userImage={userImage} />
@@ -61,7 +56,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-// Function to get the title based on the current path
 const getTitle = (pathname: string) => {
   switch (pathname) {
     case '/admin/dashboard':

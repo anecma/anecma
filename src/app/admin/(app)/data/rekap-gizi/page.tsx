@@ -547,19 +547,24 @@ const RekapHb = () => {
             </h3>
             <ul className="list-disc pl-5 space-y-2 mx-4">
               <li>
-                <strong>Karbohidrat:</strong> {selectedItem.sarapan_karbohidrat}
+                <strong>Karbohidrat:</strong>{" "}
+                {selectedItem.sarapan_karbohidrat ?? "Tidak Makan"}
               </li>
               <li>
-                <strong>Lauk Hewani:</strong> {selectedItem.sarapan_lauk_hewani}
+                <strong>Lauk Hewani:</strong>{" "}
+                {selectedItem.sarapan_lauk_hewani ?? "Tidak Makan"}
               </li>
               <li>
-                <strong>Lauk Nabati:</strong> {selectedItem.sarapan_lauk_nabati}
+                <strong>Lauk Nabati:</strong>{" "}
+                {selectedItem.sarapan_lauk_nabati ?? "Tidak Makan"}
               </li>
               <li>
-                <strong>Sayur:</strong> {selectedItem.sarapan_sayur}
+                <strong>Sayur:</strong>{" "}
+                {selectedItem.sarapan_sayur ?? "Tidak Makan"}
               </li>
               <li>
-                <strong>Buah:</strong> {selectedItem.sarapan_buah}
+                <strong>Buah:</strong>{" "}
+                {selectedItem.sarapan_buah ?? "Tidak Makan"}
               </li>
             </ul>
 
@@ -574,23 +579,23 @@ const RekapHb = () => {
             <ul className="list-disc pl-5 space-y-2 mx-4">
               <li>
                 <strong>Karbohidrat:</strong>{" "}
-                {selectedItem.makan_siang_karbohidrat ?? "Tidak Tersedia"}
+                {selectedItem.makan_siang_karbohidrat ?? "Tidak Makan"}
               </li>
               <li>
                 <strong>Lauk Hewani:</strong>{" "}
-                {selectedItem.makan_siang_lauk_hewani ?? "Tidak Tersedia"}
+                {selectedItem.makan_siang_lauk_hewani ?? "Tidak Makan"}
               </li>
               <li>
                 <strong>Lauk Nabati:</strong>{" "}
-                {selectedItem.makan_siang_lauk_nabati ?? "Tidak Tersedia"}
+                {selectedItem.makan_siang_lauk_nabati ?? "Tidak Makan"}
               </li>
               <li>
                 <strong>Sayur:</strong>{" "}
-                {selectedItem.makan_siang_sayur ?? "Tidak Tersedia"}
+                {selectedItem.makan_siang_sayur ?? "Tidak Makan"}
               </li>
               <li>
                 <strong>Buah:</strong>{" "}
-                {selectedItem.makan_siang_buah ?? "Tidak Tersedia"}
+                {selectedItem.makan_siang_buah ?? "Tidak Makan"}
               </li>
             </ul>
 
@@ -605,21 +610,23 @@ const RekapHb = () => {
             <ul className="list-disc pl-5 space-y-2 mx-4">
               <li>
                 <strong>Karbohidrat:</strong>{" "}
-                {selectedItem.makan_malam_karbohidrat}
+                {selectedItem.makan_malam_karbohidrat ?? "Tidak Makan"}
               </li>
               <li>
                 <strong>Lauk Hewani:</strong>{" "}
-                {selectedItem.makan_malam_lauk_hewani}
+                {selectedItem.makan_malam_lauk_hewani ?? "Tidak Makan"}
               </li>
               <li>
                 <strong>Lauk Nabati:</strong>{" "}
-                {selectedItem.makan_malam_lauk_nabati}
+                {selectedItem.makan_malam_lauk_nabati ?? "Tidak Makan"}
               </li>
               <li>
-                <strong>Sayur:</strong> {selectedItem.makan_malam_sayur}
+                <strong>Sayur:</strong>{" "}
+                {selectedItem.makan_malam_sayur ?? "Tidak Makan"}
               </li>
               <li>
-                <strong>Buah:</strong> {selectedItem.makan_malam_buah}
+                <strong>Buah:</strong>{" "}
+                {selectedItem.makan_malam_buah ?? "Tidak Makan"}
               </li>
             </ul>
 
@@ -629,29 +636,35 @@ const RekapHb = () => {
               <span className="mr-2">
                 <GiHealthNormal className="w-6 h-6 text-teal-400" />
               </span>
-              Total Kalori
+              Total Porsi
             </h3>
             <ul className="list-disc pl-5 space-y-2 mx-4">
               <li>
-                <strong>Karbohidrat:</strong>{" "}
-                {selectedItem.total_kalori_karbohidrat}
+                <strong>Karbohidrat:</strong>
+                {""}
+                {selectedItem.total_kalori_karbohidrat ?? "Tidak Tersedia"}
               </li>
               <li>
-                <strong>Lauk Hewani:</strong>{" "}
-                {selectedItem.total_kalori_lauk_hewani}
+                <strong>Lauk Hewani:</strong>
+                {}
+                {selectedItem.total_kalori_lauk_hewani ?? "Tidak Tersedia"}
               </li>
               <li>
-                <strong>Lauk Nabati:</strong>{" "}
-                {selectedItem.total_kalori_lauk_nabati}
+                <strong>Lauk Nabati:</strong>
+                {""}
+                {selectedItem.total_kalori_lauk_nabati ?? "Tidak Tersedia"}
               </li>
               <li>
-                <strong>Sayur:</strong> {selectedItem.total_kalori_sayur}
+                <strong>Sayur:</strong>{" "}
+                {selectedItem.total_kalori_sayur ?? "Tidak Tersedia"}
               </li>
               <li>
-                <strong>Buah:</strong> {selectedItem.total_kalori_buah}
+                <strong>Buah:</strong>{" "}
+                {selectedItem.total_kalori_buah ?? "Tidak Tersedia"}
               </li>
               <li>
-                <strong>Total Kalori:</strong> {selectedItem.total_kalori}
+                <strong>Total Porsi:</strong>{" "}
+                {selectedItem.total_kalori ?? "Tidak Tersedia"}
               </li>
             </ul>
 

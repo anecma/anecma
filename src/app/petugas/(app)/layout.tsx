@@ -22,28 +22,27 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       try {
         const token = localStorage.getItem("authTokenPetugas");
 
-       
-        const response = await axiosInstance.get("/petugas/get-user", {
+        if (!token) {
+          console.error("Token tidak ditemukan");
+          return;
+        }
+
+        const response = await axiosInstance.get("/user", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-     
-        if (response.data && response.data.data && response.data.data.user) {
-          const { name, image } = response.data.data.user;
-          setUserName(name);
-          setUserImage(image || "/images/default-user.png"); 
-        } 
+        const { name, image } = response.data;
+        setUserName(name);
+        setUserImage(image);
       } catch (error) {
         console.error("Gagal mengambil data pengguna", error);
-       
-      } 
+      }
     };
 
     fetchUserData();
   }, []);
-
 
   return (
     <div className="flex h-screen flex-col">

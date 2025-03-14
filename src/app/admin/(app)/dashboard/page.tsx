@@ -319,7 +319,7 @@ const DashboardAdminPage: React.FC = () => {
                   )}
                 </th>
                 <th className="px-4 py-2 text-center border-r">Usia</th>
-                <th className="px-4 py-2 text-center border-r">Rasio Anemia</th>
+                <th className="px-4 py-2 text-center border-r">Resiko Anemia</th>
                 <th className="px-4 py-2 text-center border-r">Konsumsi TTD</th>
                 <th className="px-4 py-2 text-center border-r">HB Terakhir</th>
               </tr>
