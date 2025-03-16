@@ -439,16 +439,13 @@ const RekapTTD = () => {
                     {item.sum_tablet}
                   </td>
                   <td className="border border-gray-300 p-2 text-center">
-                    {item.count_vit_c_1 > item.count_vit_c_0 ? (
+                    {item.count_vit_c_1 > 0 ? (
                       <span>Vitamin C Diminum: {item.count_vit_c_1} Kali</span>
-                    ) : item.count_vit_c_0 > item.count_vit_c_1 ? (
-                      <span>
-                        Tidak minum Vitamin C : {item.count_vit_c_0} Kali
-                      </span>
+                    ) : item.count_vit_c_0 > 0 ? (
+                      <span>Tidak minum Vitamin C : 0 Kali</span>
                     ) : (
                       <span>
-                        Jumlah keduanya sama: {item.count_vit_c_1} minum Vitamin
-                        C, {item.count_vit_c_0} Kali
+                        Jumlah keduanya sama: 0 minum Vitamin C, 0 Kali
                       </span>
                     )}
                   </td>
