@@ -63,82 +63,44 @@ const RekapTTD90 = () => {
     "Bukit Kemuning": ["Sukamenanti"],
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const authToken = localStorage.getItem("authTokenAdmin");
-
-        if (!authToken) {
-          setError("No authorization token found.");
-          return;
-        }
-
-        const response = await axiosInstance.get("/admin/data/rekap-ttd-90", {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-
-        if (response.data.success) {
-          const fetchedData: RekapData[] = response.data.data;
-          const groupedData: Record<number, RekapData> = {};
-
-          fetchedData.forEach((item) => {
-            if (groupedData[item.user_id]) {
-              groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
-                item.total_jumlah_ttd_dikonsumsi;
-            } else {
-              groupedData[item.user_id] = { ...item };
-            }
-          });
-
-          const sortedData = Object.values(groupedData).sort((a, b) =>
-            a.user.name.localeCompare(b.user.name)
-          );
-
-          setData(sortedData);
-        } else {
-          setError("Failed to fetch data.");
-        }
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
-        setError("Error fetching data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // Contoh dengan JSON
-
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
-  //       const response = await fetch("/data/data.json"); // Sesuaikan path jika perlu
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch data");
+  //       const authToken = localStorage.getItem("authTokenAdmin");
+
+  //       if (!authToken) {
+  //         setError("No authorization token found.");
+  //         return;
   //       }
-  //       const data: RekapData[] = await response.json();
 
-  //       const groupedData: Record<number, RekapData> = {};
-
-  //       data.forEach((item) => {
-  //         if (groupedData[item.user_id]) {
-  //           groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
-  //             item.total_jumlah_ttd_dikonsumsi;
-  //         } else {
-  //           groupedData[item.user_id] = { ...item };
-  //         }
+  //       const response = await axiosInstance.get("/admin/data/rekap-ttd-90", {
+  //         headers: {
+  //           Authorization: `Bearer ${authToken}`,
+  //         },
   //       });
 
-  //       const sortedData = Object.values(groupedData).sort((a, b) =>
-  //         a.user.name.localeCompare(b.user.name)
-  //       );
+  //       if (response.data.success) {
+  //         const fetchedData: RekapData[] = response.data.data;
+  //         const groupedData: Record<number, RekapData> = {};
 
-  //       setData(sortedData);
-  //     } catch (err) {
+  //         fetchedData.forEach((item) => {
+  //           if (groupedData[item.user_id]) {
+  //             groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
+  //               item.total_jumlah_ttd_dikonsumsi;
+  //           } else {
+  //             groupedData[item.user_id] = { ...item };
+  //           }
+  //         });
+
+  //         const sortedData = Object.values(groupedData).sort((a, b) =>
+  //           a.user.name.localeCompare(b.user.name)
+  //         );
+
+  //         setData(sortedData);
+  //       } else {
+  //         setError("Failed to fetch data.");
+  //       }
+  //     } catch (err: any) {
   //       console.error("Error fetching data:", err);
   //       setError("Error fetching data.");
   //     } finally {
@@ -148,6 +110,44 @@ const RekapTTD90 = () => {
 
   //   fetchData();
   // }, []);
+
+  // Contoh dengan JSON
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/data/data.json"); // Sesuaikan path jika perlu
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data: RekapData[] = await response.json();
+
+        const groupedData: Record<number, RekapData> = {};
+
+        data.forEach((item) => {
+          if (groupedData[item.user_id]) {
+            groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
+              item.total_jumlah_ttd_dikonsumsi;
+          } else {
+            groupedData[item.user_id] = { ...item };
+          }
+        });
+
+        const sortedData = Object.values(groupedData).sort((a, b) =>
+          a.user.name.localeCompare(b.user.name)
+        );
+
+        setData(sortedData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Error fetching data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
