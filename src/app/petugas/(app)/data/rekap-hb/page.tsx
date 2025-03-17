@@ -334,7 +334,11 @@ const RekapHb = () => {
                       {item.urutan_periksa}
                     </td>
                     <td className="border border-black text-center p-2">
-                      {new Date(item.tanggal).toLocaleDateString()}
+                      {new Date(item.tanggal).toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
                     </td>
                     <td className="border border-black text-center p-2">
                       {item.nilai_hb}

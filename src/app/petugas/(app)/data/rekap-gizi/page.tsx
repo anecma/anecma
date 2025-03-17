@@ -314,7 +314,7 @@ const RekapHb = () => {
                   <FaSortAlphaDown className="inline ml-2" />
                 )}
               </th>
-              <th className="border border-black p-2">Tanggal Input HB</th>
+              <th className="border border-black p-2">Tanggal Input</th>
               <th className="border border-black p-2">Usia Kehamilan</th>
               <th className="border border-black p-2">Hasil Gizi</th>
               <th className="border border-black p-2">Detail</th>
@@ -361,7 +361,11 @@ const RekapHb = () => {
                     {highlightText(item.user.name)}
                   </td>
                   <td className="border border-black p-2 text-center">
-                    {item.tanggal}
+                    {new Date(item.tanggal).toLocaleDateString("id-ID", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
                   </td>
                   <td className="border border-black p-2 text-center">
                     {item.usia_kehamilan}
