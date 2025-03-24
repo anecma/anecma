@@ -222,6 +222,18 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                     </span>
                   </Link>
                 </li>
+                <li className="mb-4">
+                  <Link href="/petugas/data/kakulator">
+                    <span
+                      className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                        "/petugas/data/kakulator"
+                      )}`}
+                    >
+                      <FaList className="text-xl mr-3" />
+                      <span className="text-lg">Kakulator</span>
+                    </span>
+                  </Link>
+                </li>
               </ul>
             )}
           </li>
