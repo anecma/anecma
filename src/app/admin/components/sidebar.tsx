@@ -206,7 +206,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                 </Link>
               </li>
               <li className="mb-6">
-            <Link href="/admin/kakulator">
+            <Link href="/admin/data/kakulator">
               <span
                 className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
                   "/admin/data/kakulator"
