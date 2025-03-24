@@ -209,10 +209,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
             <Link href="/admin/kakulator">
               <span
                 className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/kakulator"
+                  "/admin/data/kakulator"
                 )}`}
               >
-                <FaCalculator className="text-xl mr-3" />
+                <FaList className="text-xl mr-3" />
                 <span className="text-lg">kakulator</span>
               </span>
             </Link>
