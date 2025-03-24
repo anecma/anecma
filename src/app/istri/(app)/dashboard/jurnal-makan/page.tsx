@@ -10,16 +10,15 @@ import Swal from "sweetalert2";
 import BackButtonNavigation from "@/components/back-button-navigation/back-button-navigation";
 import TextModal from "@/components/modal/textmodal/textmodal";
 
-// Opsi waktu makan
 const mealOptions = [
   { name: "sarapan", label: "Sarapan", jam_makan: "sarapan" },
   { name: "makan_siang", label: "Makan Siang", jam_makan: "makan_siang" },
   { name: "makan_malam", label: "Makan Malam", jam_makan: "makan_malam" },
 ];
 
-// Opsi porsi
 const portionSizes = {
   default: [
+    { value: undefined, label: "Pilih Porsi" },
     { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
@@ -27,6 +26,7 @@ const portionSizes = {
     { value: "2", label: "2 Porsi" },
   ],
   karbohidrat: [
+    { value: undefined, label: "Pilih Porsi" },
     { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
@@ -34,6 +34,7 @@ const portionSizes = {
     { value: "2", label: "2 Porsi" },
   ],
   lauk_hewani: [
+    { value: undefined, label: "Pilih Porsi" },
     { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
@@ -45,6 +46,7 @@ const portionSizes = {
     { value: "4", label: "4 Porsi" },
   ],
   lauk_nabati: [
+    { value: undefined, label: "Pilih Porsi" },
     { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
@@ -52,6 +54,7 @@ const portionSizes = {
     { value: "2", label: "2 Porsi" },
   ],
   sayur: [
+    { value: undefined, label: "Pilih Porsi" },
     { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
@@ -59,6 +62,7 @@ const portionSizes = {
     { value: "2", label: "2 Porsi" },
   ],
   buah: [
+    { value: undefined, label: "Pilih Porsi" },
     { value: "0", label: "<0.5 Porsi" },
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
@@ -67,7 +71,6 @@ const portionSizes = {
   ],
 };
 
-// Gambar kategori makanan
 const mealCategories = {
   karbohidrat: [
     {
@@ -268,7 +271,10 @@ const mealCategories = {
   ],
 };
 
-const mapPortionValue = (value: number) => {
+const mapPortionValue = (
+  value: number | null | undefined
+): string | undefined => {
+  if (value === null || value === undefined) return undefined;
   if (value === 0) return "0";
   if (value === 0.5) return "0.5";
   if (value === 1) return "1";
@@ -278,72 +284,73 @@ const mapPortionValue = (value: number) => {
   if (value === 3) return "3";
   if (value === 3.5) return "3.5";
   if (value === 4) return "4";
-  return "";
+  return undefined;
 };
 
 const FoodLogForm = () => {
   const [selectedTab, setSelectedTab] = useState<string>("sarapan");
   const [jurnalMakanData, setJurnalMakanData] = useState<any>({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPortions, setSelectedPortions] = useState<
-    Record<string, string>
-  >({});
-
-  const [usiakehamilan, setUsiaKehamilan] = useState(0);
-  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
-  // const [savedImageSrc, setSavedImageSrc] = useState("");
-  const [imageSrc, setImageSrc] = useState("");
+    Record<string, string | undefined>
+  >({
+    karbohidrat: undefined,
+    lauk_hewani: undefined,
+    lauk_nabati: undefined,
+    sayur: undefined,
+    buah: undefined,
+  });
+  const [usiaKehamilan, setUsiaKehamilan] = useState<number>(0);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState<boolean>(false);
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState<boolean>(false);
+  const [imageSrc, setImageSrc] = useState<string>("");
   const [textContent, setTextContent] = useState<string>("");
   const { data: session, status } = useSession();
 
   useEffect(() => {
     async function fetchJurnalMakanData() {
-      // Pastikan user sudah terotentikasi dan accessToken tersedia
       if (status !== "authenticated" || !session?.accessToken) {
         if (status === "unauthenticated") {
           setError("Anda perlu login terlebih dahulu.");
         }
         setLoading(false);
-        return; // Hentikan eksekusi jika user tidak terotentikasi
+        return;
       }
 
       try {
-        setLoading(true); // Set loading state saat mulai fetch data
+        setLoading(true);
 
         const response = await axiosInstance.get(
-          "/istri/dashboard/get-jurnal-makan",
+          `/istri/dashboard/get-jurnal-makan?tab=${selectedTab}`,
           {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           }
         );
 
-        const fetchedData = response.data.data; // Mengambil data yang diperlukan
+        const fetchedData = response.data.data;
 
-        // Cek jika data kosong
         if (!fetchedData || Object.keys(fetchedData).length === 0) {
           return;
         }
 
-        // Set data ke state
         setJurnalMakanData(fetchedData);
+        setUsiaKehamilan(fetchedData.usia_kehamilan);
 
-        const usiaKehamilan = fetchedData.usia_kehamilan;
-        setUsiaKehamilan(usiaKehamilan);
-
-        // Set initial selected portions based on fetched data
         if (mealCategories && typeof mealCategories === "object") {
           const initialPortions = Object.keys(mealCategories).reduce(
             (acc, category) => {
               const apiKey = `${selectedTab}_${category}`.replace(/-/g, "_");
 
+              const value = fetchedData[apiKey];
               acc[category] = mapPortionValue(
-                parseFloat(fetchedData[apiKey]) || 0
+                value !== null && value !== undefined
+                  ? parseFloat(value)
+                  : undefined
               );
               return acc;
             },
-            {} as Record<string, string>
+            {} as Record<string, string | undefined>
           );
 
           setSelectedPortions(initialPortions);
@@ -360,11 +367,11 @@ const FoodLogForm = () => {
     fetchJurnalMakanData();
   }, [session, status, selectedTab]);
 
-  const getCheckedValue = (category: string) => {
-    return selectedPortions[category] || "";
+  const getCheckedValue = (category: string): string | undefined => {
+    return selectedPortions[category];
   };
 
-  const handleRadioChange = (category: string, value: string) => {
+  const handleRadioChange = (category: string, value: string | undefined) => {
     setSelectedPortions((prev) => ({
       ...prev,
       [category]: value,
@@ -373,6 +380,45 @@ const FoodLogForm = () => {
 
   const handleSave = async () => {
     if (status === "authenticated" && session?.accessToken) {
+      // Identifikasi kategori yang belum diisi
+      const emptyCategories = Object.keys(selectedPortions).filter(
+        (category) => selectedPortions[category] === undefined
+      );
+
+      if (emptyCategories.length > 0) {
+        // Buat pesan peringatan yang detail dengan teks bold
+        const categoryLabels = emptyCategories.map((category) => {
+          switch (category) {
+            case "karbohidrat":
+              return "<strong>Karbohidrat</strong>";
+            case "lauk_hewani":
+              return "<strong>Lauk Hewani</strong>";
+            case "lauk_nabati":
+              return "<strong>Lauk Nabati</strong>";
+            case "sayur":
+              return "<strong>Sayur</strong>";
+            case "buah":
+              return "<strong>Buah</strong>";
+            default:
+              return `<strong>${category}</strong>`;
+          }
+        });
+
+        const warningMessage = `Harap isi porsi untuk: ${categoryLabels.join(
+          ", "
+        )}.`;
+
+        // Tampilkan SweetAlert dengan pesan yang detail dan teks bold
+        Swal.fire({
+          icon: "warning",
+          title: "Peringatan",
+          html: warningMessage, // Gunakan html untuk menampilkan teks bold
+          confirmButtonText: "Mengerti",
+        });
+        return; // Hentikan proses penyimpanan
+      }
+
+      // Lanjutkan proses penyimpanan jika semua kategori sudah diisi
       try {
         const currentMealOption = mealOptions.find(
           (option) => option.name === selectedTab
@@ -409,6 +455,8 @@ const FoodLogForm = () => {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
 
+        console.log("API Response:", response.data);
+
         // Menampilkan hasil setelah pengiriman data makan malam
         if (selectedTab === "makan_malam") {
           const authToken = session.accessToken;
@@ -420,7 +468,6 @@ const FoodLogForm = () => {
           const pesan =
             response.data.data.pesan ||
             "Berhasil menyimpan data untuk makan malam.";
-          // console.log(pesan)
 
           axiosInstance
             .get("/istri/get-user", {
@@ -446,7 +493,8 @@ const FoodLogForm = () => {
                 html: `
                   ${pesan}
                   <br><br> Rekomendasi Makanan Untuk Bunda:
-                  <a href="${randomLink}" target="_self">Klik Disini</a>
+                <a href="${randomLink}" target="_self" class="font-bold text-blue-500">Klik Disini</a>
+
                 `,
                 showCloseButton: true,
                 focusConfirm: false,
@@ -515,8 +563,6 @@ const FoodLogForm = () => {
     keyof typeof mealCategories
   >;
 
-  if (error) return <div>{error}</div>;
-
   return (
     <div className="">
       <Toaster richColors position="top-center" />
@@ -536,7 +582,7 @@ const FoodLogForm = () => {
         <TextModal
           isOpen={isGuideModalOpen}
           onClose={closeGuideModal}
-          textContent={textContent} // Pass the dynamic content here
+          textContent={textContent}
         />
       </div>
 
@@ -575,8 +621,8 @@ const FoodLogForm = () => {
                       key={index}
                       className="flex flex-col items-center bg-white w-40 p-5 rounded-2xl flex-shrink-0 cursor-pointer"
                       onClick={() => {
-                        setImageSrc(image.src); // Set the image source to the clicked image
-                        setIsSaveModalOpen(true); // Open the modal
+                        setImageSrc(image.src);
+                        setIsSaveModalOpen(true);
                       }}
                     >
                       <Image
@@ -594,7 +640,6 @@ const FoodLogForm = () => {
                   ))}
                 </div>
 
-                {/* The Image Modal is rendered outside the loop */}
                 <ImageModal
                   isOpen={isSaveModalOpen}
                   onClose={closeModal}
@@ -602,35 +647,56 @@ const FoodLogForm = () => {
                 />
               </div>
               <div className="my-2.5">
-                <form action="" className="flex flex-col gap-2.5">
-                  {portionSizes[category]?.map((size, index) => (
-                    <div key={index} className="flex items-center mb-4">
-                      <label
-                        htmlFor={`porsi-${size.value}`}
-                        className="w-full flex flex-row justify-between ms-2 text-xl font-medium text-black"
-                      >
-                        <p>
-                          <span className="mr-2.5">
-                            ({String.fromCharCode(65 + index)})
-                          </span>{" "}
-                          {size.label}
-                        </p>
-                        <input
-                          type="radio"
-                          id={`porsi-${size.value}`}
-                          name={`${selectedTab}-radio-${category}`}
-                          value={size.value ?? ""} // Jika size.value bisa null, pastikan tidak null
-                          className="w-7 h-7 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                          checked={
-                            getCheckedValue(category) === size.value || false
-                          } // Pastikan checked adalah boolean
-                          onChange={() =>
-                            handleRadioChange(category, size.value ?? "")
-                          }
-                        />
-                      </label>
-                    </div>
-                  ))}
+                <form action="" className="flex flex-col gap-2.5 mt-4">
+                  {portionSizes[category]?.map((size, index) => {
+                    const adjustedIndex = portionSizes[category]
+                      .slice(0, index)
+                      .filter((item) => item.value !== undefined).length;
+
+                    return (
+                      <div key={index} className="flex items-center mb-4">
+                        <label
+                          htmlFor={`porsi-${size.value}`}
+                          className={`w-full flex flex-row justify-between ms-2 text-xl font-medium ${
+                            size.value === undefined
+                              ? "text-gray-900 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          <p>
+                            {size.value !== undefined && (
+                              <span className="mr-2.5">
+                                ({String.fromCharCode(65 + adjustedIndex)})
+                              </span>
+                            )}{" "}
+                            {size.label}
+                          </p>
+                          {size.value !== undefined && (
+                            <input
+                              type="radio"
+                              id={`porsi-${size.value}`}
+                              name={`${selectedTab}-radio-${category}`}
+                              value={size.value ?? ""}
+                              className="w-7 h-7 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                              checked={
+                                getCheckedValue(category) === size.value ||
+                                false
+                              }
+                              onChange={() =>
+                                handleRadioChange(
+                                  category,
+                                  size.value ?? undefined
+                                )
+                              }
+                            />
+                          )}
+                        </label>
+                      </div>
+                    );
+                  })}
+                  {/* {getCheckedValue(category) === undefined && (
+                    <p className="text-gray-500 text-sm mt-2">Belum Makan</p>
+                  )} */}
                 </form>
               </div>
             </div>

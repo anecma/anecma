@@ -1,4 +1,5 @@
-"use client";
+"use client"; // Pastikan komponen ini dijalankan di client-side
+
 import { useState, useEffect } from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { MdKeyboardArrowRight } from "react-icons/md";
@@ -39,6 +40,7 @@ export default function ProfilPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(
     userData?.usia ? new Date(userData.usia) : null
   );
+  const [formErrors, setFormErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function fetchUserData() {
@@ -69,10 +71,54 @@ export default function ProfilPage() {
   const handleSave = async () => {
     if (!userData) return;
 
+    // Validasi form
+    const errors: Record<string, boolean> = {};
+    const errorMessages: string[] = []; // Array untuk menyimpan pesan error
+
+    if (!userData.name) {
+      errors.name = true;
+      errorMessages.push("Nama");
+    }
+    if (!userData.usia) {
+      errors.usia = true;
+      errorMessages.push("Tanggal Lahir");
+    }
+    if (!userData.no_hp) {
+      errors.no_hp = true;
+      errorMessages.push("No HP");
+    }
+    if (!userData.tempat_tinggal_ktp) {
+      errors.tempat_tinggal_ktp = true;
+      errorMessages.push("Tempat Tinggal Sesuai KTP");
+    }
+    if (!userData.tempat_tinggal_domisili) {
+      errors.tempat_tinggal_domisili = true;
+      errorMessages.push("Tempat Tinggal Domisili");
+    }
+    if (!userData.pendidikan_terakhir) {
+      errors.pendidikan_terakhir = true;
+      errorMessages.push("Pendidikan Terakhir");
+    }
+    if (!userData.pekerjaan) {
+      errors.pekerjaan = true;
+      errorMessages.push("Pekerjaan");
+    }
+
+    setFormErrors(errors);
+
+    // Jika ada error, tampilkan satu pesan error yang mencakup semua field
+    if (errorMessages.length > 0) {
+      toast.error(`Harap isi field berikut: ${errorMessages.join(", ")}`, {
+        duration: 2000,
+      });
+      return;
+    }
+
     setSaving(true);
     setError(null);
 
     try {
+      toast.loading("Menyimpan data...");
       const response = await axiosInstance.post(
         "/istri/profil/update-data-diri",
         userData,
@@ -86,7 +132,10 @@ export default function ProfilPage() {
     } catch (error) {
       console.error("Error saving data:", error);
       setError("Failed to save data.");
-    } finally {
+      toast.error("Gagal menyimpan data.", { duration: 2000 });
+    }  finally {
+    
+      toast.dismiss();
       setSaving(false);
     }
   };
@@ -99,6 +148,11 @@ export default function ProfilPage() {
       ...prevData,
       [id]: value,
     }));
+    // Hapus error saat user mulai mengisi
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [id]: false,
+    }));
   };
 
   const handleEditToggle = () => {
@@ -109,10 +163,14 @@ export default function ProfilPage() {
     const selectedDate = e.target.value;
     setUserData((prevState) => ({
       ...prevState,
-      usia: selectedDate, 
+      usia: selectedDate,
+    }));
+    // Hapus error saat user mulai mengisi
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      usia: false,
     }));
   };
-  
 
   return (
     <main className="flex flex-col min-h-screen mb-32">
@@ -132,12 +190,15 @@ export default function ProfilPage() {
 
       <div className="mx-5">
         <form className="flex flex-col gap-2.5">
+          {/* Field Nama */}
           <div className="relative my-2.5">
             <input
               type="text"
               id="name"
               value={userData?.name || ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm  text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.name ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -150,12 +211,15 @@ export default function ProfilPage() {
             </label>
           </div>
 
+          {/* Field Tanggal Lahir */}
           <div className="relative my-2.5">
             <input
               type="date"
               value={userData?.usia || ""}
               onChange={handleDateChange}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.usia ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" Tanggal Lahir "
               onClick={(e) => {
                 e.currentTarget.showPicker();
@@ -170,12 +234,15 @@ export default function ProfilPage() {
             </label>
           </div>
 
+          {/* Field No HP */}
           <div className="relative my-2.5">
             <input
               type="text"
               id="no_hp"
               value={userData?.no_hp ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.no_hp ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -187,12 +254,16 @@ export default function ProfilPage() {
               No HP
             </label>
           </div>
+
+          {/* Field Tempat Tinggal KTP */}
           <div className="relative my-2.5">
             <input
               type="text"
               id="tempat_tinggal_ktp"
               value={userData?.tempat_tinggal_ktp ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.tempat_tinggal_ktp ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -204,12 +275,16 @@ export default function ProfilPage() {
               Tempat Tinggal Sesuai KTP
             </label>
           </div>
+
+          {/* Field Tempat Tinggal Domisili */}
           <div className="relative my-2.5">
             <input
               type="text"
               id="tempat_tinggal_domisili"
               value={userData?.tempat_tinggal_domisili ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.tempat_tinggal_domisili ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -221,11 +296,15 @@ export default function ProfilPage() {
               Tempat Tinggal Domisili
             </label>
           </div>
+
+          {/* Field Pendidikan Terakhir */}
           <div className="relative my-2.5">
             <select
               id="pendidikan_terakhir"
               value={userData?.pendidikan_terakhir ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.pendidikan_terakhir ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               onChange={handleChange}
               disabled={!isEditing}
             >
@@ -244,11 +323,15 @@ export default function ProfilPage() {
               Pendidikan Terakhir
             </label>
           </div>
+
+          {/* Field Pekerjaan */}
           <div className="relative my-2.5">
             <select
               id="pekerjaan"
               value={userData?.pekerjaan ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.pekerjaan ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               onChange={handleChange}
               disabled={!isEditing}
             >

@@ -1,8 +1,20 @@
 "use client";
- 
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaHospitalAlt, FaUserMd, FaCog, FaList, FaTh, FaChalkboardTeacher, FaDatabase, FaChevronRight, FaChevronDown, FaUser } from "react-icons/fa"; // Import icons
+import { 
+  FaHospitalAlt, 
+  FaUserMd, 
+  FaCog, 
+  FaList, 
+  FaTh, 
+  FaChalkboardTeacher, 
+  FaDatabase, 
+  FaChevronRight, 
+  FaChevronDown, 
+  FaUser, 
+  FaCalculator 
+} from "react-icons/fa"; // Import icons
 import { LuLayoutDashboard } from "react-icons/lu";
 import Image from "next/image";
 import axiosInstance from "@/libs/axios";
@@ -22,34 +34,40 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
   const [error, setError] = useState<string | null>(null);
   const [isDataMenuOpen, setIsDataMenuOpen] = useState<boolean>(false);
 
+  // Check if any "Data" submenu item is active
+  const isDataSubmenuActive = [
+    "/admin/data/rekap-hb",
+    "/admin/data/rekap-TTD",
+    "/admin/data/rekap-TTD-90",
+    "/admin/data/rekap-gizi"
+  ].some(path => currentPath.includes(path));
+
+  // If the current path includes any submenu item, keep the menu open
   useEffect(() => {
-    const savedMenuStatus = localStorage.getItem("isDataMenuOpen");
+    const savedMenuStatus = localStorage.getItem("isDataMenuOpenAdmin");
     if (savedMenuStatus !== null) {
       setIsDataMenuOpen(JSON.parse(savedMenuStatus));
     }
-  
-    if (
-      currentPath.includes("/admin/data") && 
-      !isDataMenuOpen
-    ) {
+
+    if (currentPath.includes("/admin/data") && !isDataMenuOpen) {
       setIsDataMenuOpen(true);
     }
-  
+
     const fetchUserData = async () => {
       try {
         const authToken = localStorage.getItem("authTokenAdmin");
-  
+
         if (!authToken) {
           setError("No token found");
           return;
         }
-  
+
         const response = await axiosInstance.get<User>("/user", {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
-  
+
         setUser(response.data);
       } catch (err) {
         if (err instanceof Error) {
@@ -59,10 +77,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
         }
       }
     };
-  
+
     fetchUserData();
-  }, [currentPath, isDataMenuOpen]); // Add isDataMenuOpen here
-  
+  }, [currentPath, isDataMenuOpen]);
 
   const isActive = (path: string) => {
     return currentPath === path
@@ -71,10 +88,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
   };
 
   const handleDataMenuClick = () => {
-    const newStatus = !isDataMenuOpen;
-    setIsDataMenuOpen(newStatus);
+    if (!isDataSubmenuActive) {
+      const newStatus = !isDataMenuOpen;
+      setIsDataMenuOpen(newStatus);
+      localStorage.setItem("isDataMenuOpenAdmin", JSON.stringify(newStatus));
+    }
   };
-  
 
   return (
     <div className="fixed top-0 left-0 bg-white w-64 h-screen flex flex-col shadow-lg border-r overflow-x-auto">
@@ -104,6 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
 
       <nav className="flex-1 p-6">
         <ul>
+          {/* Dashboard */}
           <li className="mb-6">
             <Link href="/admin/dashboard">
               <span
@@ -117,6 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
             </Link>
           </li>
 
+          {/* Data Menu */}
           <li className="mb-6">
             <button
               onClick={handleDataMenuClick}
@@ -126,15 +147,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
             >
               <FaDatabase className="text-xl mr-3" />
               <span className="text-lg">Data</span>
-              {isDataMenuOpen ? (
+              {isDataMenuOpen || isDataSubmenuActive ? (
                 <FaChevronDown className="ml-auto text-lg" />
               ) : (
-                <FaChevronRight className="ml-auto text-lg" /> 
+                <FaChevronRight className="ml-auto text-lg" />
               )}
             </button>
           </li>
 
-          {isDataMenuOpen && (
+          {isDataMenuOpen || isDataSubmenuActive ? (
             <ul className="pl-6 mt-4">
               <li className="mb-4">
                 <Link href="/admin/data/rekap-hb">
@@ -185,8 +206,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                 </Link>
               </li>
             </ul>
-          )}
+          ) : null}
 
+          {/* Other Menu Items */}
           <li className="mb-6">
             <Link href="/admin/puskesmas">
               <span
@@ -199,6 +221,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               </span>
             </Link>
           </li>
+
           <li className="mb-6">
             <Link href="/admin/petugas">
               <span
@@ -211,6 +234,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               </span>
             </Link>
           </li>
+
           <li className="mb-6">
             <Link href="/admin/edukasi">
               <span
@@ -236,6 +260,20 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               </span>
             </Link>
           </li>
+
+          <li className="mb-6">
+            <Link href="/admin/kakulator">
+              <span
+                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                  "/admin/kakulator"
+                )}`}
+              >
+                <FaCalculator className="text-xl mr-3" />
+                <span className="text-lg">kakulator</span>
+              </span>
+            </Link>
+          </li>
+
           <li className="mb-6">
             <Link href="/admin/user">
               <span
@@ -248,6 +286,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               </span>
             </Link>
           </li>
+
           <li>
             <Link href="/admin/settings">
               <span

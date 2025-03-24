@@ -2,7 +2,13 @@
 import axiosInstance from "@/libs/axios";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { FaChevronLeft, FaSearch, FaTrash } from "react-icons/fa";
+import {
+  FaChevronLeft,
+  FaSearch,
+  FaSortAlphaDown,
+  FaSortAlphaDownAlt,
+  FaTrash,
+} from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa6";
 import Swal from "sweetalert2";
 
@@ -26,6 +32,14 @@ interface User {
   updated_at: string;
 }
 
+// Kelurahan data based on puskesmas
+const kelurahanData: { [key: string]: string[] } = {
+  "Puskesmas Sangkrah": ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
+  "Puskesmas Kratonan": ["Kratonan", "Danukusuman", "Joyotakan"],
+  "Puskesmas Gilingan": ["Gilingan", "Kestalan", "Punggawan"],
+  "Puskesmas Bukit Kemuning": ["Sukamenanti"],
+};
+
 const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,8 +49,57 @@ const UsersPage = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortedBy, setSortedBy] = useState<string>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const [isAscending, setIsAscending] = useState(true);
   const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
   const [selectedKelurahan, setSelectedKelurahan] = useState<string>("");
+  const [wilayahBinaanPetugas, setWilayahBinaanPetugas] = useState<string>("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const authToken = localStorage.getItem("authTokenPetugas");
+
+        if (!authToken) {
+          setError("No token found");
+          setLoading(false);
+          return;
+        }
+
+        // Fetch user data
+        const userResponse = await axiosInstance.get("/petugas/get-user", {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (userResponse.data.success) {
+          const userData = userResponse.data.data.user;
+          const namaPuskesmas = userData.puskesmas[0]?.nama_puskesmas || "";
+
+          // Set wilayahBinaanPetugas based on nama_puskesmas
+          setWilayahBinaanPetugas(namaPuskesmas);
+
+          // Fetch kelurahan options based on wilayahBinaanPetugas
+          if (namaPuskesmas && kelurahanData[namaPuskesmas]) {
+            setKelurahanOptions(kelurahanData[namaPuskesmas]);
+          } else {
+            setKelurahanOptions([]);
+          }
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Unknown error fetching data.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -56,16 +119,17 @@ const UsersPage = () => {
         });
 
         if (response.data.success) {
-          const sortedData = response.data.data.sort(
-            (a: User, b: User) =>
-              a.name.localeCompare(b.name) * (sortOrder === "asc" ? 1 : -1)
-          );
+          const sortedData = response.data.data.sort((a: User, b: User) => {
+            const compareA = a[sortedBy as keyof User];
+            const compareB = b[sortedBy as keyof User];
 
-          const kelurahanSet: Set<string> = new Set(
-            response.data.data.map((item: User) => item.kelurahan)
-          );
-
-          setKelurahanOptions(Array.from(kelurahanSet));
+            if (typeof compareA === "string" && typeof compareB === "string") {
+              return sortOrder === "asc"
+                ? compareA.localeCompare(compareB)
+                : compareB.localeCompare(compareA);
+            }
+            return 0;
+          });
           setUsers(sortedData);
         } else {
           setError("Failed to fetch data.");
@@ -84,7 +148,7 @@ const UsersPage = () => {
     };
 
     fetchUsers();
-  }, [sortOrder]);
+  }, [sortOrder, sortedBy]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -136,6 +200,13 @@ const UsersPage = () => {
       { length: endPage - startPage + 1 },
       (_, i) => startPage + i
     );
+  };
+  // Add this inside your component, after the useState hooks
+
+  const handleSort = (column: keyof User) => {
+    setSortedBy(column); // Update the sorting column
+    setIsAscending((prev) => !prev); // Toggle ascending/descending
+    setSortOrder(isAscending ? "asc" : "desc"); // Update sort order based on current ascending state
   };
 
   const highlightText = (text: string) => {
@@ -191,20 +262,14 @@ const UsersPage = () => {
         } else {
           Swal.fire({
             title: "Gagal!",
-            text: "Terjadi kesalahan saat menghapus data.",
+            text: "Data gagal dihapus.",
             icon: "error",
           });
         }
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("Error deleting user");
-        }
-
+      } catch (error) {
         Swal.fire({
           title: "Gagal!",
-          text: "Terjadi kesalahan saat menghapus data.",
+          text: "Terjadi kesalahan.",
           icon: "error",
         });
       }
@@ -212,8 +277,9 @@ const UsersPage = () => {
   };
 
   return (
-    <main className="bg-white min-h-screen rounded-lg py-8 px-6">
-      <div className="container mx-auto">
+    <main className="bg-gray-50 min-h-screen p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Search and Kelurahan Dropdown */}
         <div className="flex justify-between items-center mb-4 p-2 space-x-4">
           {/* Kelurahan Dropdown */}
           <div className="relative w-full max-w-xs">
@@ -275,7 +341,7 @@ const UsersPage = () => {
                     Wilayah Binaan
                   </th>
                   <th className="p-4 border-b text-left cursor-pointer">
-                    Kelurahaan
+                    Kelurahan
                   </th>
                   <th className="p-4 border-b text-left cursor-pointer">
                     Aksi
@@ -328,8 +394,16 @@ const UsersPage = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="p-4 border-b text-left cursor-pointer">ID</th>
-                  <th className="p-4 border-b text-left cursor-pointer">
-                    Nama
+                  <th
+                    className="p-4 cursor-pointer w-48 text-center"
+                    onClick={() => handleSort("name")}
+                  >
+                    Nama Ibu Hamil
+                    {isAscending ? (
+                      <FaSortAlphaDownAlt className="inline ml-2" />
+                    ) : (
+                      <FaSortAlphaDown className="inline ml-2" />
+                    )}
                   </th>
                   <th className="p-4 border-b text-left cursor-pointer">
                     Email
@@ -344,7 +418,7 @@ const UsersPage = () => {
                     Wilayah Binaan
                   </th>
                   <th className="p-4 border-b text-left cursor-pointer">
-                    Kelurahaan
+                    Kelurahan
                   </th>
                   <th className="p-4 border-b text-left cursor-pointer">
                     Aksi
@@ -375,6 +449,7 @@ const UsersPage = () => {
                 ))}
               </tbody>
             </table>
+
             <div className="flex justify-end mt-8 space-x-4">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}

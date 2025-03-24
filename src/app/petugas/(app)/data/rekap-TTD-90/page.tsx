@@ -37,6 +37,13 @@ interface RekapData {
   user: User;
 }
 
+const kelurahanData: { [key: string]: string[] } = {
+  "Puskesmas Sangkrah": ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
+  "Puskesmas Kratonan": ["Kratonan", "Danukusuman", "Joyotakan"],
+  "Puskesmas Gilingan": ["Gilingan", "Kestalan", "Punggawan"],
+  "Puskesmas Bukit Kemuning": ["Sukamenanti"],
+};
+
 const RekapTTD90 = () => {
   const [data, setData] = useState<RekapData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -53,49 +60,78 @@ const RekapTTD90 = () => {
   //   const fetchData = async () => {
   //     try {
   //       const authToken = localStorage.getItem("authTokenPetugas");
-
+  
   //       if (!authToken) {
   //         setError("No authorization token found.");
   //         return;
   //       }
-
-  //       const response = await axiosInstance.get("/petugas/data/rekap-ttd-90", {
+  
+  //       // Step 1: Fetch user data (same as the second useEffect)
+  //       const userResponse = await axiosInstance.get("/petugas/get-user", {
   //         headers: {
   //           Authorization: `Bearer ${authToken}`,
   //         },
   //       });
-
-  //       if (response.data.success) {
-  //         const fetchedData: RekapData[] = response.data.data;
-  //         const groupedData: Record<number, RekapData> = {};
-
-  //         fetchedData.forEach((item) => {
-  //           if (groupedData[item.user_id]) {
-  //             groupedData[item.user_id].total_jumlah_ttd_dikonsumsi +=
-  //               item.total_jumlah_ttd_dikonsumsi;
-  //           } else {
-  //             groupedData[item.user_id] = { ...item };
-  //           }
+  
+  //       if (userResponse.data.success) {
+  //         const userData = userResponse.data.data.user;
+  
+  //         // Extract nama_puskesmas and use it for wilayah binaan
+  //         const namaPuskesmas = userData.puskesmas[0]?.nama_puskesmas || "";
+  //         const wilayahBinaanPetugas = namaPuskesmas;
+  
+  //         // Step 2: Fetch rekap data (same as your initial code)
+  //         const rekapResponse = await axiosInstance.get("/petugas/data/rekap-ttd-90", {
+  //           headers: {
+  //             Authorization: `Bearer ${authToken}`,
+  //           },
   //         });
-
-  //         const sortedData = Object.values(groupedData).sort((a, b) =>
-  //           a.user.name.localeCompare(b.user.name)
-  //         );
-
-  //         setData(sortedData);
+  
+  //         if (rekapResponse.data.success) {
+  //           const fetchedData: RekapData[] = rekapResponse.data.data;
+  //           const groupedData: Record<number, RekapData> = {};
+  
+  //           // Group the fetched data by user_id and accumulate total_jumlah_ttd_dikonsumsi
+  //           fetchedData.forEach((item) => {
+  //             if (groupedData[item.user_id]) {
+  //               groupedData[item.user_id].total_jumlah_ttd_dikonsumsi += item.total_jumlah_ttd_dikonsumsi;
+  //             } else {
+  //               groupedData[item.user_id] = { ...item };
+  //             }
+  //           });
+  
+  //           // Step 3: Sort the data by user name
+  //           const sortedData = Object.values(groupedData).sort((a, b) =>
+  //             a.user.name.localeCompare(b.user.name)
+  //           );
+  
+  //           // Optional: You can add filtering based on wilayahBinaanPetugas if needed
+  //           console.log("Wilayah Binaan Petugas:", wilayahBinaanPetugas);
+  
+  //           setData(sortedData); // Set sorted data
+  //         } else {
+  //           setError("Failed to fetch rekap data.");
+  //         }
   //       } else {
-  //         setError("Failed to fetch data.");
+  //         setError("Failed to fetch user data.");
   //       }
   //     } catch (err: any) {
-  //       console.error("Error fetching data:", err);
-  //       setError("Error fetching data.");
+  //       if (err instanceof Error) {
+  //         console.error("Error fetching data:", err.message);
+  //         setError(`Error fetching data: ${err.message}`);
+  //       } else {
+  //         console.error("Unknown error fetching data:", err);
+  //         setError("Unknown error fetching data.");
+  //       }
   //     } finally {
   //       setLoading(false);
   //     }
   //   };
-
+  
   //   fetchData();
   // }, []);
+  
+  
 
   // Contoh dengan JSON
 

@@ -78,6 +78,8 @@ const getTitle = (pathname: string) => {
       return 'Rekap TTD > 90';
     case '/admin/data/rekap-gizi':
       return 'Rekap Gizi';
+    case '/admin/kakulator':
+      return 'Kakulator Anemia';
     default:
       return 'Admin Panel';
   }

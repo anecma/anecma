@@ -26,7 +26,7 @@ const kelurahanData: { [key: string]: string[] } = {
   Sangkrah: ["Sangkrah", "Kedunglumbu", "Mojo", "Semanggi"],
   Kratonan: ["Kratonan", "Danukusuman", "Joyotakan"],
   Gilingan: ["Gilingan", "Kestalan", "Punggawan"],
-  "Bukit Kemuning": ["Sukamenanti"], 
+  "Bukit Kemuning": ["Sukamenanti"],
 };
 
 const desaData: { [key: string]: string[] } = {
@@ -103,6 +103,7 @@ export default function ProfilPage() {
   const [saving, setSaving] = useState(false);
   const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
   const [desaOptions, setDesaOptions] = useState<string[]>([]);
+  const [formErrors, setFormErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function fetchUserData() {
@@ -136,25 +137,71 @@ export default function ProfilPage() {
   };
 
   const handleSave = async () => {
-    if (status === "authenticated" && session?.accessToken) {
-      setSaving(true);
-      try {
-        await axiosInstance.post(
-          "/istri/profil/update-data-kehamilan",
-          editableData,
-          {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          }
-        );
-        setUserData(editableData);
-        setIsEditing(false);
-        setError(null);
-        toast.success("Berhasil Menyimpan.", { duration: 2000 });
-      } catch (error) {
-        setError("Failed to update user data.");
-      } finally {
-        setSaving(false);
-      }
+    if (!editableData) return;
+  
+    // Validasi form
+    const errors: Record<string, boolean> = {};
+    const errorMessages: string[] = []; // Array untuk menyimpan pesan error
+  
+    if (!editableData.hari_pertama_haid) {
+      errors.hari_pertama_haid = true;
+      errorMessages.push("Hari Pertama Haid Terakhir");
+    }
+    if (!editableData.wilayah_binaan) {
+      errors.wilayah_binaan = true;
+      errorMessages.push("Wilayah Binaan");
+    }
+    if (!editableData.kelurahan) {
+      errors.kelurahan = true;
+      errorMessages.push("Kelurahan");
+    }
+    if (!editableData.tempat_periksa_kehamilan) {
+      errors.tempat_periksa_kehamilan = true;
+      errorMessages.push("Tempat Pemeriksaan Kehamilan");
+    }
+  
+    setFormErrors(errors);
+  
+    // Jika ada error, tampilkan satu pesan error yang mencakup semua field
+    if (errorMessages.length > 0) {
+      toast.error(`Harap isi field berikut: ${errorMessages.join(", ")}`, {
+        duration: 2000,
+      });
+      return;
+    }
+  
+    setSaving(true);
+    setError(null);
+  
+    try {
+      // Tampilkan notifikasi loading
+      toast.loading("Menyimpan data...");
+  
+      // Kirim data ke server
+      const response = await axiosInstance.post(
+        "/istri/profil/update-data-kehamilan",
+        editableData,
+        {
+          headers: { Authorization: `Bearer ${session?.accessToken}` },
+        }
+      );
+  
+      // Jika berhasil, tampilkan notifikasi sukses
+      toast.success("Berhasil Menyimpan.", { duration: 2000 });
+  
+      // Update state
+      setUserData(editableData);
+      setIsEditing(false);
+      setError(null);
+    } catch (error) {
+      // Jika gagal, tampilkan notifikasi error
+      console.error("Error saving data:", error);
+      setError("Failed to update user data.");
+      toast.error("Gagal menyimpan data.", { duration: 2000 });
+    } finally {
+    
+      toast.dismiss();
+      setSaving(false);
     }
   };
 
@@ -178,29 +225,11 @@ export default function ProfilPage() {
       setEditableData((prev) => (prev ? { ...prev, desa: "" } : null));
     }
 
-    if (id === "tempat_periksa_kehamilan") {
-      if (value === "Puskesmas") {
-        setEditableData((prev) =>
-          prev ? { ...prev, someOtherField: "" } : null
-        );
-      } else if (value === "Puskesmas") {
-        setEditableData((prev) =>
-          prev ? { ...prev, someOtherField: "" } : null
-        );
-      } else if (value === "Bidan Praktik Mandiri") {
-        setEditableData((prev) =>
-          prev ? { ...prev, someOtherField: "" } : null
-        );
-      } else if (value === "Klinik SPOG") {
-        setEditableData((prev) =>
-          prev ? { ...prev, someOtherField: "" } : null
-        );
-      }
-
-      if (!value) {
-        setError("Silakan pilih tempat pemeriksaan kehamilan.");
-      }
-    }
+    // Hapus error saat user mulai mengisi
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [id]: false,
+    }));
   };
 
   return (
@@ -221,18 +250,20 @@ export default function ProfilPage() {
         </div>
       </div>
 
-
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
 
       <div className="mx-5 mb-32">
         <p className="text-xl font-semibold">Data Kehamilan</p>
 
         <form className="flex flex-col gap-2.5">
+          {/* Field Hari Pertama Haid */}
           <div className="relative my-2.5">
             <input
               type="date"
               id="hari_pertama_haid"
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 ${
+                formErrors.hari_pertama_haid ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               value={
                 isEditing
@@ -253,10 +284,13 @@ export default function ProfilPage() {
             </label>
           </div>
 
+          {/* Field Wilayah Binaan */}
           <div className="relative my-2.5">
             <select
               id="wilayah_binaan"
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 ${
+                formErrors.wilayah_binaan ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               value={
                 isEditing
                   ? editableData?.wilayah_binaan || ""
@@ -281,10 +315,13 @@ export default function ProfilPage() {
             </label>
           </div>
 
+          {/* Field Kelurahan */}
           <div className="relative my-2.5">
             <select
               id="kelurahan"
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 ${
+                formErrors.kelurahan ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               value={
                 isEditing
                   ? editableData?.kelurahan || ""
@@ -310,10 +347,13 @@ export default function ProfilPage() {
             </label>
           </div>
 
+          {/* Field Tempat Pemeriksaan Kehamilan */}
           <div className="relative my-2.5">
             <select
               id="tempat_periksa_kehamilan"
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 ${
+                formErrors.tempat_periksa_kehamilan ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               value={
                 isEditing
                   ? editableData?.tempat_periksa_kehamilan || ""
@@ -326,9 +366,7 @@ export default function ProfilPage() {
                 Tempat Pemeriksaan Kehamilan
               </option>
               <option value="Puskesmas">Puskesmas</option>
-              <option value="Bidan Praktik Mandir">
-                Bidan Praktik Mandiri
-              </option>
+              <option value="Bidan Praktik Mandiri">Bidan Praktik Mandiri</option>
               <option value="Klinik SPOG">Klinik SPOG</option>
             </select>
             <label

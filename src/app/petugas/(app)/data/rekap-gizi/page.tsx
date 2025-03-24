@@ -66,6 +66,13 @@ interface RekapData {
   user: User;
 }
 
+const kelurahanData: { [key: string]: string[] } = {
+  "Puskesmas Sangkrah": ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
+  "Puskesmas Kratonan": ["Kratonan", "Danukusuman", "Joyotakan"],
+  "Puskesmas Gilingan": ["Gilingan", "Kestalan", "Punggawan"],
+  "Puskesmas Bukit Kemuning": ["Sukamenanti"],
+};
+
 const RekapHb = () => {
   const [data, setData] = useState<RekapData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -84,33 +91,55 @@ const RekapHb = () => {
     const fetchData = async () => {
       try {
         const authToken = localStorage.getItem("authTokenPetugas");
-
+  
         if (!authToken) {
           setError("No authorization token found.");
           return;
         }
-
-        const response = await axiosInstance.get(
-          "/petugas/data/rekap-konsumsi-gizi",
-          {
+  
+        // Ambil data petugas
+        const userResponse = await axiosInstance.get("/petugas/get-user", {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+  
+        if (userResponse.data.success) {
+          const userData = userResponse.data.data.user;
+  
+          // Ambil nama_puskesmas dari response
+          const namaPuskesmas = userData.puskesmas[0]?.nama_puskesmas || "";
+  
+          // Set wilayahBinaanPetugas berdasarkan nama_puskesmas
+          const wilayahBinaanPetugas = namaPuskesmas;
+  
+          // Ambil data rekap HB
+          const rekapResponse = await axiosInstance.get("/petugas/data/rekap-konsumsi-gizi", {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },
+          });
+  
+          if (rekapResponse.data.success) {
+            const sortedData = rekapResponse.data.data.sort(
+              (a: RekapData, b: RekapData) =>
+                a.user.name.localeCompare(b.user.name)
+            );
+  
+            // Filter kelurahan berdasarkan wilayah binaan petugas
+            if (wilayahBinaanPetugas && kelurahanData[wilayahBinaanPetugas]) {
+              setKelurahanOptions(kelurahanData[wilayahBinaanPetugas]);
+            } else {
+              setKelurahanOptions([]);
+            }
+            console.log("wilayah binaan :", wilayahBinaanPetugas)
+  
+            setData(sortedData);
+          } else {
+            setError("Failed to fetch rekap data.");
           }
-        );
-
-        if (response.data.success) {
-          const sortedData = response.data.data.sort(
-            (a: RekapData, b: RekapData) =>
-              a.user.name.localeCompare(b.user.name)
-          );
-          const kelurahanSet: Set<string> = new Set(
-            response.data.data.map((item: RekapData) => item.user.kelurahan)
-          );
-          setKelurahanOptions(Array.from(kelurahanSet));
-          setData(sortedData);
         } else {
-          setError("Failed to fetch data.");
+          setError("Failed to fetch user data.");
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -124,7 +153,7 @@ const RekapHb = () => {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
 
