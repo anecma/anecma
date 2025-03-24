@@ -49,15 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
     "/petugas/data/rekap-gizi",
   ].some((path) => currentPath.includes(path));
 
-  // Simpan status submenu "Data" ke localStorage
-  const handleDataMenuClick = () => {
-    if (!isDataSubmenuActive) {
-      const newStatus = !isDataMenuOpen;
-      setIsDataMenuOpen(newStatus);
-      localStorage.setItem("isDataMenuOpenPetugas", JSON.stringify(newStatus));
-    }
-  };
-
+  
   // Ambil status submenu "Data" dari localStorage saat komponen pertama kali di-render
   useEffect(() => {
     const savedMenuStatus = localStorage.getItem("isDataMenuOpenPetugas");
@@ -68,13 +60,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
 
   // Buka submenu "Data" jika path saat ini termasuk "/petugas/data"
   useEffect(() => {
+    const savedMenuStatus = localStorage.getItem("isDataMenuOpenAdmin");
+    if (savedMenuStatus !== null) {
+      setIsDataMenuOpen(JSON.parse(savedMenuStatus));
+    }
+
     if (currentPath.includes("/petugas/data") && !isDataMenuOpen) {
       setIsDataMenuOpen(true);
     }
-  }, [currentPath, isDataMenuOpen]);
 
-  // Ambil data pengguna
-  useEffect(() => {
     const fetchUserData = async () => {
       try {
         const authToken = localStorage.getItem("authTokenPetugas");
@@ -84,20 +78,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
           return;
         }
 
-        const response = await axiosInstance.get<ApiResponse>(
-          "petugas/get-user",
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
+        const response = await axiosInstance.get<User>("/user", {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
 
-        if (response.data && response.data.data && response.data.data.user) {
-          setUser(response.data.data.user);
-        } else {
-          setError("User data is missing or invalid");
-        }
+        setUser(response.data);
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -108,13 +95,19 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
     };
 
     fetchUserData();
-  }, []);
-
+  }, [currentPath, isDataMenuOpen]);
   // Fungsi untuk menentukan apakah path aktif
   const isActive = (path: string) => {
     return currentPath === path
       ? "bg-indigo-400 text-white"
       : "hover:bg-indigo-300";
+  };
+  const handleDataMenuClick = () => {
+    if (!isDataSubmenuActive) {
+      const newStatus = !isDataMenuOpen;
+      setIsDataMenuOpen(newStatus);
+      localStorage.setItem("isDataMenuOpenPetugas", JSON.stringify(newStatus));
+    }
   };
 
   return (
