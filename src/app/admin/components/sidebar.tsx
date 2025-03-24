@@ -205,6 +205,18 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                   </span>
                 </Link>
               </li>
+              <li className="mb-6">
+            <Link href="/admin/kakulator">
+              <span
+                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                  "/admin/kakulator"
+                )}`}
+              >
+                <FaCalculator className="text-xl mr-3" />
+                <span className="text-lg">kakulator</span>
+              </span>
+            </Link>
+          </li>
             </ul>
           ) : null}
 
@@ -257,19 +269,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               >
                 <FaTh className="text-xl mr-3" />
                 <span className="text-lg">Kategori</span>
-              </span>
-            </Link>
-          </li>
-
-          <li className="mb-6">
-            <Link href="/admin/kakulator">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/kakulator"
-                )}`}
-              >
-                <FaCalculator className="text-xl mr-3" />
-                <span className="text-lg">kakulator</span>
               </span>
             </Link>
           </li>
