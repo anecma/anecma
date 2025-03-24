@@ -34,6 +34,8 @@ export default function ProfilSuamiPage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  
+  const [formErrors, setFormErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function fetchUserData() {
@@ -62,13 +64,62 @@ export default function ProfilSuamiPage() {
 
   const handleSave = async () => {
     if (!userData) return;
-
+  
+    // Validasi form
+    const errors: Record<string, boolean> = {};
+    const errorMessages: string[] = []; // Array untuk menyimpan pesan error
+  
+    // Memeriksa setiap field dan menambahkan error jika kosong
+    if (!userData.name) {
+      errors.name = true;
+      errorMessages.push("Nama");
+    }
+    if (!userData.usia) {
+      errors.usia = true;
+      errorMessages.push("Tanggal Lahir");
+    }
+    if (!userData.no_hp) {
+      errors.no_hp = true;
+      errorMessages.push("No HP");
+    }
+    if (!userData.tempat_tinggal_ktp) {
+      errors.tempat_tinggal_ktp = true;
+      errorMessages.push("Tempat Tinggal Sesuai KTP");
+    }
+    if (!userData.tempat_tinggal_domisili) {
+      errors.tempat_tinggal_domisili = true;
+      errorMessages.push("Tempat Tinggal Domisili");
+    }
+    if (!userData.pendidikan_terakhir) {
+      errors.pendidikan_terakhir = true;
+      errorMessages.push("Pendidikan Terakhir");
+    }
+    if (!userData.pekerjaan) {
+      errors.pekerjaan = true;
+      errorMessages.push("Pekerjaan");
+    }
+  
+    // Menyimpan status error ke state formErrors
+    setFormErrors(errors);
+  
+    // Jika ada error, tampilkan satu pesan error yang mencakup semua field
+    if (errorMessages.length > 0) {
+      toast.error(`Harap isi field berikut: ${errorMessages.join(", ")}`, {
+        duration: 2000,
+      });
+      return; // Tidak lanjut ke penyimpanan jika ada error
+    }
+  
+    // Menandakan bahwa data sedang disimpan
     setSaving(true);
     setError(null);
-
-    const authToken = localStorage.getItem("authToken"); // Ambil token dari localStorage
-
+  
     try {
+      // Menampilkan loading sebelum menyimpan
+      toast.loading("Menyimpan data...");
+  
+      // Melakukan request POST untuk menyimpan data
+      const authToken = localStorage.getItem("authToken"); // Ambil token dari localStorage
       const response = await axiosInstance.post(
         "/suami/profil/update-data-diri",
         userData,
@@ -76,15 +127,21 @@ export default function ProfilSuamiPage() {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
+  
+      // Menampilkan pesan sukses jika berhasil
       toast.success("Berhasil Menyimpan.", { duration: 2000 });
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving data:", error);
       setError("Failed to save data.");
+      toast.error("Gagal menyimpan data.", { duration: 2000 });
     } finally {
+      // Menghapus pesan loading setelah selesai
+      toast.dismiss();
       setSaving(false);
     }
   };
+  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
@@ -125,30 +182,36 @@ export default function ProfilSuamiPage() {
 
       <div className="mx-5">
         <form className="flex flex-col gap-2.5">
+          {/* Field Nama */}
           <div className="relative my-2.5">
             <input
               type="text"
               id="name"
               value={userData?.name || ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm  text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.name ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
             />
             <label
-              htmlFor="name"
+              htmlFor="nama"
               className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
             >
               Nama
             </label>
           </div>
 
+          {/* Field Tanggal Lahir */}
           <div className="relative my-2.5">
             <input
               type="date"
               value={userData?.usia || ""}
               onChange={handleDateChange}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.usia ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" Tanggal Lahir "
               onClick={(e) => {
                 e.currentTarget.showPicker();
@@ -163,12 +226,15 @@ export default function ProfilSuamiPage() {
             </label>
           </div>
 
+          {/* Field No HP */}
           <div className="relative my-2.5">
             <input
               type="text"
               id="no_hp"
               value={userData?.no_hp ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm  text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.no_hp ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -181,12 +247,15 @@ export default function ProfilSuamiPage() {
             </label>
           </div>
 
+          {/* Field Tempat Tinggal KTP */}
           <div className="relative my-2.5">
             <input
               type="text"
               id="tempat_tinggal_ktp"
               value={userData?.tempat_tinggal_ktp ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm  text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.tempat_tinggal_ktp ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -199,12 +268,15 @@ export default function ProfilSuamiPage() {
             </label>
           </div>
 
+          {/* Field Tempat Tinggal Domisili */}
           <div className="relative my-2.5">
             <input
               type="text"
               id="tempat_tinggal_domisili"
               value={userData?.tempat_tinggal_domisili ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm  text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.tempat_tinggal_domisili ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -213,15 +285,18 @@ export default function ProfilSuamiPage() {
               htmlFor="tempat_tinggal_domisili"
               className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
             >
-              Tempat Tinggal Sesuai Domisili
+              Tempat Tinggal Domisili
             </label>
           </div>
 
+          {/* Field Pendidikan Terakhir */}
           <div className="relative my-2.5">
             <select
               id="pendidikan_terakhir"
               value={userData?.pendidikan_terakhir ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.pendidikan_terakhir ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               onChange={handleChange}
               disabled={!isEditing}
             >
@@ -241,11 +316,14 @@ export default function ProfilSuamiPage() {
             </label>
           </div>
 
+          {/* Field Pekerjaan */}
           <div className="relative my-2.5">
             <select
               id="pekerjaan"
               value={userData?.pekerjaan ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
+                formErrors.pekerjaan ? "border-red-500" : "border-gray-300"
+              } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               onChange={handleChange}
               disabled={!isEditing}
             >
@@ -268,16 +346,6 @@ export default function ProfilSuamiPage() {
               Pekerjaan
             </label>
           </div>
-          <Link
-            href="/suami/profile/update-data-password"
-            className="flex flex-row items-center justify-between bg-white-background p-5 rounded-2xl my-2.5"
-          >
-            <p>Ganti Kata Sandi</p>
-            <MdKeyboardArrowRight className="w-7 h-7" />
-          </Link>
-
-          
-         
         </form>
       </div>
     </main>
