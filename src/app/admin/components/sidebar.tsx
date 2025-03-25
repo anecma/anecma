@@ -206,14 +206,14 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
                 </Link>
               </li>
               <li className="mb-6">
-            <Link href="/admin/data/kakulator">
+            <Link href="/admin/data/faktor-resiko-anemia">
               <span
                 className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
-                  "/admin/data/kakulator"
+                  "/admin/data/faktor-resiko-anemia"
                 )}`}
               >
                 <FaList className="text-xl mr-3" />
-                <span className="text-lg">kakulator</span>
+                <span className="text-lg">Faktor Resiko </span>
               </span>
             </Link>
           </li>

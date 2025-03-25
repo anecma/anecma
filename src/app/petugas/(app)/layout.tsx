@@ -84,6 +84,8 @@ const getTitle = (pathname: string) => {
       return "Rekap TTD > 90";
     case "/petugas/data/rekap-gizi":
       return "Rekap Gizi";
+    case "/petugas/data/faktor-resiko-anemia":
+      return "Rekap Faktor Resiko Anemia";
     default:
       return "Admin Panel";
   }

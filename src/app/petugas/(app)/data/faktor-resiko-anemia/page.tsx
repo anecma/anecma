@@ -31,7 +31,12 @@ interface RekapData {
   user: User;
 }
 
-type Puskesmas = "Sangkrah" | "Kratonan" | "Gilingan" | "Bukit Kemuning";
+const kelurahanData: { [key: string]: string[] } = {
+  "Puskesmas Sangkrah": ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
+  "Puskesmas Kratonan": ["Kratonan", "Danukusuman", "Joyotakan"],
+  "Puskesmas Gilingan": ["Gilingan", "Kestalan", "Punggawan"],
+  "Puskesmas Bukit Kemuning": ["Sukamenanti"],
+};
 
 const DataTable: React.FC = () => {
   const [data, setData] = useState<RekapData[]>([]);
@@ -45,46 +50,72 @@ const DataTable: React.FC = () => {
   const [isAscending, setIsAscending] = useState(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [kelurahanOptions, setKelurahanOptions] = useState<string[]>([]);
-  const puskesmasOptions = [
-    "Sangkrah",
-    "Kratonan",
-    "Gilingan",
-    "Bukit Kemuning",
-  ];
-  const puskesmasToKelurahanMap = {
-    Sangkrah: ["Sangkrah", "Semanggi", "Kedunglumbu", "Mojo"],
-    Kratonan: ["Kratonan", "Danukusuman", "Joyotakan"],
-    Gilingan: ["Gilingan", "Kestalan", "Punggawan"],
-    "Bukit Kemuning": ["Sukamenanti"],
-  };
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const authTokenAdmin = localStorage.getItem("authTokenAdmin");
-        if (!authTokenAdmin) {
+        const authTokenPetugas = localStorage.getItem("authTokenPetugas");
+
+        if (!authTokenPetugas) {
           setError("No authentication token found.");
-          setLoading(false);
           return;
         }
 
-        const response = await axiosInstance.get(
-          "/admin/data/rekap-kalkulator-anemia",
-          {
-            headers: {
-              Authorization: `Bearer ${authTokenAdmin}`,
-            },
-          }
-        );
+        // Ambil data petugas
+        const userResponse = await axiosInstance.get("/petugas/get-user", {
+          headers: {
+            Authorization: `Bearer ${authTokenPetugas}`,
+          },
+        });
 
-        if (response.data.success && Array.isArray(response.data.data)) {
-          setData(response.data.data);
+        if (userResponse.data.success) {
+          const userData = userResponse.data.data.user;
+
+          // Ambil nama_puskesmas dari response
+          const namaPuskesmas = userData.puskesmas[0]?.nama_puskesmas || "";
+
+          // Set wilayahBinaanPetugas berdasarkan nama_puskesmas
+          const wilayahBinaanPetugas = namaPuskesmas;
+
+          // Ambil data rekap kalkulator anemia
+          const rekapResponse = await axiosInstance.get(
+            "/petugas/data/rekap-kalkulator-anemia",
+            {
+              headers: {
+                Authorization: `Bearer ${authTokenPetugas}`,
+              },
+            }
+          );
+
+          if (rekapResponse.data.success) {
+            const sortedData = rekapResponse.data.data.sort(
+              (a: RekapData, b: RekapData) => a.user.name.localeCompare(b.user.name)
+            );
+
+            // Filter kelurahan berdasarkan wilayah binaan petugas
+            if (wilayahBinaanPetugas && kelurahanData[wilayahBinaanPetugas]) {
+              setKelurahanOptions(kelurahanData[wilayahBinaanPetugas]);
+            } else {
+              setKelurahanOptions([]);
+            }
+
+            console.log("Wilayah binaan:", wilayahBinaanPetugas);
+            setData(sortedData);
+          } else {
+            setError("Failed to fetch rekap data.");
+          }
         } else {
-          setError("Failed to fetch valid data.");
+          setError("Failed to fetch user data.");
         }
       } catch (err) {
-        setError("Failed to fetch data.");
-        console.error(err);
+        // Menangani kesalahan
+        if (err instanceof Error) {
+          console.error("Error fetching data:", err.message);
+          setError(`Error fetching data: ${err.message}`);
+        } else {
+          console.error("Unknown error fetching data:", err);
+          setError("Unknown error fetching data.");
+        }
       } finally {
         setLoading(false);
       }
@@ -96,7 +127,7 @@ const DataTable: React.FC = () => {
   const handleExportToExcel = async () => {
     setIsLoading(true);
 
-    const authToken = localStorage.getItem("authTokenAdmin");
+    const authToken = localStorage.getItem("authTokenPetugas");
 
     if (!authToken) {
       setError("No authorization token found.");
@@ -106,7 +137,7 @@ const DataTable: React.FC = () => {
 
     try {
       const response = await axiosInstance.get(
-        "/admin/rekap-kalkulator-anemia/export-data",
+        "/petugas/rekap-kalkulator-anemia/export-data",
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -152,21 +183,6 @@ const DataTable: React.FC = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handlePuskesmasChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedPuskesmas = e.target.value as Puskesmas;
-    setSelectedPuskesmas(selectedPuskesmas);
-
-    if (selectedPuskesmas) {
-      setKelurahanOptions(puskesmasToKelurahanMap[selectedPuskesmas]);
-    } else {
-      setKelurahanOptions([]);
-    }
-    setSelectedKelurahan("");
-  };
-
-  const handleKelurahanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedKelurahan(e.target.value);
-  };
 
   const filteredData = data.filter((item) => {
     const nameMatch = item.user.name
@@ -221,70 +237,43 @@ const DataTable: React.FC = () => {
 
   return (
     <div className="bg-white p-4">
-      <div className="flex justify-between items-center mb-4 p-2">
-        <div className="flex space-x-4">
-          {/* Kelurahan Dropdown */}
-
-          <div className="relative w-full max-w-xs">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedPuskesmas}
-              onChange={handlePuskesmasChange}
-            >
-              <option value="">Pilih Puskesmas</option>
-              {puskesmasOptions.map((puskesmas, index) => (
-                <option key={index} value={puskesmas}>
-                  {puskesmas}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <Image
-                src="/icon/Vector.png"
-                alt="Sort by Puskesmas"
-                width={20}
-                height={20}
-                className="object-contain"
-              />
+          <div className="flex justify-between items-center mb-4 p-2 space-x-4">
+              {/* Kelurahan Dropdown */}
+              <div className="relative w-full max-w-xs">
+                <select
+                  value={selectedKelurahan}
+                  onChange={(e) => setSelectedKelurahan(e.target.value)}
+                  className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg w-full appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">Pilih Kelurahan</option>
+                  {kelurahanOptions.map((kelurahan, index) => (
+                    <option key={index} value={kelurahan}>
+                      {kelurahan}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
+                  <Image
+                    src="/icon/Vector.png"
+                    alt="Sort by Puskesmas"
+                    width={20}
+                    height={20}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+      
+              {/* Search Input */}
+              <div className="relative w-full md:w-1/3">
+                <input
+                  type="text"
+                  placeholder="Search by Name..."
+                  onChange={handleSearch}
+                  className="border p-3 bg-gray-200 rounded-lg w-full pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-500 p-2 rounded-full h-8 w-8 text-white" />
+              </div>
             </div>
-          </div>
-          {/* Dropdown for Kelurahan */}
-          <div className="relative w-full">
-            <select
-              className="bg-gray-200 p-2 pl-4 pr-10 rounded-lg appearance-none w-full"
-              value={selectedKelurahan}
-              onChange={handleKelurahanChange}
-            >
-              <option value="">Pilih Kelurahan</option>
-              {kelurahanOptions.map((kelurahan, index) => (
-                <option key={index} value={kelurahan}>
-                  {kelurahan}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-3 bg-indigo-500 rounded-md p-2 top-1/2 transform -translate-y-1/2">
-              <Image
-                src="/icon/Vector.png"
-                alt="Sort by Kelurahan"
-                width={20}
-                height={20}
-                className="object-contain"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Search Input with Icon */}
-        <div className="relative ml-auto w-1/3">
-          <input
-            type="text"
-            placeholder="Search by Name..."
-            onChange={handleSearch}
-            className="border p-3 bg-gray-200 rounded-lg w-full pr-12 focus:outline-none"
-          />
-          <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-indigo-500 p-2 rounded-full h-8 w-8 text-white" />
-        </div>
-      </div>
       <div className="p-4 overflow-x-auto">
         <table className="table-auto w-full border-collapse border border-gray-200">
           <thead>
@@ -309,7 +298,7 @@ const DataTable: React.FC = () => {
               <th className="border border-black p-2 w-32">
                 Konsumsi TTD 7 Hari Terakhir
               </th>
-              <th className="border border-black p-2 w-32">Lila</th>
+              <th className="border border-black p-2 w-32">LILA</th>
               <th className="border border-black p-2 w-32">Hasil HB</th>
               <th className="border border-black p-2 w-32">Skor Resiko</th>
               <th className="border border-black p-2 w-32">Resiko</th>
@@ -338,6 +327,9 @@ const DataTable: React.FC = () => {
                   </td>
                   <td className="border border-black p-2">
                     <div className="w-24 h-6 bg-gray-300 rounded-lg"></div>
+                  </td>
+                  <td className="border border-black p-2">
+                    <div className="w-32 h-6 bg-gray-300 rounded-lg"></div>
                   </td>
                   <td className="border border-black p-2">
                     <div className="w-32 h-6 bg-gray-300 rounded-lg"></div>
