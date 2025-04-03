@@ -13,6 +13,26 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET!,
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "none", // Ubah ke 'none' jika diperlukan (dengan secure true)
+        path: "/",
+        secure: true,
+      },
+    },
+    csrfToken: {
+      name: "next-auth.csrf-token",
+      options: {
+        httpOnly: false,
+        sameSite: "none", // Atur sesuai kebutuhan, misal 'none' jika terjadi masalah cross-site
+        path: "/",
+        secure: true,
+      },
+    },
+  },
   callbacks: {
     async signIn({ account, user }) {
       if (account?.provider === "google") {
