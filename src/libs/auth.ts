@@ -9,30 +9,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
   secret: process.env.NEXTAUTH_SECRET!,
-  cookies: {
-    sessionToken: {
-      name: `__Secure-next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "none", // Ubah ke 'none' jika diperlukan (dengan secure true)
-        path: "/",
-        secure: true,
-      },
-    },
-    csrfToken: {
-      name: "next-auth.csrf-token",
-      options: {
-        httpOnly: false,
-        sameSite: "none", // Atur sesuai kebutuhan, misal 'none' jika terjadi masalah cross-site
-        path: "/",
-        secure: true,
-      },
-    },
-  },
   callbacks: {
     async signIn({ account, user }) {
       if (account?.provider === "google") {
@@ -66,9 +43,6 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       session.accessToken = token.accessToken as string;
       return session;
-    },
-    async redirect({ url, baseUrl }) {
-      return baseUrl;
     },
   },
 };
