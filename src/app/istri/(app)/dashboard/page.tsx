@@ -25,7 +25,7 @@ interface UserData {
   resiko_anemia_terbaru: {
     hasil_hb: number;
     resiko: string;
-  }[];
+  };
 }
 
 interface ApiResponse {
