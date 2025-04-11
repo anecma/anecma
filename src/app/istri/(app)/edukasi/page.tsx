@@ -40,7 +40,7 @@ interface Kategori {
 interface UserData {
   user: {
     id: number;
-    resiko_anemia: { id: number; user_id: number; resiko: string }[];
+    resiko_anemia_terbaru: { id: number; user_id: number; resiko: string }[];
   };
 }
 
@@ -72,7 +72,7 @@ export default function EdukasiPage() {
           });
           if (response.data.success && response.data.data.user) {
             const resiko =
-              response.data.data.user.resiko_anemia[0]?.resiko || null;
+              response.data.data.user.resiko_anemia_terbaru.resiko || null;
             setUserResiko(resiko);
           } else {
             console.error("Unexpected response format:", response.data);
