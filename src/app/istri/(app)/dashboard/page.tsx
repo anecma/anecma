@@ -22,10 +22,10 @@ declare module "next-auth" {
 interface UserData {
   name: string;
   usia: number;
-  resiko_anemia_terbaru: {
-    hasil_hb: number;
-    resiko: string;
-  };
+  resiko_anemia_terbaru?: {
+    hasil_hb?: number;
+    resiko?: string;
+  } | null;
 }
 
 interface ApiResponse {
@@ -65,9 +65,9 @@ export default function DashboardPage() {
   }, [session, status]);
 
   // Ambil nilai HB dan risiko dari userData
-  const hbValue = userData?.resiko_anemia_terbaru.hasil_hb || "-";
+  const hbValue = userData?.resiko_anemia_terbaru?.hasil_hb ?? "-";
   const anemiaRisk =
-    userData?.resiko_anemia_terbaru.resiko || "Data tidak tersedia";
+    userData?.resiko_anemia_terbaru?.resiko ?? "Data tidak tersedia";
 
   return (
     <main>
