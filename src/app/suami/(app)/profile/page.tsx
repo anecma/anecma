@@ -353,14 +353,14 @@ export default function ProfilSuamiPage() {
               Pekerjaan
             </label>
           </div>
+          <Link
+            href="/suami/profile/update-data-password"
+            className="flex flex-row items-center justify-between bg-white-background p-5 rounded-2xl my-2.5"
+          >
+            <p>Ganti Kata Sandi</p>
+            <MdKeyboardArrowRight className="w-7 h-7" />
+          </Link>
         </form>
-        <Link
-          href="/suami/profile/update-data-password"
-          className="flex flex-row items-center justify-between bg-white-background p-5 rounded-2xl my-2.5"
-        >
-          <p>Ganti Kata Sandi</p>
-          <MdKeyboardArrowRight className="w-7 h-7" />
-        </Link>
       </div>
     </main>
   );
