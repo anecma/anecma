@@ -4,7 +4,6 @@ import { MdOutlinePregnantWoman } from "react-icons/md";
 import Image from "next/image";
 import Layout from "../layout";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
 
 // Define types for the updated API response
@@ -39,7 +38,6 @@ const DashboardSuami = () => {
   const [userDataSuami, setUserDataSuami] = useState<
     ApiResponse["data"] | null
   >(null);
-  const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,7 +62,7 @@ const DashboardSuami = () => {
         } finally {
           setLoading(false);
         }
-      } else if (status === "unauthenticated") {
+      } else {
         setError("You need to be logged in.");
         setLoading(false);
       }
