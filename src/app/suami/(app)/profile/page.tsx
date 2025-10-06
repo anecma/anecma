@@ -11,7 +11,6 @@ import axiosInstance from "@/libs/axios";
 import { Toaster, toast } from "sonner";
 import EditSaveButton from "@/components/edit-save-button.tsx/edit-save-button";
 
-
 interface UserData {
   name: string;
   usia?: string | null;
@@ -34,7 +33,7 @@ export default function ProfilSuamiPage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  
+
   const [formErrors, setFormErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -43,9 +42,12 @@ export default function ProfilSuamiPage() {
 
       if (authToken) {
         try {
-          const response = await axiosInstance.get<ApiResponse>("/suami/get-user", {
-            headers: { Authorization: `Bearer ${authToken}` },
-          });
+          const response = await axiosInstance.get<ApiResponse>(
+            "/suami/get-user",
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
           setUserData(response.data.data.user);
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -64,11 +66,11 @@ export default function ProfilSuamiPage() {
 
   const handleSave = async () => {
     if (!userData) return;
-  
+
     // Validasi form
     const errors: Record<string, boolean> = {};
     const errorMessages: string[] = []; // Array untuk menyimpan pesan error
-  
+
     // Memeriksa setiap field dan menambahkan error jika kosong
     if (!userData.name) {
       errors.name = true;
@@ -98,10 +100,10 @@ export default function ProfilSuamiPage() {
       errors.pekerjaan = true;
       errorMessages.push("Pekerjaan");
     }
-  
+
     // Menyimpan status error ke state formErrors
     setFormErrors(errors);
-  
+
     // Jika ada error, tampilkan satu pesan error yang mencakup semua field
     if (errorMessages.length > 0) {
       toast.error(`Harap isi field berikut: ${errorMessages.join(", ")}`, {
@@ -109,15 +111,15 @@ export default function ProfilSuamiPage() {
       });
       return; // Tidak lanjut ke penyimpanan jika ada error
     }
-  
+
     // Menandakan bahwa data sedang disimpan
     setSaving(true);
     setError(null);
-  
+
     try {
       // Menampilkan loading sebelum menyimpan
       toast.loading("Menyimpan data...");
-  
+
       // Melakukan request POST untuk menyimpan data
       const authToken = localStorage.getItem("authToken"); // Ambil token dari localStorage
       const response = await axiosInstance.post(
@@ -127,7 +129,7 @@ export default function ProfilSuamiPage() {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
-  
+
       // Menampilkan pesan sukses jika berhasil
       toast.success("Berhasil Menyimpan.", { duration: 2000 });
       setIsEditing(false);
@@ -141,7 +143,6 @@ export default function ProfilSuamiPage() {
       setSaving(false);
     }
   };
-  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
@@ -161,7 +162,7 @@ export default function ProfilSuamiPage() {
     const selectedDate = e.target.value;
     setUserData((prevState) => ({
       ...prevState,
-      usia: selectedDate, 
+      usia: selectedDate,
     }));
   };
   return (
@@ -254,7 +255,9 @@ export default function ProfilSuamiPage() {
               id="tempat_tinggal_ktp"
               value={userData?.tempat_tinggal_ktp ?? ""}
               className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
-                formErrors.tempat_tinggal_ktp ? "border-red-500" : "border-gray-300"
+                formErrors.tempat_tinggal_ktp
+                  ? "border-red-500"
+                  : "border-gray-300"
               } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
@@ -275,7 +278,9 @@ export default function ProfilSuamiPage() {
               id="tempat_tinggal_domisili"
               value={userData?.tempat_tinggal_domisili ?? ""}
               className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
-                formErrors.tempat_tinggal_domisili ? "border-red-500" : "border-gray-300"
+                formErrors.tempat_tinggal_domisili
+                  ? "border-red-500"
+                  : "border-gray-300"
               } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               placeholder=" "
               onChange={handleChange}
@@ -295,7 +300,9 @@ export default function ProfilSuamiPage() {
               id="pendidikan_terakhir"
               value={userData?.pendidikan_terakhir ?? ""}
               className={`block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border ${
-                formErrors.pendidikan_terakhir ? "border-red-500" : "border-gray-300"
+                formErrors.pendidikan_terakhir
+                  ? "border-red-500"
+                  : "border-gray-300"
               } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
               onChange={handleChange}
               disabled={!isEditing}
@@ -347,6 +354,13 @@ export default function ProfilSuamiPage() {
             </label>
           </div>
         </form>
+        <Link
+          href="/suami/profile/update-data-password"
+          className="flex flex-row items-center justify-between bg-white-background p-5 rounded-2xl my-2.5"
+        >
+          <p>Ganti Kata Sandi</p>
+          <MdKeyboardArrowRight className="w-7 h-7" />
+        </Link>
       </div>
     </main>
   );
