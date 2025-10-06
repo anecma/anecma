@@ -36,7 +36,9 @@ interface ApiResponse {
 }
 
 const DashboardSuami = () => {
-  const [userDataSuami, setUserDataSuami] = useState<ApiResponse["data"] | null>(null);
+  const [userDataSuami, setUserDataSuami] = useState<
+    ApiResponse["data"] | null
+  >(null);
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,12 +48,15 @@ const DashboardSuami = () => {
 
   useEffect(() => {
     async function fetchUserData() {
-      if (status === "authenticated" && token) {
+      if (token) {
         try {
           // Fetch data for suami
-          const suamiResponse = await axiosInstance.get<ApiResponse>("/suami/get-user", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const suamiResponse = await axiosInstance.get<ApiResponse>(
+            "/suami/get-user",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           setUserDataSuami(suamiResponse.data.data);
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -157,9 +162,7 @@ const DashboardSuami = () => {
               </div>
               <div className="flex flex-row space-x-2 items-center">
                 <MdOutlinePregnantWoman className="w-6 h-6 text-white" />
-                <p className="text-white">
-                  {usia_kehamilan_istri} minggu
-                </p>
+                <p className="text-white">{usia_kehamilan_istri} minggu</p>
               </div>
             </div>
             <div>
